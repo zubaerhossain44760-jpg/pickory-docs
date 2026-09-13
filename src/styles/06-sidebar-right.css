@@ -1,0 +1,127 @@
+/* ============================================================================
+   8. COLUMN 3: RIGHT TOC SIDEBAR (SINGLE-CLASS)
+   ============================================================================ */
+.doc-sidebar-right {
+  width: var(--toc-w);
+  min-width: var(--toc-w);
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  background-color: var(--color-canvas);
+  border-left: 1px solid var(--color-border);
+  padding: var(--space-10) var(--space-4) var(--space-8);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  user-select: none;
+  scrollbar-width: auto;
+  scrollbar-color: var(--color-border-hover) var(--color-surface-subtle);
+  z-index: 20;
+}
+
+/* Webkit scrollbar for right sidebar */
+.doc-sidebar-right::-webkit-scrollbar {
+  width: 10px;
+}
+
+.doc-sidebar-right::-webkit-scrollbar-track {
+  background: var(--color-surface-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.doc-sidebar-right::-webkit-scrollbar-thumb {
+  background: var(--color-border-hover);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--color-surface-subtle);
+}
+
+.doc-sidebar-right::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+
+.doc-toc-section-title {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--space-4);
+  padding-left: var(--space-2);
+  line-height: 1.3;
+}
+
+.doc-toc-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-left: 2px solid var(--color-border-subtle);
+  padding-left: 0;
+  margin-bottom: 0;
+  transition: opacity 120ms ease;
+}
+
+.doc-toc-item {
+  position: relative;
+  list-style: none;
+  margin-bottom: 0;
+}
+
+.doc-toc-link {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  padding: 10px 14px 10px 14px;
+  margin-left: -2px;
+  border: 1px solid transparent;
+  border-left: 2.5px solid transparent;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  line-height: 1.35;
+  transition: color var(--transition), border-color var(--transition), background-color var(--transition);
+}
+
+.doc-toc-link:hover {
+  color: var(--color-text);
+  border-color: rgba(255, 255, 255, 0.08);
+  border-left-color: var(--color-success);
+  background-color: rgba(255, 255, 255, 0.035);
+}
+
+.doc-toc-item.is-active .doc-toc-link {
+  color: var(--color-success);
+  font-weight: 700;
+  border-color: var(--color-success-alpha);
+  border-left-color: var(--color-success);
+  background-color: var(--color-success-alpha);
+}
+
+
+.doc-toc-footer {
+  margin-top: auto;
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.doc-toc-ext-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.doc-toc-ext-link:hover {
+  color: var(--color-brand);
+}
+
+.doc-toc-ext-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}

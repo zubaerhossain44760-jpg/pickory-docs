@@ -47,16 +47,28 @@
   --gray-900: #111827;
 
   /* Primitive Semantic Colors */
-  --emerald-50: #ecfdf5;
-  --emerald-100: #d1fae5;
-  --emerald-200: #a7f3d0;
-  --emerald-300: #6ee7b7;
-  --emerald-400: #34d399;
-  --emerald-500: #10b981;
-  --emerald-600: #059669;
-  --emerald-700: #047857;
-  --emerald-800: #065f46;
-  --emerald-900: #064e3b;
+  --magenta-50: #fdf4ff;
+  --magenta-100: #fae8ff;
+  --magenta-200: #f5d0fe;
+  --magenta-300: #f0abfc;
+  --magenta-400: #e879f9;
+  --magenta-500: #d946ef;
+  --magenta-600: #c026d3;
+  --magenta-700: #a21caf;
+  --magenta-800: #86198f;
+  --magenta-900: #701a75;
+
+  /* Aliased for backward compatibility */
+  --emerald-50: var(--magenta-50);
+  --emerald-100: var(--magenta-100);
+  --emerald-200: var(--magenta-200);
+  --emerald-300: var(--magenta-300);
+  --emerald-400: var(--magenta-400);
+  --emerald-500: var(--magenta-500);
+  --emerald-600: var(--magenta-600);
+  --emerald-700: var(--magenta-700);
+  --emerald-800: var(--magenta-800);
+  --emerald-900: var(--magenta-900);
 
   --amber-50: #fffbeb;
   --amber-100: #fef3c7;
@@ -91,10 +103,10 @@
   --color-brand-glow: rgba(132, 115, 255, 0.28);
 
   /* Semantic Colors */
-  --color-success: var(--emerald-500);
-  --color-success-hover: var(--emerald-400);
-  --color-success-alpha: rgba(16, 185, 129, 0.12);
-  --color-success-glow: rgba(16, 185, 129, 0.28);
+  --color-success: var(--magenta-500);
+  --color-success-hover: var(--magenta-400);
+  --color-success-alpha: rgba(217, 70, 239, 0.14);
+  --color-success-glow: rgba(217, 70, 239, 0.28);
 
   --color-warning: var(--amber-500);
   --color-warning-hover: var(--amber-400);
@@ -391,7 +403,7 @@ body {
   text-decoration: none;
   border: 1px solid transparent;
   border-left: 3px solid transparent;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   transition: color var(--transition), border-color var(--transition), background-color var(--transition);
   line-height: 1.25;
 }
@@ -411,7 +423,6 @@ body {
   background-color: var(--nav-link-bg-active);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
 }
-
 
 /* ============================================================================
    6. COLUMN 2: CENTER CANVAS & SEMANTIC BASE LAYER

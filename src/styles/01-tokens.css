@@ -1,0 +1,255 @@
+/**
+ * ============================================================================
+ * Pickory Product Filter - Developer Documentation Design System
+ * File: styles.css
+ * Architecture: Semantic HTML Base Layer + Single-Class UI Components
+ *
+ * DESIGN SYSTEM SPECIFICATIONS:
+ * - W3C DTCG Compliant Three-Tier Token Architecture (Primitive → Semantic → Component)
+ * - Single-class architecture: No dual-class patterns or compound aliases
+ * - Enhanced scrollbar ergonomics with cross-browser consistency
+ * - Content typography powered by semantic element selectors inside <main>
+ * - Modular UI Types: .ui-card, .ui-callout (strictly <div>), .ui-badge, .ui-code-window, .ui-flowchart
+ * ============================================================================
+ */
+
+/* ============================================================================
+   1. CSS DESIGN TOKENS (W3C DTCG COMPLIANT THREE-TIER ARCHITECTURE)
+   ============================================================================ */
+:root {
+  /* ----------------------------------------------------------------------------
+     1.1 PRIMITIVE TOKENS (Raw Color Values - Platform Agnostic)
+     ---------------------------------------------------------------------------- */
+
+  /* Primitive Blue Scale */
+  --blue-50: #eef2ff;
+  --blue-100: #e0e7ff;
+  --blue-200: #c7d2fe;
+  --blue-300: #a5b4fc;
+  --blue-400: #818cf8;
+  --blue-500: #3867f5;
+  /* Current brand color base */
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+  --blue-800: #1e40af;
+  --blue-900: #1e3a8a;
+
+  /* Primitive Gray Scale */
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+
+  /* Primitive Semantic Colors */
+  --magenta-50: #fdf4ff;
+  --magenta-100: #fae8ff;
+  --magenta-200: #f5d0fe;
+  --magenta-300: #f0abfc;
+  --magenta-400: #e879f9;
+  --magenta-500: #d946ef;
+  --magenta-600: #c026d3;
+  --magenta-700: #a21caf;
+  --magenta-800: #86198f;
+  --magenta-900: #701a75;
+
+  /* Aliased for backward compatibility */
+  --emerald-50: var(--magenta-50);
+  --emerald-100: var(--magenta-100);
+  --emerald-200: var(--magenta-200);
+  --emerald-300: var(--magenta-300);
+  --emerald-400: var(--magenta-400);
+  --emerald-500: var(--magenta-500);
+  --emerald-600: var(--magenta-600);
+  --emerald-700: var(--magenta-700);
+  --emerald-800: var(--magenta-800);
+  --emerald-900: var(--magenta-900);
+
+  --amber-50: #fffbeb;
+  --amber-100: #fef3c7;
+  --amber-200: #fde68a;
+  --amber-300: #fcd34d;
+  --amber-400: #fbbf24;
+  --amber-500: #f59e0b;
+  --amber-600: #d97706;
+  --amber-700: #b45309;
+  --amber-800: #92400e;
+  --amber-900: #78350f;
+
+  --cyan-50: #ecfeff;
+  --cyan-100: #cffafe;
+  --cyan-200: #a5f3fc;
+  --cyan-300: #67e8f9;
+  --cyan-400: #22d3ee;
+  --cyan-500: #06b6d4;
+  --cyan-600: #0891b2;
+  --cyan-700: #0e7490;
+  --cyan-800: #155e75;
+  --cyan-900: #164e63;
+
+  /* ----------------------------------------------------------------------------
+     1.2 SEMANTIC TOKENS (Intent-Based Aliases - Point to Primitives)
+     ---------------------------------------------------------------------------- */
+
+  /* Brand Colors */
+  --color-brand: var(--blue-500);
+  --color-brand-hover: var(--blue-600);
+  --color-brand-alpha: rgba(132, 115, 255, 0.14);
+  --color-brand-glow: rgba(132, 115, 255, 0.28);
+
+  /* Semantic Colors */
+  --color-success: var(--magenta-500);
+  --color-success-hover: var(--magenta-400);
+  --color-success-alpha: rgba(217, 70, 239, 0.14);
+  --color-success-glow: rgba(217, 70, 239, 0.28);
+
+  --color-warning: var(--amber-500);
+  --color-warning-hover: var(--amber-400);
+  --color-warning-alpha: rgba(245, 158, 11, 0.12);
+
+  --color-info: var(--cyan-500);
+  --color-info-hover: var(--cyan-400);
+  --color-info-alpha: rgba(6, 182, 212, 0.12);
+
+  /* Surface & Background Semantics */
+  --color-canvas: #19191c;
+  /* Custom dark canvas, mapped from gray-900 with slight tint */
+  --color-surface: #252528;
+  /* Custom dark surface, mapped from gray-800 with slight tint */
+  --color-surface-hover: #2c2c30;
+  /* Custom hover state */
+  --color-surface-subtle: #18181b;
+  /* Custom subtle surface */
+
+  /* Structural Border Semantics */
+  --color-border: #303033;
+  /* Custom border, mapped from gray-700 with slight tint */
+  --color-border-subtle: #27272a;
+  /* Custom subtle border */
+  --color-border-hover: #424248;
+  /* Custom hover border */
+
+  /* Typography Semantics */
+  --color-text: #f4f4f4;
+  /* Custom text color */
+  --color-text-muted: #b5b5b5;
+  /* Custom muted text */
+
+  /* ----------------------------------------------------------------------------
+     1.3 COMPONENT TOKENS (Component-Specific - Point to Semantic Tokens)
+     ---------------------------------------------------------------------------- */
+
+  /* Button Component Tokens */
+  --button-primary-bg: var(--color-brand);
+  --button-primary-bg-hover: var(--color-brand-hover);
+  --button-primary-text: #ffffff;
+
+  /* Card Component Tokens */
+  --card-bg: var(--color-surface);
+  --card-bg-hover: var(--color-surface-hover);
+  --card-border: var(--color-border);
+
+  /* Badge Component Tokens */
+  --badge-bg-brand: var(--color-brand-alpha);
+  --badge-bg-success: var(--color-success-alpha);
+  --badge-bg-warning: var(--color-warning-alpha);
+  --badge-bg-info: var(--color-info-alpha);
+  --badge-text-brand: var(--color-brand);
+  --badge-text-success: var(--color-success);
+  --badge-text-warning: var(--color-warning);
+  --badge-text-info: var(--color-info);
+
+  /* Navigation Component Tokens */
+  --nav-link-bg-hover: var(--color-surface-hover);
+  --nav-link-bg-active: rgba(79, 110, 247, 0.12);
+  --nav-link-border-active: var(--color-brand);
+
+  /* Effect Tokens */
+  --effect-brand-glow-large: rgba(20, 105, 250, 0.28);
+  --effect-brand-glow-medium: rgba(20, 105, 250, 0.22);
+  --effect-brand-glow-small: rgba(20, 105, 250, 0.12);
+  --effect-success-glow: rgba(16, 185, 129, 0.28);
+
+  /* Custom Background Colors */
+  --bg-canvas-dark: #0c0e14;
+  --bg-card-dark: #151824;
+  --bg-code-window: #0b0e17;
+  --bg-flowchart: #131622;
+  --bg-flowchart-active: #14231b;
+
+  /* Custom Text Colors */
+  --text-white: #ffffff;
+  --text-lead: #c0c6d4;
+  --text-code: #d1c9ff;
+  --text-code-window: #e6edf3;
+  --text-filepath: #79c0ff;
+
+  /* Syntax Highlighting Colors */
+  --syntax-keyword: #ff7b72;
+  --syntax-function: #d2a8ff;
+  --syntax-string: #a5d6ff;
+  --syntax-comment: #6e7681;
+  --syntax-type: #ffa657;
+  --syntax-variable: #79c0ff;
+
+  /* Typography Scale - Enterprise Grade (Inter + JetBrains Mono) */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --font-xs: 0.75rem;
+  /* 12px */
+  --font-base: 0.875rem;
+  /* 14px */
+  --font-lg: 1.0625rem;
+  /* 17px */
+  --font-xl: 1.25rem;
+  /* 20px */
+  --font-2xl: 1.625rem;
+  /* 26px */
+  --font-3xl: 2.35rem;
+  /* 38px */
+
+  --color-text: #f4f4f4;
+  --color-text-muted: #b5b5b5;
+
+  /* Spacing Scale (4px modular) */
+  --space-1: 0.25rem;
+  /* 4px */
+  --space-2: 0.5rem;
+  /* 8px */
+  --space-3: 0.75rem;
+  /* 12px */
+  --space-4: 1rem;
+  /* 16px */
+  --space-5: 1.25rem;
+  /* 20px */
+  --space-6: 1.5rem;
+  /* 24px */
+  --space-8: 2rem;
+  /* 32px */
+  --space-10: 2.5rem;
+  /* 40px */
+  --space-12: 3rem;
+  /* 48px */
+  --space-16: 4rem;
+  /* 64px */
+
+  /* Border Radii */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-full: 9999px;
+
+  /* Layout Constraints */
+  --sidebar-w: 300px;
+  --toc-w: 250px;
+  --content-w: 1000px;
+
+  /* Smooth Transitions (Enterprise Grade) */
+  --transition: 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}

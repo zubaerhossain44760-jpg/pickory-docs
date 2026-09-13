@@ -1,0 +1,76 @@
+/* ============================================================================
+   2. ACCESSIBILITY BASE STYLES
+   ============================================================================ */
+
+/* Skip Navigation Link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-brand);
+  color: white;
+  padding: 8px 16px;
+  z-index: 1000;
+  transition: top 0.3s;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: var(--font-base);
+  border-radius: 0 0 var(--radius-md) 0;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+
+/* Enhanced Focus Management */
+*:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+/* Specific focus states for interactive elements */
+.doc-nav-link:focus-visible,
+.doc-toc-link:focus-visible,
+.code-tab-btn:focus-visible,
+.copy-btn:focus-visible,
+.flow-node:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: -2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================================================
+   4. SCOPED RESET & ISOLATED CANVAS LAYOUT
+   ============================================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  background-color: var(--color-canvas);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.pickory-docs-canvas {
+  min-height: 100vh;
+  width: 100%;
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr) var(--toc-w);
+  background-color: var(--color-canvas);
+  color: var(--color-text);
+  position: relative;
+  overflow-x: clip;
+}
