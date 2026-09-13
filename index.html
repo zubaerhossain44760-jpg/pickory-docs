@@ -1,0 +1,3314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pickory Product Filter — Developer Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Skip Navigation Link for Accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Isolated Embeddable Documentation Canvas -->
+  <div class="pickory-docs-canvas" id="pickory-docs-root">
+
+    <!-- ======================================================================
+         COLUMN 1: LEFT NAVIGATION (Sticky, Fixed Width ~250px)
+         ====================================================================== -->
+    <aside class="doc-sidebar-left" aria-label="Documentation Navigation">
+      <nav class="doc-nav-tree" aria-label="Documentation Navigation">
+        <ul class="doc-nav-list">
+          <li class="doc-nav-item is-active">
+            <a href="#core-architecture" class="doc-nav-link">
+              <span>1. Core Architecture &amp; System Foundation</span>
+              <span class="ui-badge" data-variant="brand">CORE</span>
+            </a>
+          </li>
+          <li class="doc-nav-item">
+            <a href="#client-reactive-engine" class="doc-nav-link">
+              <span>2. Client Reactive Engine &amp; UI Layer</span>
+              <span class="ui-badge" data-variant="brand">CLIENT</span>
+            </a>
+          </li>
+          <li class="doc-nav-item">
+            <a href="#ssr-query-engine" class="doc-nav-link">
+              <span>3. SSR &amp; Query Execution Engine</span>
+              <span class="ui-badge">SSR/SQL</span>
+            </a>
+          </li>
+          <li class="doc-nav-item">
+            <a href="#database-indexing-storage" class="doc-nav-link">
+              <span>4. Database Indexing, Storage &amp; Sorting</span>
+              <span class="ui-badge" data-variant="brand">STORAGE</span>
+            </a>
+          </li>
+          <li class="doc-nav-item">
+            <a href="#rest-api-lifecycle" class="doc-nav-link">
+              <span>5. REST API, Fragment Rendering &amp; Lifecycle</span>
+              <span class="ui-badge">API/DOM</span>
+            </a>
+          </li>
+          <li class="doc-nav-item">
+            <a href="#admin-security-extensibility" class="doc-nav-link">
+              <span>6. Admin Architecture, Security &amp; Extensibility</span>
+              <span class="ui-badge">ADMIN/SEC</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- ======================================================================
+         COLUMN 2: CENTER CANVAS & SEMANTIC CONTENT
+         ====================================================================== -->
+    <main class="doc-center-canvas" id="main-content" tabindex="-1">
+      <div class="doc-content-wrapper">
+
+
+        <!-- ==================================================================
+             TOPIC 1: CORE ARCHITECTURE & SYSTEM FOUNDATION
+             ================================================================== -->
+        <section class="doc-section" id="core-architecture">
+
+          <!-- Document Header Block -->
+          <header class="doc-header-block">
+            <h1 class="doc-main-title">1. Core Architecture &amp; System Foundation</h1>
+            <p class="doc-lead-paragraph">
+              Pickory Product Filter provides an enterprise-grade, zero-dependency client/server architecture for high-performance WooCommerce faceted filtering. Engineered to eliminate client-state drift and bypass relational <code>wp_postmeta</code> joins, the engine guarantees deterministic sub-50ms query resolution under high concurrent traffic.
+            </p>
+            <div class="doc-meta-pills">
+              <span class="ui-badge" data-variant="success"><span class="doc-pill-dot"></span>Production Ready</span>
+              <span class="ui-badge">HPOS Compatible</span>
+              <span class="ui-badge">Priority 20 Engine</span>
+              <span class="ui-badge">URL SSOT Invariant</span>
+              <span class="ui-badge">Zero Runtime Dep</span>
+            </div>
+          </header>
+
+          <!-- Feature Highlight Grid (UI Cards) -->
+          <div class="ui-card-grid">
+            <div class="ui-card" data-type="feature" id="overview-flat-index">
+              <span class="ui-badge" data-variant="brand">STORAGE</span>
+              <h3 class="ui-card-title">Flat Product Index</h3>
+              <p class="ui-card-desc">
+                Bypasses standard <code>wp_postmeta</code> joins by compiling multi-attribute metadata into a dedicated denormalized index table.
+              </p>
+            </div>
+
+            <div class="ui-card" data-type="feature" id="overview-rest-engine">
+              <span class="ui-badge" data-variant="brand">API</span>
+              <h3 class="ui-card-title">REST Query Engine</h3>
+              <p class="ui-card-desc">
+                Abortable HTTP requests via <code>AbortController</code> with debounced slider inputs and deep URL state synchronization.
+              </p>
+            </div>
+
+            <div class="ui-card" data-type="feature" id="overview-cache-tier">
+              <span class="ui-badge" data-variant="brand">CACHE</span>
+              <h3 class="ui-card-title">Object Cache Tier</h3>
+              <p class="ui-card-desc">
+                Seamless Redis/Memcached integration with automatic invalidation upon product save, trash, or inventory update events.
+              </p>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               1.1 Plugin Anatomy & Directory Contract
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-1-1">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">1.1 SPECIFICATION</span>
+              <h3>Plugin Anatomy &amp; Directory Contract</h3>
+            </div>
+            <p>
+              The codebase adheres to a strict separation of concerns across the PHP/JavaScript boundary. The backend isolates data management, query compilation, and REST endpoints into modular PSR-compliant classes, while the frontend is structured as state-decoupled ES6 modules built via Vite:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Directory / File Path</th>
+                    <th>Runtime Boundary</th>
+                    <th>Architectural Responsibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>pickory-product-filter.php</code></td>
+                    <td>Plugin Bootstrap</td>
+                    <td>Declares HPOS compatibility, defines core constants (<code>PPFX_VERSION</code>, <code>PPFX_INDEX_VERSION</code>), and guards bootstrapping behind <code>plugins_loaded</code> and <code>class_exists('WooCommerce')</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>includes/services/</code></td>
+                    <td>Query &amp; Cache Engine</td>
+                    <td>Houses the 5 core backend services: <code>PPFX_Product_Query_Builder</code>, <code>PPFX_Query_Clause_Compiler</code>, <code>PPFX_Query_Hook_Scope</code>, <code>PPFX_Query_Cache</code>, and <code>PPFX_Rate_Limiter</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>includes/api/</code></td>
+                    <td>REST Controller</td>
+                    <td>Endpoint registration and request handling for <code>/wp-json/pickory-filter/v1/products</code> with schema verification and argument sanitization.</td>
+                  </tr>
+                  <tr>
+                    <td><code>includes/frontend/</code></td>
+                    <td>Fragment Assembly</td>
+                    <td><code>PPFX_Fragment_Renderer</code> producing isolated DOM replacement regions (product loop, pagination, result counters, active chips) with HTML tag attribute injection.</td>
+                  </tr>
+                  <tr>
+                    <td><code>includes/class-ppfx-index.php</code></td>
+                    <td>Storage &amp; Sync</td>
+                    <td>Flat table schema installation, product lifecycle event listeners, and chunked background indexing routines.</td>
+                  </tr>
+                  <tr>
+                    <td><code>src/js/components/</code></td>
+                    <td>Reactive Client Layer</td>
+                    <td>Zero-dependency UI controllers: <code>filter-form.js</code> (form controller), <code>active-filters.js</code> (chip manager), <code>filter-globals.js</code> (instance registry), <code>price-slider.js</code>, and <code>mobile-drawer.js</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>src/js/utils/</code></td>
+                    <td>Functional Utilities</td>
+                    <td>URL query parsing/serialization (<code>url.js</code>) and client-side MD5 hashing (<code>hash.js</code>) for SSR state comparison.</td>
+                  </tr>
+                  <tr>
+                    <td><code>build/</code></td>
+                    <td>Distribution</td>
+                    <td>Production-ready bundled assets generated via Vite (<code>pickory-filter.js</code> and <code>pickory-filter.css</code>) with source map generation.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               1.2 The Dual-Path Execution Model (SSR vs. AJAX)
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-1-2">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">1.2 ARCHITECTURE</span>
+              <h3>The Dual-Path Execution Model (SSR vs. AJAX)</h3>
+            </div>
+            <p>
+              To guarantee zero cumulative layout shift (CLS) for human visitors and complete content visibility for search engine crawlers, Pickory executes via two deterministic execution pipelines:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="success">PATH A: SERVER-SIDE (SSR)</span>
+                <h4 class="ui-card-title">Initial Page Load &amp; Crawlers</h4>
+                <p class="ui-card-desc">
+                  Executed by <code>PPFX_Server_Filter</code>. Binds to WordPress core <code>pre_get_posts</code> on WooCommerce catalog archives. It reads public <code>ppfx_</code> query variables directly from the global request, rewrites the main query using the flat index, and delivers pre-filtered HTML before client JavaScript executes.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">PATH B: CLIENT-SIDE (AJAX)</span>
+                <h4 class="ui-card-title">Reactive User Interactions</h4>
+                <p class="ui-card-desc">
+                  Executed by <code>PPFXURLStateManager</code> and REST fetchers. User gestures immediately mutate the browser URL, dispatch synthetic <code>ppfx:url-change</code> events, abort pending in-flight requests, and fetch surgical HTML fragments from <code>/pickory-filter/v1/products</code> to update DOM containers without page reload.
+                </p>
+              </div>
+            </div>
+
+            <div class="ui-callout" data-type="guardrail" role="note">
+              <div class="ui-callout-header">
+                <span class="ui-badge" data-variant="success">[DETERMINISTIC FIDELITY]</span>
+                <h4 class="ui-callout-title">SSR and AJAX Parity Invariant</h4>
+              </div>
+              <div class="ui-callout-body">
+                Both Path A and Path B delegate to the same underlying <code>PPFX_Query_Clause_Compiler</code> SQL compiler. Whether a filtered catalog URL is loaded freshly via hard browser reload or transitioned into via client clicks, the returned product set and pagination counters are mathematically identical.
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               1.3 The ppfx_ Namespace Convention
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-1-3">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">1.3 CONVENTIONS</span>
+              <h3>The <code>ppfx_</code> Namespace Convention</h3>
+            </div>
+            <p>
+              To eliminate collision vectors with WordPress core query variables, theme parameters, and companion WooCommerce extensions, Pickory enforces an immutable prefix contract across every subsystem:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Domain</th>
+                    <th>Namespace Pattern</th>
+                    <th>Concrete Implementation Examples</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>PHP Classes &amp; Constants</td>
+                    <td><code>PPFX_*</code> / <code>ppfx_*</code></td>
+                    <td><code>PPFX_Product_Indexer</code>, <code>PPFX_VERSION</code>, <code>PPFX_INDEX_VERSION</code>, <code>ppfx_bootstrap()</code></td>
+                  </tr>
+                  <tr>
+                    <td>Database Tables</td>
+                    <td><code>{$wpdb->prefix}ppfx_*</code></td>
+                    <td><code>wp_ppfx_product_index</code> (aliased as <code>ppfxi</code>), <code>wp_ppfx_product_terms</code> (aliased as <code>ppfxt</code>)</td>
+                  </tr>
+                  <tr>
+                    <td>Public URL Query Parameters</td>
+                    <td><code>ppfx_{facet}</code></td>
+                    <td><code>ppfx_category</code>, <code>ppfx_min_price</code>, <code>ppfx_max_price</code>, <code>ppfx_rating</code>, <code>ppfx_stock</code>, <code>ppfx_on_sale</code>, <code>ppfx_attr_{taxonomy}</code></td>
+                  </tr>
+                  <tr>
+                    <td>Custom DOM Events</td>
+                    <td><code>ppfx:*</code> / <code>ppfx_*</code></td>
+                    <td><code>ppfx:url-change</code>, <code>ppfx-filters-updated</code>, <code>ppfx_products_rendered</code>, <code>ppfx:ajax_loaded</code>, <code>ppfx:destroy</code></td>
+                  </tr>
+                  <tr>
+                    <td>Localized JS Global</td>
+                    <td><code>window.ppfxFilterData</code></td>
+                    <td>Exposes REST root, nonce, currency symbols, archive context, localized labels, and section manifests.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               1.4 WooCommerce Integration Surface
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-1-4">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">1.4 INTEGRATION</span>
+              <h3>WooCommerce Integration Surface</h3>
+            </div>
+            <p>
+              Pickory operates as a native extension of WooCommerce rather than an isolated external layer. It integrates cleanly with core hooks and respect store configurations:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">CORE COMPATIBILITY</span>
+                <h4 class="ui-card-title">HPOS Custom Order Tables</h4>
+                <p class="ui-card-desc">
+                  Declares full compatibility with WooCommerce High-Performance Order Storage via <code>FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true)</code>.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">HOOK INTERCEPTION</span>
+                <h4 class="ui-card-title">Priority 20 Execution</h4>
+                <p class="ui-card-desc">
+                  Hooks <code>woocommerce_product_query</code> and <code>posts_clauses</code> at Priority 20 to safely intercept queries after WooCommerce core Priority 10 orderby and visibility mutations.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">LIFECYCLE HOOKS</span>
+                <h4 class="ui-card-title">Real-Time Synchronization</h4>
+                <p class="ui-card-desc">
+                  Monitors <code>woocommerce_product_object_updated_props</code>, <code>woocommerce_trash_product</code>, and stock update hooks to trigger immediate atomic index refreshes and cache invalidations.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               1.5 Data Flow: Browser -> REST -> Query -> Fragment -> DOM
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-1-5">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">1.5 DATA PIPELINE</span>
+              <h3>Data Flow: Browser &rarr; REST &rarr; Query &rarr; Fragment &rarr; DOM</h3>
+            </div>
+            <p>
+              Dynamic filter interactions follow a unidirectional reactive loop across 6 discrete architectural stages:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Stage</th>
+                    <th>Component</th>
+                    <th>Operational Responsibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>1. Ingestion</strong></td>
+                    <td><code>filter-form.js</code></td>
+                    <td>Captures user gestures (swatch clicks, checkbox toggles, dual-slider drag). Debounces continuous slider updates at 300ms.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>2. Serialization</strong></td>
+                    <td><code>url.js (PPFXURLStateManager)</code></td>
+                    <td>Maps internal facet keys to public <code>ppfx_</code> parameters. Commits state to browser history via <code>pushState()</code> or <code>replaceState()</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>3. Event Broadcast</strong></td>
+                    <td><code>window (EventBus)</code></td>
+                    <td>Dispatches custom synthetic event <code>ppfx:url-change</code> with active parameters, synchronizing desktop sidebar and mobile drawer widgets.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>4. REST Transport</strong></td>
+                    <td><code>api.js &amp; Products_Controller</code></td>
+                    <td>Initiates abortable fetch to <code>/wp-json/pickory-filter/v1/products</code> with nonce validation and token bucket rate limiting (80 req/min).</td>
+                  </tr>
+                  <tr>
+                    <td><strong>5. Query &amp; Cache</strong></td>
+                    <td><code>Query_Builder &amp; Query_Cache</code></td>
+                    <td>Computes normalized MD5 key in persistent object cache. On cache miss, compiles optimized SQL against <code>wp_ppfx_product_index</code> via Priority 20 hook scope.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>6. Fragment Patch</strong></td>
+                    <td><code>Fragment_Renderer &amp; DOM</code></td>
+                    <td>Renders isolated HTML fragments (products loop, pagination, chip container). Client replaces target DOM containers, manages ARIA live states, and fires <code>ppfx_products_rendered</code>.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               1.6 Class Responsibility Map
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-1-6">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">1.6 REFERENCE</span>
+              <h3>Class Responsibility Map</h3>
+            </div>
+            <p>
+              The table below maps the core PHP classes and JavaScript modules to their single architectural responsibilities:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Class / Module</th>
+                    <th>Subsystem</th>
+                    <th>Single Architectural Responsibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>PPFX_Server_Filter</code></td>
+                    <td>PHP Core</td>
+                    <td>Intercepts main archive query during initial SSR page loads, preventing filtered shop 404s and canonical redirects.</td>
+                  </tr>
+                  <tr>
+                    <td><code>PPFX_Products_Controller</code></td>
+                    <td>REST API</td>
+                    <td>Validates and routes requests to <code>/pickory-filter/v1/products</code>, enforcing parameter schemas and sanitization.</td>
+                  </tr>
+                  <tr>
+                    <td><code>PPFX_Product_Query_Builder</code></td>
+                    <td>Query Service</td>
+                    <td>Orchestrates query assembly, coordinates cache lookups, and applies compiled clauses to <code>WP_Query</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>PPFX_Query_Clause_Compiler</code></td>
+                    <td>Query Service</td>
+                    <td>Compiles multi-facet parameters into optimized SQL clauses targeting the flat index table (<code>ppfxi</code>).</td>
+                  </tr>
+                  <tr>
+                    <td><code>PPFX_Query_Hook_Scope</code></td>
+                    <td>Query Service</td>
+                    <td>Provides scoped attachment to <code>posts_clauses</code> with object hash guards (<code>spl_object_hash</code>) to prevent global query pollution.</td>
+                  </tr>
+                  <tr>
+                    <td><code>PPFX_Query_Cache</code></td>
+                    <td>Cache Service</td>
+                    <td>Generates normalized MD5 cache keys and manages ID-only transient caching and group invalidation.</td>
+                  </tr>
+                  <tr>
+                    <td><code>PPFX_Rate_Limiter</code></td>
+                    <td>Security</td>
+                    <td>Protects the REST API against DoS scraping by enforcing transient token buckets per client IP address.</td>
+                  </tr>
+                  <tr>
+                    <td><code>PPFX_Fragment_Renderer</code></td>
+                    <td>View Layer</td>
+                    <td>Executes partial rendering for product loops, pagination links, and result counts with <code>WP_HTML_Tag_Processor</code> attribute tagging.</td>
+                  </tr>
+                  <tr>
+                    <td><code>PPFX_Index</code></td>
+                    <td>Storage</td>
+                    <td>Maintains table schemas, synchronizes products on post mutations, and manages batch indexing with transient locks.</td>
+                  </tr>
+                  <tr>
+                    <td><code>PPFXURLStateManager</code></td>
+                    <td>JS Core</td>
+                    <td>Serves as the client-side Single Source of Truth, translating internal widget state to canonical URL query strings.</td>
+                  </tr>
+                  <tr>
+                    <td><code>filter-form.js</code></td>
+                    <td>JS UI</td>
+                    <td>Delegates input change events, serializes widgets, coordinates form hydration, and executes container swaps.</td>
+                  </tr>
+                  <tr>
+                    <td><code>active-filters.js</code></td>
+                    <td>JS UI</td>
+                    <td>Renders removable active filter chips from canonical URL state with dynamic label fallback resolution.</td>
+                  </tr>
+                  <tr>
+                    <td><code>filter-globals.js</code></td>
+                    <td>JS Coordination</td>
+                    <td>Manages multi-instance filter deduplication, shared AbortControllers, and third-party compatibility bridges.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             TOPIC 2: CLIENT REACTIVE ENGINE & UI LAYER
+             ================================================================== -->
+        <section class="doc-section" id="client-reactive-engine">
+
+          <!-- Document Header Block -->
+          <header class="doc-header-block">
+            <h1 class="doc-main-title">2. Client Reactive Engine &amp; UI Layer</h1>
+            <p class="doc-lead-paragraph">
+              Pickory Product Filter treats the browser URL address bar as the absolute, immutable Single Source of Truth (SSOT). All user interactions—from dual-thumb price drags to taxonomy swatch toggles—are serialized into canonical parameters, routed through a centralized write gate, and broadcast across a decoupled event bus. This architecture guarantees zero client-state drift between multiple desktop and mobile widgets while ensuring 100% bookmarkable, shareable catalog views.
+            </p>
+            <div class="doc-meta-pills">
+              <span class="ui-badge" data-variant="brand">SSOT INVARIANT</span>
+              <span class="ui-badge">Event Bus</span>
+              <span class="ui-badge">History API</span>
+              <span class="ui-badge">Zero Client Drift</span>
+              <span class="ui-badge">Multi-Instance Sync</span>
+            </div>
+          </header>
+
+          <!-- Interactive Flowchart Component (State Machine Visualizer) -->
+          <div class="ui-flowchart" id="state-machine-container">
+            <div class="flowchart-header">
+              <div class="flowchart-heading">
+                <span class="ui-badge" data-variant="success">INTERACTIVE</span>
+                <span>Reactive State Machine Lifecycle</span>
+              </div>
+              <span class="flowchart-hint">Click a pipeline node to inspect invariant logic</span>
+            </div>
+
+            <div class="flowchart-canvas">
+              <svg class="flowchart-svg" viewBox="0 0 868 98" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="region" aria-label="Reactive State Machine Architecture Flow">
+                <defs>
+                  <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 1.5 L 8 5 L 0 8.5 z" class="flow-arrowhead" />
+                  </marker>
+                </defs>
+
+                <!-- Node 1: User Interaction -->
+                <g class="flow-node is-active" data-node-id="user-interaction" tabindex="0" role="button" aria-selected="true" aria-label="Node 1: User Interaction">
+                  <rect x="10" y="20" width="136" height="58" rx="8" />
+                  <text x="22" y="41" class="node-step">01. INGESTION</text>
+                  <text x="22" y="60" class="node-title">User Interaction</text>
+                </g>
+
+                <!-- Arrow 1 -> 2 -->
+                <path class="flow-connector" d="M 146 49 L 182 49" marker-end="url(#arrow)" />
+
+                <!-- Node 2: URL SearchParams -->
+                <g class="flow-node" data-node-id="url-params" tabindex="0" role="button" aria-selected="false" aria-label="Node 2: URL SearchParams">
+                  <rect x="186" y="20" width="138" height="58" rx="8" />
+                  <text x="198" y="41" class="node-step">02. SERIALIZE</text>
+                  <text x="198" y="60" class="node-title">URL SearchParams</text>
+                </g>
+
+                <!-- Arrow 2 -> 3 -->
+                <path class="flow-connector" d="M 324 49 L 360 49" marker-end="url(#arrow)" />
+
+                <!-- Node 3: ppfx:url-change Event -->
+                <g class="flow-node" data-node-id="url-change-event" tabindex="0" role="button" aria-selected="false" aria-label="Node 3: ppfx:url-change Event">
+                  <rect x="364" y="20" width="144" height="58" rx="8" />
+                  <text x="376" y="41" class="node-step">03. EVENT BUS</text>
+                  <text x="376" y="60" class="node-title">ppfx:url-change</text>
+                </g>
+
+                <!-- Arrow 3 -> 4 -->
+                <path class="flow-connector" d="M 508 49 L 544 49" marker-end="url(#arrow)" />
+
+                <!-- Node 4: Primary Coordinator -->
+                <g class="flow-node" data-node-id="coordinator" tabindex="0" role="button" aria-selected="false" aria-label="Node 4: Primary Coordinator">
+                  <rect x="548" y="20" width="142" height="58" rx="8" />
+                  <text x="560" y="41" class="node-step">04. ORCHESTRATE</text>
+                  <text x="560" y="60" class="node-title">Coordinator</text>
+                </g>
+
+                <!-- Arrow 4 -> 5 -->
+                <path class="flow-connector" d="M 690 49 L 726 49" marker-end="url(#arrow)" />
+
+                <!-- Node 5: REST Engine -->
+                <g class="flow-node" data-node-id="rest-engine" tabindex="0" role="button" aria-selected="false" aria-label="Node 5: REST Engine">
+                  <rect x="730" y="20" width="128" height="58" rx="8" />
+                  <text x="742" y="41" class="node-step">05. RESOLUTION</text>
+                  <text x="742" y="60" class="node-title">REST Engine</text>
+                </g>
+              </svg>
+            </div>
+
+            <!-- Adjacent Inspector Micro-Card (UI Card) -->
+            <div class="ui-card" data-type="inspector" id="state-inspector-card" aria-live="polite">
+              <div class="ui-card-header">
+                <span class="ui-badge" data-variant="brand">[PIPELINE STAGE INSPECTOR]</span>
+                <span class="ui-badge">ACTIVE TARGET</span>
+              </div>
+              <h3 class="ui-card-title">User Interaction</h3>
+              <div class="ui-card-row">
+                <span class="ui-card-label">Source File:</span>
+                <code class="ui-card-filepath">src/js/components/filter-form.js</code>
+              </div>
+              <div class="ui-card-row">
+                <span class="ui-card-label">Lifecycle Role:</span>
+                <span class="ui-card-role">Synchronous Event Capture &amp; Debounce</span>
+              </div>
+              <div class="ui-card-box">
+                <strong>Architectural Invariant:</strong>
+                <p class="ui-card-invariant">
+                  UI events (dual-thumb slider drag, checkbox toggle, swatch selection) are captured synchronously and debounced at 300ms for continuous sliders. Presentation components are strictly decoupled from network dispatchers and never initiate direct fetch operations.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               2.1 The URL as Single Source of Truth
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-1">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.1 ARCHITECTURAL INVARIANT</span>
+              <h3>The URL as Single Source of Truth</h3>
+            </div>
+            <p>
+              In complex WooCommerce themes, filter controls frequently exist simultaneously across multiple DOM subtrees: a desktop sidebar, a mobile off-canvas drawer, a top-bar sort dropdown, and breadcrumb chips. Traditional filtering plugins store filter state in component-level memory or ad-hoc jQuery objects, leading to synchronization drift, duplicate REST fetches, and broken browser history.
+            </p>
+            <p>
+              Pickory resolves this by declaring the <strong>browser window URL search parameters</strong> as the sole authoritative state container. Components possess zero independent filter state; they act strictly as <em>readers</em> and <em>writers</em> of the canonical URL string:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Dimension</th>
+                    <th>Traditional In-Memory Store</th>
+                    <th>Pickory URL SSOT Architecture</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Authority</strong></td>
+                    <td>Component state / JS variables in memory</td>
+                    <td>Browser address bar (<code>window.location.search</code>)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Multi-Widget Sync</strong></td>
+                    <td>Imperative DOM event spaghetti across widgets</td>
+                    <td>Automatic reactive hydration via <code>syncAllUIs()</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>History Navigation</strong></td>
+                    <td>Requires custom state serialization &amp; stack recovery</td>
+                    <td>Native <code>popstate</code> listener re-hydrates UI automatically</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Shareability</strong></td>
+                    <td>State is lost on copy/paste or page refresh</td>
+                    <td>100% deterministic link fidelity with SSR parity</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               2.2 PPFXURLStateManager — Observer Contract & Event Bus
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-2">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.2 OBSERVER CONTRACT</span>
+              <h3><code>PPFXURLStateManager</code> — Observer Contract &amp; Event Bus</h3>
+            </div>
+            <p>
+              Located in <code>src/js/utils/url.js</code>, the <code>PPFXURLStateManager</code> class manages the observer registry and event bus. It exports a singleton instance, <code>PPFX_URL_State</code>, that decouples UI widget controllers from network fetchers:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">OBSERVER REGISTRY</span>
+                <h4 class="ui-card-title"><code>subscribe(listener)</code></h4>
+                <p class="ui-card-desc">
+                  Accepts a callback function <code>fn(params, detail)</code> and registers it within an internal <code>Set</code>. Returns a clean unsubscription closure to prevent memory leaks during component destruction.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">EVENT BUS</span>
+                <h4 class="ui-card-title"><code>ppfx:url-change</code></h4>
+                <p class="ui-card-desc">
+                  Whenever the canonical state transitions, the manager dispatches a native <code>CustomEvent('ppfx:url-change')</code> with <code>{ detail: { params, source, url } }</code> to the global <code>window</code> object.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">CANONICAL READER</span>
+                <h4 class="ui-card-title"><code>getCanonicalState()</code></h4>
+                <p class="ui-card-desc">
+                  Synchronously reads <code>window.location.search</code>, converts public <code>ppfx_</code> query variables into internal parameter objects, and returns an immutable state snapshot.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               2.3 Internal ↔ Public Parameter Translation Layer
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-3">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.3 TRANSLATION LAYER</span>
+              <h3>Internal &harr; Public Parameter Translation Layer</h3>
+            </div>
+            <p>
+              Pickory enforces a strict boundary between clean internal property names used within JavaScript widgets and public query parameters exposed in the browser URL and HTTP REST requests:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Internal Facet Key</th>
+                    <th>Public URL Parameter</th>
+                    <th>Serialization Format</th>
+                    <th>Example Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>category</code></td>
+                    <td><code>ppfx_category</code></td>
+                    <td>Comma-separated slugs</td>
+                    <td><code>hoodies,accessories</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>product_tag</code></td>
+                    <td><code>ppfx_product_tag</code></td>
+                    <td>Comma-separated slugs</td>
+                    <td><code>summer,clearance</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>min_price</code></td>
+                    <td><code>ppfx_min_price</code></td>
+                    <td>Numeric float string</td>
+                    <td><code>25.00</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>max_price</code></td>
+                    <td><code>ppfx_max_price</code></td>
+                    <td>Numeric float string</td>
+                    <td><code>150.00</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>rating</code></td>
+                    <td><code>ppfx_rating</code></td>
+                    <td>Integer string (1&ndash;5)</td>
+                    <td><code>4</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>on_sale</code></td>
+                    <td><code>ppfx_on_sale</code></td>
+                    <td>Binary flag (<code>1</code> or omitted)</td>
+                    <td><code>1</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>orderby</code> / <code>order</code></td>
+                    <td><code>ppfx_orderby</code> / <code>ppfx_order</code></td>
+                    <td>String sorting key</td>
+                    <td><code>price</code> / <code>DESC</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>page</code></td>
+                    <td><code>ppfx_page</code></td>
+                    <td>Positive integer string</td>
+                    <td><code>2</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>filter_{taxonomy}</code></td>
+                    <td><code>ppfx_attr_{taxonomy}</code></td>
+                    <td>Comma-separated term slugs</td>
+                    <td><code>blue,red</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="ui-callout" data-type="security" role="note">
+              <div class="ui-callout-header">
+                <span class="ui-badge" data-variant="cyan">[SECURITY]</span>
+                <h4 class="ui-callout-title">Prototype Pollution Hardening</h4>
+              </div>
+              <div class="ui-callout-body">
+                Both <code>toPublicParams()</code> and <code>toInternalParams()</code> explicitly drop reserved object keys (<code>__proto__</code>, <code>constructor</code>, <code>prototype</code>) during translation to defend against prototype pollution attacks injected via crafted URL query strings.
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               2.4 commitFilterUpdate — The Unidirectional Write Gate
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-4">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.4 UNIDIRECTIONAL WRITE GATE</span>
+              <h3><code>commitFilterUpdate</code> — The Unidirectional Write Gate</h3>
+            </div>
+            <p>
+              To maintain absolute determinism, no UI component directly calls <code>window.history.pushState()</code>. Instead, all mutations in <code>filter-form.js</code> must pass through the <code>commitFilterUpdate</code> gate:
+            </p>
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Execution Step</th>
+                    <th>Subsystem Action</th>
+                    <th>Architectural Purpose</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>1. Read Current</strong></td>
+                    <td><code>PPFX_URL_State.getCanonicalState()</code></td>
+                    <td>Reads the existing parameters directly from the browser URL address bar.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>2. Clone State</strong></td>
+                    <td><code>next = { ...current }</code></td>
+                    <td>Creates a detached copy to ensure state mutations are isolated and transactional.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>3. Automatic Page Reset</strong></td>
+                    <td><code>delete next.page; delete next.paged;</code></td>
+                    <td>If <code>resetPage: true</code> (default), clearing pagination guarantees the user lands on page 1 of new filter results.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>4. Execute Mutator</strong></td>
+                    <td><code>modifierFn(next)</code></td>
+                    <td>Applies specific facet additions, deletions, or range changes to the mutable clone.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>5. Gate Evaluation</strong></td>
+                    <td><code>if (isAutoFilter || source === "submit")</code></td>
+                    <td>In auto-filter mode, commits immediately to URL. In manual submit mode, holds staging state until submit is clicked.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               2.5 setCanonicalState — History Push vs. Replace Strategy
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-5">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.5 HISTORY API STRATEGY</span>
+              <h3><code>setCanonicalState</code> — History Push vs. Replace Strategy</h3>
+            </div>
+            <p>
+              The <code>setCanonicalState</code> method constructs a clean <code>URL</code> object, purges obsolete <code>ppfx_*</code> keys, and writes the new query string using an intentional history management strategy:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="success">PUSH STATE (pushHistory: true)</span>
+                <h4 class="ui-card-title">Discrete User Selections</h4>
+                <p class="ui-card-desc">
+                  Used for distinct user choices (clicking category checkboxes, color swatches, star ratings, or pagination links). Creates a new entry in the browser session history so users can click the browser Back button to revert the selection.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">REPLACE STATE (pushHistory: false)</span>
+                <h4 class="ui-card-title">Continuous Inputs &amp; Normalization</h4>
+                <p class="ui-card-desc">
+                  Used during dual-thumb price slider drag movements, text search debounces, or initial boot normalization. Replaces the current history entry in-place to avoid polluting the browser history with dozens of micro-step drag entries.
+                </p>
+              </div>
+            </div>
+
+            <div class="ui-callout" data-type="guardrail" role="note">
+              <div class="ui-callout-header">
+                <span class="ui-badge" data-variant="success">[NON-FILTER PRESERVATION]</span>
+                <h4 class="ui-callout-title">Preservation of Foreign Parameters</h4>
+              </div>
+              <div class="ui-callout-body">
+                <code>setCanonicalState()</code> only purges known filter keys and <code>ppfx_</code> prefixed parameters. Foreign query parameters (such as marketing UTM tags <code>utm_source</code>, affiliate tokens, or WordPress search <code>s</code>) are strictly preserved across state transitions.
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               2.6 popstate Handling & Browser Back/Forward Integration
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-6">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.6 BROWSER NAVIGATION</span>
+              <h3><code>popstate</code> Handling &amp; Browser Back/Forward Integration</h3>
+            </div>
+            <p>
+              When a user clicks the browser Back or Forward button, the browser triggers a native <code>popstate</code> event. Pickory intercepts this via an immutable lifecycle loop:
+            </p>
+            <ol>
+              <li><code>_initPopstate()</code> listener receives the native <code>popstate</code> event from the window.</li>
+              <li>Calls <code>getCanonicalState()</code> to parse the newly active URL search string.</li>
+              <li>Dispatches <code>ppfx:url-change</code> with <code>source: 'popstate'</code> and the event's history state.</li>
+              <li>The state coordinator receives the event and initiates an AJAX fragment fetch matching the historical URL.</li>
+              <li><strong>History Cycle Protection:</strong> Because the navigation was initiated by the browser itself, the coordinator never calls <code>pushState()</code> or <code>replaceState()</code>, avoiding infinite loop traps.</li>
+            </ol>
+          </div>
+
+          <!-- ================================================================
+               2.7 Multi-Instance Synchronization via syncAllUIs
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-7">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.7 MULTI-INSTANCE SYNC</span>
+              <h3>Multi-Instance Synchronization via <code>syncAllUIs</code></h3>
+            </div>
+            <p>
+              In responsive WooCommerce themes, desktop sidebar filters and mobile drawer filters exist as independent DOM instances. Pickory maintains a global instance registry (<code>filterFormInstances</code> Set in <code>filter-globals.js</code>) to enforce bilateral UI synchrony:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Control Type</th>
+                    <th>Hydration Mechanism in <code>applyFilterState()</code></th>
+                    <th>Focus &amp; Input Guard</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Checkboxes &amp; Radios</strong></td>
+                    <td>Matches input <code>value</code> against deserialized array. Toggles <code>checked</code> and sets <code>data-was-checked</code>.</td>
+                    <td>Does not disrupt focus if user is tabbing.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Select Dropdowns</strong></td>
+                    <td>Sets <code>select.value</code> to canonical string; synchronizes WooCommerce catalog ordering dropdowns.</td>
+                    <td>Bypasses <code>select === document.activeElement</code> to prevent closing open dropdown menus.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Swatches &amp; Buttons</strong></td>
+                    <td>Toggles <code>.is-active</code> class and updates <code>aria-pressed</code> attribute on matching <code>data-value</code> elements.</td>
+                    <td>Syncs hidden companion input values for form submission compatibility.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Price Slider Inputs</strong></td>
+                    <td>Updates min/max input values and dispatches synthetic <code>input</code> event to reposition slider thumbs.</td>
+                    <td>Bypasses active slider thumb if currently being dragged by user.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Text Search Inputs</strong></td>
+                    <td>Updates input string to match canonical query.</td>
+                    <td>Preserves <code>selectionStart</code> and <code>selectionEnd</code> caret positions if input is active.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               2.8 Reserved Key Partition: Filters vs. Sort & Pagination
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-8">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.8 KEY PARTITIONING</span>
+              <h3>Reserved Key Partition: Filters vs. Sort &amp; Pagination</h3>
+            </div>
+            <p>
+              Not all parameters in the URL represent product facets. Pickory establishes a strict key partition through <code>RESERVED_FILTER_KEYS</code>:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">FACET KEYS</span>
+                <h4 class="ui-card-title">Criteria Modifiers</h4>
+                <p class="ui-card-desc">
+                  <code>category</code>, <code>product_tag</code>, <code>min_price</code>, <code>max_price</code>, <code>rating</code>, <code>on_sale</code>, and dynamic <code>filter_*</code> attributes. Mutating any facet key triggers an automatic reset of pagination (<code>page=1</code>) and recalculates facet term counts.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">RESERVED KEYS</span>
+                <h4 class="ui-card-title">Traversal &amp; Presentation</h4>
+                <p class="ui-card-desc">
+                  <code>orderby</code>, <code>order</code>, <code>page</code>, <code>paged</code>, <code>ppfx_instance_id</code>. Mutating reserved keys changes catalog presentation or pagination page without altering facet boundaries or generating active filter chips.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               2.9 Auto-Filter Mode vs. Manual Submit Mode
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-9">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.9 OPERATIONAL MODES</span>
+              <h3>Auto-Filter Mode vs. Manual Submit Mode</h3>
+            </div>
+            <p>
+              Pickory supports two operational modes configurable via shortcode attribute or admin panel:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Feature</th>
+                    <th>Auto-Filter Mode (<code>auto_filter="1"</code>)</th>
+                    <th>Manual Submit Mode (<code>auto_filter="0"</code>)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Execution Trigger</strong></td>
+                    <td>Instantaneous upon user gesture or slider debounce timeout.</td>
+                    <td>User clicks the explicit "Apply Filters" submit button.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>URL Mutation</strong></td>
+                    <td>Immediate. URL updates on every selection.</td>
+                    <td>Deferred. URL remains unchanged until submit button is pressed.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Network Profile</strong></td>
+                    <td>High reactivity; aborts in-flight requests on rapid changes.</td>
+                    <td>Batched; exactly one REST request dispatched per submission.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Mobile Suitability</strong></td>
+                    <td>Ideal for high-speed Wi-Fi and fast catalogs.</td>
+                    <td>Recommended for cellular data or heavily multi-faceted mobile drawers.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               2.10 Debounce & Delay Semantics by Interaction Source
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-10">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.10 LATENCY CONTRACT</span>
+              <h3>Debounce &amp; Delay Semantics by Interaction Source</h3>
+            </div>
+            <p>
+              To protect the server against request floods while delivering an instantaneous tactile feel, Pickory enforces source-specific delay semantics:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Interaction Source</th>
+                    <th>Debounce Delay</th>
+                    <th>Execution Semantics</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Checkbox / Radio / Swatch / Rating</strong></td>
+                    <td><code>0ms</code> (Instant)</td>
+                    <td>Immediately commits to URL and dispatches REST request. Previous in-flight request is cancelled via <code>AbortController</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Price Range Dual Slider</strong></td>
+                    <td><code>300ms</code> (Trailing)</td>
+                    <td>Continuous thumb movement updates local labels in real-time; URL commit and REST dispatch are deferred until dragging ceases for 300ms.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Keyword / SKU Search Input</strong></td>
+                    <td><code>300ms</code> (Trailing)</td>
+                    <td>Debounces keyboard keystrokes to prevent partial prefix database queries while user is actively typing.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Reset / Clear All Filters</strong></td>
+                    <td><code>0ms</code> (Instant)</td>
+                    <td>Immediately purges all facet parameters, resets pagination, and requests clean catalog baseline.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- ================================================================
+               PART II: FILTER FORM CONTROLLER & WIDGET ARCHITECTURE
+               ================================================================ -->
+          <div class="doc-module-divider" id="filter-form-engine">
+            <h2 class="doc-module-divider-title">Part II: Filter Form Controller &amp; Widget Architecture</h2>
+            <p class="doc-lead-paragraph doc-module-divider-desc">
+              The Filter Form Engine (<code>src/js/components/filter-form.js</code>) serves as the primary input controller across all Pickory instances. It manages the complete component lifecycle, resolves dynamic catalog product loops via multi-tier container heuristics, delegates native input events, maps custom UI controls (swatches, button grids, star ratings, dual-thumb sliders), and enforces deterministic request cancellation via <code>AbortController</code>.
+            </p>
+            <div class="doc-meta-pills">
+              <span class="ui-badge" data-variant="brand">EVENT DELEGATION</span>
+              <span class="ui-badge">DOM HYDRATION</span>
+              <span class="ui-badge">ABORT CONTROLLER</span>
+              <span class="ui-badge">CONTAINER RESOLVER</span>
+              <span class="ui-badge">RADIO UNCHECK</span>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               3.1 initFilterForm — Instance Lifecycle & Initialization Guard
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-1">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.1 LIFECYCLE GUARD</span>
+              <h3><code>initFilterForm</code> — Instance Lifecycle &amp; Initialization Guard</h3>
+            </div>
+            <p>
+              The entry point <code>initFilterForm(formElement, productsContainer, options)</code> bootstraps an isolated filter instance. To prevent duplicate listeners during AJAX container re-renders or dynamic theme scripts, the engine binds an instance-level <code>AbortController</code> (<code>domAbortController</code>) and registers the instance with the global tracking set:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Lifecycle Stage</th>
+                    <th>Execution Routine</th>
+                    <th>Architectural Responsibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>1. Bootstrap Guard</strong></td>
+                    <td><code>formElement.dataset.ppfxInstance</code></td>
+                    <td>Reads unique instance ID and assigns scoped target selector (<code>data-ppfx-target</code>).</td>
+                  </tr>
+                  <tr>
+                    <td><strong>2. Scope Attachment</strong></td>
+                    <td><code>new AbortController() &rarr; { signal }</code></td>
+                    <td>Passes a scoped DOM abort signal to every event listener, ensuring clean bulk detachment upon teardown.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>3. Registry Enrolment</strong></td>
+                    <td><code>registerGlobalInstance(globalInstance)</code></td>
+                    <td>Appends instance to <code>filterFormInstances</code> Set for multi-instance bilateral synchronization.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>4. Boot Hydration</strong></td>
+                    <td><code>syncStateFromUrl()</code></td>
+                    <td>Performs initial idempotent DOM input reconciliation from URL parameters without firing unnecessary HTTP requests.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>5. Teardown Protocol</strong></td>
+                    <td><code>destroy()</code></td>
+                    <td>Aborts DOM signal, tears down active chips, unregisters global instance, and aborts pending in-flight REST fetches.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               3.2 Container Resolution Strategy (Instance -> Root -> Global)
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-2">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.2 RESOLUTION HEURISTIC</span>
+              <h3>Container Resolution Strategy (Instance &rarr; Root &rarr; Global Fallback)</h3>
+            </div>
+            <p>
+              In diverse WooCommerce themes, the catalog product grid container varies widely across page builders (Elementor, Divi, Gutenberg blocks, or classic template loops). Pickory implements a 4-tier resolution heuristic in <code>getLiveProductsContainer()</code>:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Priority</th>
+                    <th>Resolution Stage</th>
+                    <th>Selector Heuristic</th>
+                    <th>Target Theme Context</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>1. Live Cache</strong></td>
+                    <td>DOM Attachment Check</td>
+                    <td><code>document.body.contains(currentProductsContainer)</code></td>
+                    <td>Reuses existing container reference if not replaced by third-party DOM mutation.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>2. Explicit Target</strong></td>
+                    <td>Instance Target Selector</td>
+                    <td><code>document.querySelector(formElement.dataset.ppfxTarget)</code></td>
+                    <td>Explicit custom container selector passed via shortcode or block attribute.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>3. Scoped Instance</strong></td>
+                    <td>Instance ID Attribute</td>
+                    <td><code>.ppfx-products-wrapper[data-ppfx-instance="{id}"]</code></td>
+                    <td>Multi-catalog pages where multiple independent filter forms target specific loops.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>4. Universal Fallback</strong></td>
+                    <td>Progressive Cascade</td>
+                    <td><code>.ppfx-products-wrapper</code> &rarr; <code>.products</code> &rarr; <code>.woocommerce-no-products</code> &rarr; <code>.woocommerce-info</code></td>
+                    <td>Standard WooCommerce templates, block archives, and zero-results state views.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               3.3 toggleMultiValue vs. setSingleValue — State Mutation Primitives
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-3">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.3 MUTATION PRIMITIVES</span>
+              <h3><code>toggleMultiValue</code> vs. <code>setSingleValue</code> — State Mutation Primitives</h3>
+            </div>
+            <p>
+              All interactive inputs channel their state changes through two foundational primitives that manage serialized array vs. scalar facet states:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">MULTI-VALUE PRIMITIVE</span>
+                <h4 class="ui-card-title"><code>toggleMultiValue(name, value, isChecked)</code></h4>
+                <p class="ui-card-desc">
+                  Used by checkboxes, color swatches, and button grids. Deserializes existing comma-separated terms into a Set, adds or removes the target slug, re-serializes as a sorted, deduplicated string, and purges the key if empty. Automatically triggers a pagination reset.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">SCALAR PRIMITIVE</span>
+                <h4 class="ui-card-title"><code>setSingleValue(name, value, options)</code></h4>
+                <p class="ui-card-desc">
+                  Used by radio buttons, dropdown selects, star ratings, and toggle switches. Assigns the scalar string directly or completely deletes the key if value is empty, null, or <code>"0"</code>. Supports custom history push/replace flags.
+                </p>
+              </div>
+            </div>
+
+            <div class="ui-callout" data-type="security" role="note">
+              <div class="ui-callout-header">
+                <span class="ui-badge" data-variant="cyan">[SECURITY &amp; RESERVED KEY GUARD]</span>
+                <h4 class="ui-callout-title">Mutation Boundary Enforcement</h4>
+              </div>
+              <div class="ui-callout-body">
+                Both primitives enforce an immediate return guard if <code>name</code> matches prototype keys (<code>__proto__</code>, <code>constructor</code>, <code>prototype</code>) or falls within the <code>RESERVED_FILTER_KEYS</code> set (<code>orderby</code>, <code>order</code>, <code>page</code>), preventing accidental pollution of core traversal properties.
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               3.4 Native Input Handler Architecture (change delegation)
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-4">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.4 EVENT DELEGATION</span>
+              <h3>Native Input Handler Architecture (Change Delegation)</h3>
+            </div>
+            <p>
+              Rather than attaching hundreds of individual event listeners to native DOM form inputs—which exhausts memory and breaks when inner HTML is re-rendered—the engine binds a single delegated <code>change</code> listener to the root <code>formElement</code>:
+            </p>
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Target Input Type</th>
+                    <th>Evaluation Condition</th>
+                    <th>State Mutation Mapping</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>input[type="checkbox"]</code></td>
+                    <td><code>e.target.type === 'checkbox'</code></td>
+                    <td>Delegates to <code>toggleMultiValue(target.name, target.value, target.checked)</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>input[type="radio"]</code></td>
+                    <td><code>e.target.type === 'radio'</code></td>
+                    <td>Delegates to <code>setSingleValue(target.name, target.checked ? target.value : '')</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>select (facet select)</code></td>
+                    <td><code>e.target.type === 'select-one' &amp;&amp; target.name !== 'orderby'</code></td>
+                    <td>Delegates to <code>setSingleValue(target.name, target.value)</code>. Orderby is explicitly intercepted separately.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               3.5 Non-Native Widget Handlers
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-5">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.5 CUSTOM WIDGETS</span>
+              <h3>Non-Native Widget Handlers: Button Grid, Swatches, Toggle, Star Rating</h3>
+            </div>
+            <p>
+              Pickory delivers high-performance custom widgets that operate without native form elements, maintaining accessibility via ARIA state attributes:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Widget Type</th>
+                    <th>DOM Selector</th>
+                    <th>Event Contract &amp; ARIA State</th>
+                    <th>Associated Hidden Input</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Button Grid</strong></td>
+                    <td><code>.ppfx-grid-btn</code></td>
+                    <td>Click event toggles <code>.is-active</code> class and updates <code>aria-pressed</code>. Supports multi-selection.</td>
+                    <td><code>.ppfx-grid-hidden-input</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Color / Image Swatches</strong></td>
+                    <td><code>.ppfx-swatch-item</code></td>
+                    <td>Click event toggles visual ring, updates <code>aria-pressed</code>, and serializes term slug.</td>
+                    <td><code>.ppfx-swatch-hidden-input</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Toggle Switch</strong></td>
+                    <td><code>.ppfx-frontend-toggle</code></td>
+                    <td>Click and Keyboard (<code>Space</code> / <code>Enter</code>) listener toggles binary state (<code>1</code> or <code>""</code>) with <code>aria-checked</code>.</td>
+                    <td><code>.ppfx-toggle-input</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Star Rating List</strong></td>
+                    <td><code>.ppfx-star-row</code></td>
+                    <td>Click event selects minimum rating threshold (1&ndash;5 stars), toggling active row state.</td>
+                    <td><code>.ppfx-rating-input</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               3.6 Radio Uncheck Toggle Pattern
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-6">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.6 UX PATTERN</span>
+              <h3>Radio Uncheck Toggle Pattern</h3>
+            </div>
+            <p>
+              In native HTML, radio buttons are latching inputs: once selected, clicking an already-checked radio button does nothing. This produces poor UX in faceted search when users wish to deselect a singular facet option without clicking a global reset button.
+            </p>
+            <p>
+              Pickory solves this via a pre-change click interceptor tracking transient selection states through <code>target.dataset.wasChecked</code>:
+            </p>
+            <ol>
+              <li>A delegated <code>click</code> listener intercepts clicks on <code>input[type="radio"]</code> before the <code>change</code> event fires.</li>
+              <li>If <code>target.dataset.wasChecked === "true"</code>, the user is clicking an already-active radio:
+                <ul>
+                  <li>Forces <code>target.checked = false</code>.</li>
+                  <li>Sets <code>target.dataset.wasChecked = "false"</code>.</li>
+                  <li>Calls <code>setSingleValue(target.name, "")</code> to purge the parameter from state.</li>
+                </ul>
+              </li>
+              <li>Otherwise, sets <code>target.dataset.wasChecked = "true"</code> and resets companion sibling radios in the same group to <code>wasChecked = "false"</code>.</li>
+            </ol>
+          </div>
+
+          <!-- ================================================================
+               3.7 Form Serialization for Manual Submit Mode
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-7">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.7 FORM SERIALIZER</span>
+              <h3>Form Serialization for Manual Submit Mode</h3>
+            </div>
+            <p>
+              When <code>isAutoFilter: false</code> is configured, widget interactions mutate internal input staging states without altering the canonical URL. When the user clicks "Apply Filters", <code>serializeFormState()</code> compiles the entire form snapshot:
+            </p>
+            <ol>
+              <li>Gathers all checked <code>input[type="checkbox"]</code>, grouping common names into comma-delimited arrays.</li>
+              <li>Gathers checked <code>input[type="radio"]</code> and non-empty <code>select:not([name="orderby"])</code> values.</li>
+              <li>Extracts values from hidden inputs corresponding to custom button grids, swatches, star ratings, and toggle switches.</li>
+              <li>Inspects price slider inputs: if prices differ from default boundary datasets (<code>data-min</code>, <code>data-max</code>), serializes <code>min_price</code> and <code>max_price</code>.</li>
+              <li>Preserves existing sort order (<code>orderby</code>, <code>order</code>) from canonical URL state.</li>
+              <li>Purges pagination (<code>page</code>, <code>paged</code>) and commits to URL via <code>setCanonicalState(state, { pushHistory: true, source: "submit" })</code>.</li>
+            </ol>
+          </div>
+
+          <!-- ================================================================
+               3.8 applyFilterState — Idempotent UI Hydration Engine
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-8">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.8 IDEMPOTENT HYDRATION</span>
+              <h3><code>applyFilterState</code> — Idempotent UI Hydration Engine</h3>
+            </div>
+            <p>
+              When the URL changes via browser navigation or secondary widgets, <code>applyFilterState(formElement, filters)</code> reconciles all form controls without destructive side-effects. It enforces strict non-interference guards:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">FOCUS PRESERVATION</span>
+                <h4 class="ui-card-title">Active Element Guard</h4>
+                <p class="ui-card-desc">
+                  Compares elements against <code>document.activeElement</code>. If a user is actively typing in a search input or has an open dropdown select, the hydration engine skips value reassignment or restores caret selection ranges (<code>setSelectionRange</code>).
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">SLIDER DRAG PROTECTION</span>
+                <h4 class="ui-card-title">Active Thumb Protection</h4>
+                <p class="ui-card-desc">
+                  If either min or max price input currently possesses keyboard or pointer focus, background hydration does not disrupt the active thumb handle or overwrite transient input values.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               3.9 Price Slider State & Default Bound Detection
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-9">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.9 BOUND DETECTION</span>
+              <h3>Price Slider State &amp; Default Bound Detection</h3>
+            </div>
+            <p>
+              A major source of query bloat in WooCommerce filtering is sending price constraints that match the catalog's absolute min/max limits (e.g. <code>min_price=0&amp;max_price=500</code> when all products fall within that range).
+            </p>
+            <p>
+              Pickory solves this via <code>isPriceAtDefaultBounds(formElement, params)</code>:
+            </p>
+            <ul>
+              <li>Reads dataset bounds <code>data-min</code> and <code>data-max</code> from the parent <code>.ppfx-price-group</code> container.</li>
+              <li>Compares current values against these bounds.</li>
+              <li>If <code>currentMin === minBound &amp;&amp; currentMax === maxBound</code>, the price parameters are completely deleted from the request payload and URL query string.</li>
+              <li>Bypasses unnecessary SQL price range clauses entirely, allowing the database query to execute without indexed price comparisons.</li>
+            </ul>
+          </div>
+
+          <!-- ================================================================
+               3.10 applySortState — Sort Dropdown Sync Across Contexts
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-10">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.10 SORT SYNCHRONIZATION</span>
+              <h3><code>applySortState</code> — Sort Dropdown Sync Across Contexts</h3>
+            </div>
+            <p>
+              The <code>applySortState(root, sort)</code> utility synchronizes WooCommerce catalog ordering dropdowns (<code>select[name="orderby"]</code>, <code>select.orderby</code>, <code>.woocommerce-ordering select</code>) across both sidebar widgets and main loop toolbars:
+            </p>
+            <ul>
+              <li>Escapes target orderby values with <code>cssEscape()</code> before executing DOM queries.</li>
+              <li>Matches target values against child <code>&lt;option&gt;</code> elements.</li>
+              <li><strong>Safe Fallback:</strong> If target orderby is empty, resolves to the default option (<code>value=""</code>, <code>option[selected]</code>, or <code>option[value="menu_order"]</code>) rather than leaving the dropdown in an unselected blank state.</li>
+            </ul>
+          </div>
+
+          <!-- ================================================================
+               3.11 AbortController Pattern for In-Flight Request Cancellation
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-11">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.11 MUTEX CONTROL</span>
+              <h3>AbortController Pattern for In-Flight Request Cancellation</h3>
+            </div>
+            <p>
+              When users interact rapidly with faceted filters, multiple asynchronous HTTP fetches are dispatched in close succession. Without concurrency control, slower network responses can resolve out of order, overwriting newer filter states with stale catalog fragments.
+            </p>
+            <p>
+              Pickory eliminates network race conditions using a dual-mutex strategy in <code>executeFilterChange()</code>:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Mechanism</th>
+                    <th>Implementation</th>
+                    <th>Concurrency Protection</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>AbortController Mutex</strong></td>
+                    <td><code>if (currentAbortController) currentAbortController.abort();</code></td>
+                    <td>Cancels the pending in-flight browser network request immediately, stopping client socket processing.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Monotonic Request ID</strong></td>
+                    <td><code>const requestId = ++activeRequestId; if (requestId !== activeRequestId) return;</code></td>
+                    <td>Discards any asynchronous response payload whose ID does not match the latest dispatched request ID.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               3.12 Pagination Intercept & AJAX-Driven Page Transitions
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-12">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.12 PAGINATION HOOK</span>
+              <h3>Pagination Intercept &amp; AJAX-Driven Page Transitions</h3>
+            </div>
+            <p>
+              The <code>onPaginationClick(e)</code> handler captures clicks on catalog pagination links (<code>.woocommerce-pagination a</code>) and converts them into seamless AJAX transitions:
+            </p>
+            <ul>
+              <li><strong>Instance Scoping:</strong> Confirms the clicked link belongs to the active filter instance by checking container relationships and instance attributes.</li>
+              <li><strong>Path &amp; Query Parsing:</strong> Extracts target page numbers using regex matching on WordPress pretty permalinks (<code>/\/page\/(\d+)\/?/</code>) and query string fallbacks (<code>product-page</code>, <code>paged</code>, <code>page</code>).</li>
+              <li><strong>Preservation Invariant:</strong> Invokes <code>commitFilterUpdate</code> with <code>resetPage: false</code> and <code>source: "pagination"</code>, preserving all active facet criteria while advancing the page offset.</li>
+            </ul>
+          </div>
+
+          <!-- ================================================================
+               3.13 Sort Dropdown Intercept & stopImmediatePropagation Contract
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-13">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.13 EVENT TRAPPING</span>
+              <h3>Sort Dropdown Intercept &amp; <code>stopImmediatePropagation</code> Contract</h3>
+            </div>
+            <p>
+              Standard WooCommerce themes attach hard page reload scripts to the <code>woocommerce-ordering</code> form (e.g. <code>jQuery('.woocommerce-ordering').submit()</code> on change).
+            </p>
+            <p>
+              Pickory overrides this default theme behavior through a strict event trapping contract in <code>onSortChange(e)</code>:
+            </p>
+            <ol>
+              <li>Intercepts the native <code>change</code> event on <code>select[name="orderby"]</code>.</li>
+              <li>Executes <code>e.preventDefault()</code> to halt form submission.</li>
+              <li>Executes <code>e.stopPropagation()</code> to prevent bubbling to theme wrapper elements.</li>
+              <li>Executes <code>e.stopImmediatePropagation()</code> to prevent subsequent jQuery or vanilla event listeners on the same element from firing.</li>
+              <li>Commits the selected sort order via <code>commitFilterUpdate</code> with <code>resetPage: true</code> and <code>source: "sort"</code>, executing a smooth AJAX re-order.</li>
+            </ol>
+          </div>
+
+          <!-- ================================================================
+               3.14 domAbortController Listener Cleanup & Teardown Protocol
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-14">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.14 TEARDOWN PROTOCOL</span>
+              <h3><code>domAbortController</code> Listener Cleanup &amp; Component Teardown</h3>
+            </div>
+            <p>
+              In Single-Page Applications (SPAs), quick-view modals, and dynamic drawer toggles, filter forms are frequently instantiated and discarded without a full page refresh. Without explicit listener teardown, dangling DOM references cause catastrophic memory leaks.
+            </p>
+            <p>
+              Pickory routes every single DOM listener (clicks, keydowns, changes, and submit events) through a single instance signal: <code>{ signal: domAbortController.signal }</code>. The exported <code>destroy()</code> closure executes an atomic teardown:
+            </p>
+            <ol>
+              <li>Executes <code>domAbortController.abort()</code>, which instantly detaches every DOM listener across the form and root containers without manual <code>removeEventListener</code> boilerplate.</li>
+              <li>Invokes <code>formElement._ppfxActiveFilters?.destroy()</code> to clean active chip containers.</li>
+              <li>Destroys companion mobile drawers via <code>window.__ppfxDrawerInstance?.destroy()</code>.</li>
+              <li>Removes the instance from <code>filterFormInstances</code> via <code>unregisterGlobalInstance()</code>.</li>
+              <li>Cancels any pending REST requests via <code>currentAbortController?.abort()</code> and clears debounce timers via <code>clearTimeout(filterTimeout)</code>.</li>
+            </ol>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             MULTI-TAB CODE WINDOW (JetBrains / Stripe Inspired)
+             ================================================================== -->
+        <section class="doc-section" id="code-implementation">
+          <h2>
+            <span>Multi-Tab Implementation Reference</span>
+            <a href="#code-implementation" class="section-anchor" aria-label="Permalink to Implementation Reference">#</a>
+          </h2>
+          <p>
+            Inspect the core execution logic across server PHP integration, frontend reactive state orchestration, and compiled index SQL queries:
+          </p>
+
+          <div class="ui-code-window">
+            <div class="code-window-header">
+              <div class="code-tab-group" role="tablist" aria-label="Code Implementation Languages">
+                <button type="button" class="code-tab-btn is-active" data-target="code-php" data-file="includes/services/class-ppfx-product-query-builder.php" role="tab" aria-selected="true">
+                  <span>PHP (Priority 20 Scope)</span>
+                </button>
+                <button type="button" class="code-tab-btn" data-target="code-js" data-file="src/js/utils/url.js" role="tab" aria-selected="false">
+                  <span>JavaScript (URL State Machine)</span>
+                </button>
+                <button type="button" class="code-tab-btn" data-target="code-sql" data-file="includes/services/class-ppfx-query-clause-compiler.php" role="tab" aria-selected="false">
+                  <span>Compiled SQL (Index Query)</span>
+                </button>
+              </div>
+              <div class="code-window-meta">
+                <span class="code-window-filename" id="active-filename">includes/services/class-ppfx-product-query-builder.php</span>
+                <button type="button" class="copy-btn" id="copy-code-btn" aria-label="Copy active code snippet">
+                  <svg class="copy-icon copy-default-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25v-7.5Z"/>
+                    <path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25v-7.5Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25h-7.5Z"/>
+                  </svg>
+                  <svg class="copy-icon checkmark-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M12.416 3.376a.75.75 0 0 1 .208 1.04l-5 7.5a.75.75 0 0 1-1.154.114l-3-3a.75.75 0 0 1 1.06-1.06l2.353 2.353 4.493-6.74a.75.75 0 0 1 1.04-.207Z" clip-rule="evenodd"/>
+                  </svg>
+                  <span class="copy-text">Copy Code</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Pane 1: PHP -->
+            <div class="code-tab-pane is-active" id="code-php" role="tabpanel">
+              <pre><code><span class="token-keyword">&lt;?php</span>
+<span class="token-comment">/**
+ * includes/services/class-ppfx-product-query-builder.php
+ * Orchestrates query compilation and scoped SQL lifecycle for filtered WooCommerce catalog queries.
+ */</span>
+<span class="token-keyword">final class</span> <span class="token-function">PPFX_Product_Query_Builder</span> {
+    <span class="token-keyword">private</span> <span class="token-variable">$compiler</span> = <span class="token-keyword">null</span>;
+
+    <span class="token-comment">/**
+     * Applies compiled index filters to WooCommerce's WP_Query instance.
+     * SQL hooks stay attached until this exact query has completed, preventing
+     * nested or secondary queries from removing them prematurely.
+     */</span>
+    <span class="token-keyword">public function</span> <span class="token-function">apply_to_query</span>( \<span class="token-type">WP_Query</span> <span class="token-variable">$query</span> ): <span class="token-type">void</span> {
+        <span class="token-variable">$compilation</span> = <span class="token-variable">$this</span>-&gt;<span class="token-function">compiler</span>()-&gt;<span class="token-function">compile</span>( <span class="token-variable">$this</span>-&gt;<span class="token-function">get_params</span>() );
+        <span class="token-variable">$args</span>        = <span class="token-variable">$compilation</span>[<span class="token-string">'args'</span>];
+
+        <span class="token-comment">// Flag the target query instance to activate hook scope guards</span>
+        <span class="token-variable">$query</span>-&gt;<span class="token-function">set</span>( <span class="token-string">'ppfx_is_filter_query'</span>, <span class="token-keyword">true</span> );
+
+        <span class="token-keyword">if</span> ( ! <span class="token-keyword">empty</span>( <span class="token-variable">$args</span>[<span class="token-string">'tax_query'</span>] ) ) {
+            <span class="token-variable">$query</span>-&gt;<span class="token-function">set</span>( <span class="token-string">'tax_query'</span>, <span class="token-variable">$args</span>[<span class="token-string">'tax_query'</span>] );
+        }
+
+        <span class="token-comment">// Attach temporary scoped SQL clauses to the posts_clauses filter</span>
+        <span class="token-variable">$scope</span> = <span class="token-variable">$compilation</span>[<span class="token-string">'scope'</span>];
+        <span class="token-variable">$scope</span>-&gt;<span class="token-function">attach</span>( <span class="token-variable">$query</span> );
+    }
+}</code></pre>
+            </div>
+
+            <!-- Pane 2: JavaScript -->
+            <div class="code-tab-pane" id="code-js" role="tabpanel">
+              <pre><code><span class="token-comment">/**
+ * src/js/utils/url.js &amp; src/js/components/filter-form.js
+ * Central transactional write gate enforcing URL as Single Source of Truth (SSOT).
+ */</span>
+<span class="token-keyword">export const</span> <span class="token-function">commitFilterUpdate</span> = (modifierFn, options = {}) =&gt; {
+  <span class="token-keyword">const</span> { resetPage = <span class="token-keyword">true</span>, pushHistory = <span class="token-keyword">true</span>, source = <span class="token-string">"user"</span> } = options;
+  <span class="token-keyword">const</span> current = PPFX_URL_State.<span class="token-function">getCanonicalState</span>();
+  <span class="token-keyword">const</span> next = { ...current };
+
+  <span class="token-comment">// Automatic page reset invariant: facet mutations always revert to page 1</span>
+  <span class="token-keyword">if</span> (resetPage) {
+    <span class="token-keyword">delete</span> next.page;
+    <span class="token-keyword">delete</span> next.paged;
+  }
+
+  <span class="token-comment">// Execute caller's transactional mutation on detached state clone</span>
+  <span class="token-function">modifierFn</span>(next);
+
+  <span class="token-keyword">if</span> (isAutoFilter || source === <span class="token-string">"submit"</span> || source === <span class="token-string">"pagination"</span> || source === <span class="token-string">"sort"</span> || source === <span class="token-string">"reset"</span>) {
+    PPFX_URL_State.<span class="token-function">setCanonicalState</span>(next, { pushHistory, source });
+  }
+};</code></pre>
+            </div>
+
+            <!-- Pane 3: SQL -->
+            <div class="code-tab-pane" id="code-sql" role="tabpanel">
+              <pre><code><span class="token-comment">-- includes/services/class-ppfx-query-clause-compiler.php
+-- Compiled posts_clauses query targeting denormalized flat index tables (ppfxi &amp; ppfxt)
+-- Bypasses wp_postmeta joins to achieve sub-50ms query execution across 50,000+ SKUs</span>
+
+<span class="token-keyword">SELECT DISTINCT</span> wp_posts.ID
+<span class="token-keyword">FROM</span> wp_posts
+<span class="token-keyword">INNER JOIN</span> wp_ppfx_product_index <span class="token-keyword">AS</span> ppfxi 
+    <span class="token-keyword">ON</span> ppfxi.product_id = wp_posts.ID
+<span class="token-keyword">INNER JOIN</span> wp_ppfx_product_terms <span class="token-keyword">AS</span> ppfxt_cat 
+    <span class="token-keyword">ON</span> ppfxt_cat.product_id = wp_posts.ID 
+   <span class="token-keyword">AND</span> ppfxt_cat.taxonomy = <span class="token-string">'product_cat'</span> 
+   <span class="token-keyword">AND</span> ppfxt_cat.term_id <span class="token-keyword">IN</span> (18, 24)
+<span class="token-keyword">WHERE</span> wp_posts.post_type = <span class="token-string">'product'</span>
+  <span class="token-keyword">AND</span> wp_posts.post_status = <span class="token-string">'publish'</span>
+  <span class="token-keyword">AND</span> ppfxi.stock_status = <span class="token-string">'instock'</span>
+  <span class="token-keyword">AND</span> ppfxi.min_price &gt;= 25.00
+  <span class="token-keyword">AND</span> ppfxi.max_price &lt;= 150.00
+  <span class="token-keyword">AND</span> ppfxi.rating_average &gt;= 4.00
+<span class="token-keyword">ORDER BY</span> ppfxi.min_price <span class="token-keyword">ASC</span>
+<span class="token-keyword">LIMIT</span> 0, 24;</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             TOPIC 3: SSR & QUERY EXECUTION ENGINE
+             ================================================================== -->
+        <section class="doc-section" id="ssr-query-engine">
+
+          <!-- Document Header Block -->
+          <header class="doc-header-block">
+            <h1 class="doc-main-title">3. SSR &amp; Query Execution Engine</h1>
+            <p class="doc-lead-paragraph">
+              The Server-Side Rendering (SSR) and Query Execution Engine intercepts WooCommerce product queries during initial catalog page load and REST retrieval. Powered by <code>PPFX_Server_Filter</code>, <code>PPFX_Product_Query_Builder</code>, and <code>PPFX_Query_Clause_Compiler</code>, the subsystem safely modifies the main <code>WP_Query</code> loop before DOM output, eliminating Cumulative Layout Shift (CLS), preventing catalog 404 routing anomalies, and executing scoped, high-performance database queries with zero <code>wp_postmeta</code> joins.
+            </p>
+            <div class="doc-meta-pills">
+              <span class="ui-badge" data-variant="brand">PRE_GET_POSTS</span>
+              <span class="ui-badge">PRIORITY 20 HOOK</span>
+              <span class="ui-badge">POSTS_CLAUSES</span>
+              <span class="ui-badge">SPL_OBJECT_HASH</span>
+              <span class="ui-badge">ZERO CLS</span>
+              <span class="ui-badge">SQL COMPILER</span>
+            </div>
+          </header>
+
+          <!-- ================================================================
+               4.1 PPFX_Server_Filter Execution Scope
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-4-1">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">4.1 HOOK LIFECYCLE</span>
+              <h3><code>PPFX_Server_Filter</code> Execution Scope</h3>
+            </div>
+            <p>
+              Located in <code>includes/class-ppfx-server-filter.php</code>, the <code>PPFX_Server_Filter</code> class hooks into the WordPress request lifecycle at strict priority checkpoints to intercept catalog queries before HTML delivery:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>WordPress / WooCommerce Hook</th>
+                    <th>Priority</th>
+                    <th>Class Method</th>
+                    <th>Architectural Responsibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>request</code></td>
+                    <td><code>1</code> (Early)</td>
+                    <td><code>normalize_shop_request_query_vars</code></td>
+                    <td>Sanitizes rewrite variables on shop requests to prevent taxonomy 404 conflicts before WP routing executes.</td>
+                  </tr>
+                  <tr>
+                    <td><code>pre_handle_404</code></td>
+                    <td><code>10</code> (Standard)</td>
+                    <td><code>prevent_filtered_shop_404</code></td>
+                    <td>Suppresses HTTP 404 header status on valid shop and taxonomy archive URLs that yield zero matching products.</td>
+                  </tr>
+                  <tr>
+                    <td><code>woocommerce_product_query</code></td>
+                    <td><code>20</code> (Post-Core)</td>
+                    <td><code>modify_main_query</code></td>
+                    <td>Intercepts WooCommerce's main catalog query after core Priority 10 orderby/visibility filters have attached.</td>
+                  </tr>
+                  <tr>
+                    <td><code>woocommerce_shortcode_products_query</code></td>
+                    <td><code>20</code> (Post-Core)</td>
+                    <td><code>modify_shortcode_query</code></td>
+                    <td>Applies active URL parameters to WooCommerce shortcode product loops (e.g. <code>[products]</code>) without overwriting base attributes.</td>
+                  </tr>
+                  <tr>
+                    <td><code>query_vars</code></td>
+                    <td><code>10</code> (Standard)</td>
+                    <td><code>register_query_vars</code></td>
+                    <td>Registers all <code>ppfx_*</code> public parameters with WordPress core so they survive query sanitization.</td>
+                  </tr>
+                  <tr>
+                    <td><code>redirect_canonical</code></td>
+                    <td><code>10</code> (Standard)</td>
+                    <td><code>prevent_canonical_redirect</code></td>
+                    <td>Halts WordPress canonical redirection from stripping custom filter parameters on catalog root URLs.</td>
+                  </tr>
+                  <tr>
+                    <td><code>woocommerce_default_catalog_orderby</code></td>
+                    <td><code>10</code> (Standard)</td>
+                    <td><code>override_default_orderby</code></td>
+                    <td>Synchronizes the catalog's default sort order with incoming <code>ppfx_orderby</code> query parameters.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               4.2 pre_get_posts & modify_main_query Interception
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-4-2">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">4.2 QUERY INTERCEPTION</span>
+              <h3><code>pre_get_posts</code> &amp; <code>modify_main_query</code> Interception</h3>
+            </div>
+            <p>
+              Modifying WordPress queries globally is hazardous. To avoid polluting secondary loops (menus, sidebars, related products) or backend admin tables, <code>modify_main_query($query)</code> enforces strict boundary guards:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">PRIMARY LOOP GUARD</span>
+                <h4 class="ui-card-title"><code>is_main_query() &amp;&amp; !is_admin()</code></h4>
+                <p class="ui-card-desc">
+                  Immediately bails if the query is not the primary WordPress loop or is executing in an administrative context. Secondary product sliders and footer widgets remain completely untouched.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">CATALOG ARCHIVE CONTEXT</span>
+                <h4 class="ui-card-title">Archive Detection Heuristic</h4>
+                <p class="ui-card-desc">
+                  Verifies the current request matches <code>is_shop()</code>, <code>is_product_category()</code>, <code>is_product_tag()</code>, or a custom product taxonomy archive (e.g. brand, designer).
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">TAXONOMY INHERITANCE</span>
+                <h4 class="ui-card-title">Archive Context Merging</h4>
+                <p class="ui-card-desc">
+                  When filtering on <code>/product-category/shoes/</code>, the queried term is automatically extracted and merged into active parameters, ensuring filters operate strictly within the scoped category.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               4.3 Shop 404 & Redirect Guard
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-4-3">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">4.3 ROUTING DEFENSE</span>
+              <h3>Shop 404 &amp; Redirect Guard</h3>
+            </div>
+            <p>
+              Faceted filtering in WordPress introduces severe URL routing conflicts due to core's rewrite engine:
+            </p>
+
+            <div class="ui-callout" data-type="guardrail" role="note">
+              <div class="ui-callout-header">
+                <span class="ui-badge" data-variant="warning">[CORE REWRITE ANOMALY]</span>
+                <h4 class="ui-callout-title">The Taxonomy 404 Collision</h4>
+              </div>
+              <div class="ui-callout-body">
+                WordPress core registers rewrite query vars for taxonomy slugs (e.g. <code>product_tag</code>). When a filtered URL like <code>/shop/?product_tag=summer</code> is requested, WordPress attempts to parse the shop page with a taxonomy constraint. If the taxonomy constraint does not resolve to the configured shop page ID, WordPress core emits an HTTP 404 header before WooCommerce template loading begins.
+              </div>
+            </div>
+
+            <p>
+              Pickory eliminates this via <code>normalize_shop_request_query_vars($query_vars)</code>:
+            </p>
+            <ul>
+              <li>Intercepts the raw request query vars at Priority 1.</li>
+              <li>Detects if the query targets the configured shop page.</li>
+              <li>Removes conflicting taxonomy query parameters from the WordPress internal query parser, keeping <code>$_GET</code> intact for Pickory.</li>
+              <li><code>prevent_canonical_redirect()</code> inspects incoming GET parameters; if any key starts with <code>ppfx_</code>, it returns <code>false</code> to prevent WordPress from stripping parameters and redirecting to the canonical shop root.</li>
+            </ul>
+          </div>
+
+          <!-- ================================================================
+               4.4 PPFX_Product_Query_Builder Façade
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-4-4">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">4.4 QUERY FAÇADE</span>
+              <h3><code>PPFX_Product_Query_Builder</code> Façade</h3>
+            </div>
+            <p>
+              Located in <code>includes/services/class-ppfx-product-query-builder.php</code>, this service orchestrates query construction across both REST API controllers and server-side filtering:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Method</th>
+                    <th>Input Signature</th>
+                    <th>Architectural Responsibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>__construct</code></td>
+                    <td><code>WP_REST_Request|array|null $request</code></td>
+                    <td>Normalizes public parameters into internal clean keys using <code>PPFX_Utility::normalize_public_filter_params()</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>apply_to_query</code></td>
+                    <td><code>WP_Query $query</code></td>
+                    <td>Compiles filter clauses, sets <code>tax_query</code> on the query instance, tags it with <code>ppfx_is_filter_query</code>, and attaches scoped SQL hooks.</td>
+                  </tr>
+                  <tr>
+                    <td><code>merge_query_args_with_params</code></td>
+                    <td><code>array $query_args, array $params</code></td>
+                    <td>Static utility that safely merges active URL filters with existing shortcode arguments without overwriting default limits.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               4.5 PPFX_Query_Clause_Compiler SQL Engine
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-4-5">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">4.5 SQL COMPILER</span>
+              <h3><code>PPFX_Query_Clause_Compiler</code> SQL Engine</h3>
+            </div>
+            <p>
+              Located in <code>includes/services/class-ppfx-query-clause-compiler.php</code>, this engine compiles multi-facet criteria into high-performance SQL targeting the flat index table:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Filter Dimension</th>
+                    <th>Target Table / Alias</th>
+                    <th>Compiled SQL Clause Pattern</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Price Range</strong></td>
+                    <td><code>wp_ppfx_product_index (ppfxi)</code></td>
+                    <td><code>ppfxi.min_price &gt;= %f AND ppfxi.max_price &lt;= %f</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Customer Rating</strong></td>
+                    <td><code>wp_ppfx_product_index (ppfxi)</code></td>
+                    <td><code>ppfxi.rating_average &gt;= %f</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Stock Status</strong></td>
+                    <td><code>wp_ppfx_product_index (ppfxi)</code></td>
+                    <td><code>ppfxi.stock_status = 'instock'</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Catalog Visibility</strong></td>
+                    <td><code>wp_ppfx_product_terms (ppfxt_vis)</code></td>
+                    <td><code>NOT EXISTS (SELECT 1 FROM ppfxt WHERE taxonomy = 'product_visibility' AND term_id = %d)</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Cross-Attribute AND</strong></td>
+                    <td><code>wp_ppfx_product_terms (ppfxt)</code></td>
+                    <td><code>HAVING COUNT(DISTINCT ppfxt.taxonomy) = %d</code> across multiple attribute groups.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               4.6 Scoped posts_clauses Hooks & spl_object_hash Lifecycle
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-4-6">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">4.6 SCOPED HOOK LIFECYCLE</span>
+              <h3>Scoped <code>posts_clauses</code> Hooks &amp; <code>spl_object_hash</code> Lifecycle</h3>
+            </div>
+            <p>
+              Standard WordPress SQL filters (<code>posts_clauses</code>, <code>posts_join</code>, <code>posts_where</code>) are global singletons. Once added via <code>add_filter()</code>, they execute on every subsequent query unless explicitly removed.
+            </p>
+            <p>
+              <code>PPFX_Query_Hook_Scope</code> solves this with an isolated object-hash lifecycle:
+            </p>
+            <ol>
+              <li>When <code>attach($query)</code> is invoked, it records the unique memory identity of the target query via <code>spl_object_hash($query)</code>.</li>
+              <li>In the attached SQL callback, it inspects the passing query:
+                <pre><code>if ( spl_object_hash( $wp_query ) !== $this-&gt;expected_hash || ! $wp_query-&gt;get( 'ppfx_is_filter_query' ) ) {
+    return $clauses;
+}</code></pre>
+              </li>
+              <li>Hooks a cleanup listener on <code>the_posts</code> or <code>posts_results</code> that automatically detaches the exact callbacks as soon as the target query finishes executing.</li>
+              <li>Guarantees zero leakage into secondary loop queries, navigation menus, or admin queries.</li>
+            </ol>
+          </div>
+
+          <!-- ================================================================
+               4.7 Client-Server SSR Hash Parity
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-4-7">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">4.7 PERFORMANCE FIDELITY</span>
+              <h3>Client-Server SSR Hash Parity</h3>
+            </div>
+            <p>
+              When a user loads a filtered URL (e.g. from a shared link or bookmark), the server renders the complete filtered catalog via SSR. Without state parity coordination, frontend JavaScript initializes, notices the active URL parameters, and immediately fires a redundant AJAX fetch—wasting bandwidth and causing layout flicker.
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">SERVER FINGERPRINT</span>
+                <h4 class="ui-card-title"><code>ppfxFilterData.ssrHash</code></h4>
+                <p class="ui-card-desc">
+                  During SSR rendering, <code>PPFX_Server_Filter</code> normalizes the active parameters, sorts their keys alphabetically, and computes an MD5 checksum injected into the localized script global.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="success">CLIENT VERIFICATION</span>
+                <h4 class="ui-card-title">Zero Redundant Fetch</h4>
+                <p class="ui-card-desc">
+                  On client boot, <code>src/js/utils/hash.js</code> computes the identical MD5 checksum of the current URL parameters. If <code>clientHash === serverHash</code>, the initial AJAX request is suppressed and DOM hydration completes instantly.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             TOPIC 4: DATABASE INDEXING, STORAGE & SORTING
+             ================================================================== -->
+        <section class="doc-section" id="database-indexing-storage">
+
+          <!-- Document Header Block -->
+          <header class="doc-header-block">
+            <h1 class="doc-main-title">4. Database Indexing, Storage &amp; Sorting</h1>
+            <p class="doc-lead-paragraph">
+              High-volume WooCommerce stores frequently suffer catastrophic query degradation when filtering across multiple custom product attributes, price bands, stock states, and ratings. Standard WooCommerce architectures execute 4&times; to 8&times; nested relational joins against the unindexed Entity-Attribute-Value (EAV) table <code>wp_postmeta</code>. Pickory eliminates this bottleneck entirely by pre-computing all facet dimensions into two dedicated, high-performance B-tree indexed storage tables: <code>wp_ppfx_product_index</code> and <code>wp_ppfx_product_terms</code>.
+            </p>
+            <div class="doc-meta-pills">
+              <span class="ui-badge" data-variant="brand">FLAT INDEX</span>
+              <span class="ui-badge">COMPOSITE B-TREE</span>
+              <span class="ui-badge">ATOMIC UPSERT</span>
+              <span class="ui-badge">CURSOR SYNC</span>
+              <span class="ui-badge">QUERY CACHE</span>
+              <span class="ui-badge">O(1) INVALIDATION</span>
+            </div>
+          </header>
+
+          <!-- Feature Highlight Grid (UI Cards) -->
+          <div class="ui-card-grid">
+            <div class="ui-card" data-type="feature">
+              <span class="ui-badge" data-variant="brand">DENORMALIZATION</span>
+              <h3 class="ui-card-title">Flat Product Index (<code>ppfxi</code>)</h3>
+              <p class="ui-card-desc">
+                Collapses volatile numerical metrics (min/max price, on-sale flag, average star rating, stock status) into a single denormalized table with zero EAV join overhead.
+              </p>
+            </div>
+
+            <div class="ui-card" data-type="feature">
+              <span class="ui-badge" data-variant="brand">COVERING INDEX</span>
+              <h3 class="ui-card-title">Taxonomy Terms Index (<code>ppfxt</code>)</h3>
+              <p class="ui-card-desc">
+                Dedicated relational term map with 3-column covering index <code>(taxonomy, term_id, product_id)</code> enabling MySQL to resolve multi-attribute criteria directly in memory.
+              </p>
+            </div>
+
+            <div class="ui-card" data-type="feature">
+              <span class="ui-badge" data-variant="brand">CACHE VERSIONING</span>
+              <h3 class="ui-card-title">Microtime Key Invalidation</h3>
+              <p class="ui-card-desc">
+                Global query cache versioning decouples persistence from cache eviction storms. Modifying a single product bumps the global timestamp, invalidating all query keys in O(1) time.
+              </p>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               5.1 Flat Index Schema (wp_ppfx_product_index)
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-5-1">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">5.1 STORAGE SCHEMA</span>
+              <h3>Flat Index Schema (<code>wp_ppfx_product_index</code>)</h3>
+            </div>
+            <p>
+              Managed by <code>PPFX_Index_Schema::create_table()</code> in <code>includes/index/class-ppfx-index-schema.php</code>, the flat index table (aliased as <code>ppfxi</code> in compiled SQL) stores atomic product-level filtering criteria:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Column Name</th>
+                    <th>SQL Data Type</th>
+                    <th>Default</th>
+                    <th>Indexing &amp; Constraints</th>
+                    <th>Architectural Responsibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>product_id</code></td>
+                    <td><code>bigint(20) unsigned</code></td>
+                    <td><em>None</em></td>
+                    <td><code>PRIMARY KEY</code></td>
+                    <td>Matches <code>wp_posts.ID</code>. Guarantees exactly one row per parent catalog product.</td>
+                  </tr>
+                  <tr>
+                    <td><code>min_price</code></td>
+                    <td><code>decimal(10,2)</code></td>
+                    <td><code>0.00</code></td>
+                    <td><code>KEY idx_min_price</code></td>
+                    <td>Lowest purchasable variation price or simple product regular/sale price. Fixed decimal eliminates floating-point rounding errors.</td>
+                  </tr>
+                  <tr>
+                    <td><code>max_price</code></td>
+                    <td><code>decimal(10,2)</code></td>
+                    <td><code>0.00</code></td>
+                    <td><code>KEY idx_max_price</code></td>
+                    <td>Highest purchasable variation price. For simple products, <code>max_price === min_price</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>on_sale</code></td>
+                    <td><code>tinyint(1)</code></td>
+                    <td><code>0</code></td>
+                    <td><code>KEY idx_on_sale</code></td>
+                    <td>Boolean flag (<code>1</code> or <code>0</code>). Calculated dynamically across all child variations or parent discounts.</td>
+                  </tr>
+                  <tr>
+                    <td><code>avg_rating</code></td>
+                    <td><code>decimal(3,2)</code></td>
+                    <td><code>0.00</code></td>
+                    <td><code>KEY idx_avg_rating</code></td>
+                    <td>Aggregated customer review rating (e.g. <code>4.75</code>). Enables rapid minimum rating thresholds (<code>&gt;= 4.0</code>).</td>
+                  </tr>
+                  <tr>
+                    <td><code>stock_status</code></td>
+                    <td><code>varchar(20)</code></td>
+                    <td><code>'instock'</code></td>
+                    <td><code>KEY idx_stock_status</code></td>
+                    <td>Standardized WooCommerce inventory enum (<code>'instock'</code>, <code>'outofstock'</code>, <code>'onbackorder'</code>).</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              The DDL specification is executed via WordPress <code>dbDelta()</code> during plugin activation or schema version upgrades:
+            </p>
+
+            <pre><code>CREATE TABLE {$wpdb-&gt;prefix}ppfx_product_index (
+  product_id bigint(20) unsigned NOT NULL,
+  min_price decimal(10,2) NOT NULL DEFAULT 0.00,
+  max_price decimal(10,2) NOT NULL DEFAULT 0.00,
+  on_sale tinyint(1) NOT NULL DEFAULT 0,
+  avg_rating decimal(3,2) NOT NULL DEFAULT 0.00,
+  stock_status varchar(20) NOT NULL DEFAULT 'instock',
+  PRIMARY KEY  (product_id),
+  KEY idx_min_price (min_price),
+  KEY idx_max_price (max_price),
+  KEY idx_price_range (min_price, max_price),
+  KEY idx_on_sale (on_sale),
+  KEY idx_avg_rating (avg_rating),
+  KEY idx_stock_status (stock_status),
+  KEY idx_stock_product (stock_status, product_id)
+) {$collate};</code></pre>
+          </div>
+
+          <!-- ================================================================
+               5.2 Term Index Schema (wp_ppfx_product_terms)
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-5-2">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">5.2 RELATIONAL INDEX</span>
+              <h3>Term Index Schema (<code>wp_ppfx_product_terms</code>)</h3>
+            </div>
+            <p>
+              Managed by <code>PPFX_Index_Schema::create_term_table()</code>, the taxonomy-term table (aliased as <code>ppfxt</code> in compiled SQL) flattens product relationships across categories, tags, catalog visibility flags, and global product attributes (e.g. <code>pa_color</code>, <code>pa_size</code>, <code>pa_brand</code>):
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Column Name</th>
+                    <th>SQL Data Type</th>
+                    <th>Indexing &amp; Constraints</th>
+                    <th>Architectural Responsibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>id</code></td>
+                    <td><code>bigint(20) unsigned</code></td>
+                    <td><code>PRIMARY KEY AUTO_INCREMENT</code></td>
+                    <td>Unique row identifier for strict row-level pointer integrity.</td>
+                  </tr>
+                  <tr>
+                    <td><code>product_id</code></td>
+                    <td><code>bigint(20) unsigned</code></td>
+                    <td><code>KEY idx_product</code></td>
+                    <td>Foreign product ID reference. Targeted during atomic term synchronization and product deletion.</td>
+                  </tr>
+                  <tr>
+                    <td><code>taxonomy</code></td>
+                    <td><code>varchar(128)</code></td>
+                    <td>Compound Keys</td>
+                    <td>Public taxonomy identifier (e.g. <code>product_cat</code>, <code>pa_color</code>, <code>product_visibility</code>).</td>
+                  </tr>
+                  <tr>
+                    <td><code>term_id</code></td>
+                    <td><code>bigint(20) unsigned</code></td>
+                    <td>Compound Keys</td>
+                    <td>WordPress <code>wp_terms.term_id</code> integer key. B-tree indexed for instantaneous equality checks.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              The table enforces a composite unique constraint to guarantee zero duplicate term mappings per product:
+            </p>
+
+            <pre><code>CREATE TABLE {$wpdb-&gt;prefix}ppfx_product_terms (
+  id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  product_id bigint(20) unsigned NOT NULL,
+  taxonomy varchar(128) NOT NULL,
+  term_id bigint(20) unsigned NOT NULL,
+  PRIMARY KEY  (id),
+  UNIQUE KEY uniq_product_tax_term (product_id, taxonomy, term_id),
+  KEY idx_product (product_id),
+  KEY idx_taxonomy_term (taxonomy, term_id),
+  KEY idx_tax_term_product (taxonomy, term_id, product_id)
+) {$collate};</code></pre>
+          </div>
+
+          <!-- ================================================================
+               5.3 Composite Index Strategy & Column Types
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-5-3">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">5.3 INDEX ARCHITECTURE</span>
+              <h3>Composite Index Strategy &amp; Column Types</h3>
+            </div>
+            <p>
+              The physical layout of MySQL indexes dictates whether a query executes via an in-memory B-tree index scan or falls back to an expensive disk-bound temporary table and filesort operation. Pickory implements tailored composite indexes designed specifically around catalog filtering access patterns:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Index Name</th>
+                    <th>Table</th>
+                    <th>Indexed Columns</th>
+                    <th>Execution Optimization</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>idx_price_range</code></td>
+                    <td><code>ppfxi</code></td>
+                    <td><code>(min_price, max_price)</code></td>
+                    <td>Satisfies dual-bound price slider queries (<code>min_price &gt;= X AND max_price &lt;= Y</code>) in a single contiguous B-tree range scan.</td>
+                  </tr>
+                  <tr>
+                    <td><code>idx_stock_product</code></td>
+                    <td><code>ppfxi</code></td>
+                    <td><code>(stock_status, product_id)</code></td>
+                    <td>Enables instantaneous index-only filtering for in-stock catalog products without touching table data pages.</td>
+                  </tr>
+                  <tr>
+                    <td><code>idx_tax_term_product</code></td>
+                    <td><code>ppfxt</code></td>
+                    <td><code>(taxonomy, term_id, product_id)</code></td>
+                    <td><strong>Covering Index</strong>: MySQL satisfies both the <code>WHERE taxonomy = %s AND term_id IN (...)</code> clause and the <code>JOIN ppfxt.product_id = wp_posts.ID</code> straight from the index tree without row pointer dereferencing.</td>
+                  </tr>
+                  <tr>
+                    <td><code>uniq_product_tax_term</code></td>
+                    <td><code>ppfxt</code></td>
+                    <td><code>(product_id, taxonomy, term_id)</code></td>
+                    <td>Prevents multi-worker concurrency race conditions from inserting redundant attribute rows during bulk imports.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="ui-callout" data-type="guardrail" role="note">
+              <div class="ui-callout-header">
+                <span class="ui-badge" data-variant="success">[ENGINEERING RULE]</span>
+                <h4 class="ui-callout-title">Fixed-Point Decimal Precision (decimal(10,2))</h4>
+              </div>
+              <div class="ui-callout-body">
+                Floating-point data types (<code>FLOAT</code>, <code>DOUBLE</code>) introduce binary rounding imprecisions (e.g. <code>19.990000000000002</code>), causing price slider boundary queries (<code>min_price &gt;= 19.99</code>) to intermittently exclude products. All price columns in Pickory strictly enforce <code>decimal(10,2)</code> to guarantee exact monetary arithmetic.
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               5.4 Real-Time Product Sync Lifecycle
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-5-4">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">5.4 REAL-TIME SYNC</span>
+              <h3>Real-Time Product Sync Lifecycle</h3>
+            </div>
+            <p>
+              Whenever product attributes, prices, or inventory levels mutate in WooCommerce, <code>PPFX_Product_Indexer</code> (<code>includes/index/class-ppfx-product-indexer.php</code>) synchronizes both index tables in real time:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>WooCommerce Event / Hook</th>
+                    <th>Invoked Method</th>
+                    <th>Sync Execution Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>save_post_product</code><br><code>woocommerce_update_product</code></td>
+                    <td><code>sync_product($product_id)</code></td>
+                    <td>Calculates variable bounds, runs atomic <code>$wpdb-&gt;replace()</code> on <code>ppfxi</code>, synchronizes term rows in an explicit MySQL transaction, and purges price transients.</td>
+                  </tr>
+                  <tr>
+                    <td><code>woocommerce_new_product</code></td>
+                    <td><code>sync_product($product_id)</code></td>
+                    <td>Inserts new flat index record and term mappings, then bumps the shared query cache version.</td>
+                  </tr>
+                  <tr>
+                    <td><code>delete_post</code><br><code>woocommerce_delete_product</code></td>
+                    <td><code>delete_product($product_id)</code></td>
+                    <td>Deletes matching rows from both <code>ppfxi</code> and <code>ppfxt</code> by <code>product_id</code>, purges price cache, and bumps query cache version.</td>
+                  </tr>
+                  <tr>
+                    <td><code>woocommerce_product_set_stock_status</code></td>
+                    <td><code>sync_product($product_id)</code></td>
+                    <td>Instantly updates <code>stock_status</code> column when inventory depletes via order placement.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">VARIABLE BOUNDS</span>
+                <h4 class="ui-card-title">Variable Product Calculation</h4>
+                <p class="ui-card-desc">
+                  For <code>WC_Product_Variable</code> products, the indexer queries <code>$product-&gt;get_variation_prices(true)</code>, computing the exact lowest variation price, highest variation price, collective stock status, and collective sale status.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">ATOMIC TRANSACTIONS</span>
+                <h4 class="ui-card-title">Term Sync Transaction Boundary</h4>
+                <p class="ui-card-desc">
+                  Term replacement executes inside an isolated database transaction: <code>START TRANSACTION &rarr; DELETE FROM ppfxt WHERE product_id = %d &rarr; Bulk INSERT &rarr; COMMIT</code>. On failure, <code>ROLLBACK</code> prevents partial term records.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               5.5 Bulk Reindexing & CLI Locks
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-5-5">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">5.5 BATCH &amp; CLI OPS</span>
+              <h3>Bulk Reindexing &amp; CLI Locks</h3>
+            </div>
+            <p>
+              During initial installation or catalog-wide migrations, <code>PPFX_Product_Indexer::bulk_sync()</code> rebuilds both index tables from scratch using high-speed chunked batch processing:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Pipeline Phase</th>
+                    <th>Mechanism</th>
+                    <th>Architectural Protection</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Concurrency Lock</strong></td>
+                    <td><code>set_transient('ppfx_bulk_sync_lock', 1, 600)</code></td>
+                    <td>Prevents concurrent admin requests or cron jobs from running overlapping reindexes. Automatically released in a <code>try...finally</code> block.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Table Truncation</strong></td>
+                    <td><code>TRUNCATE TABLE {$table}</code></td>
+                    <td>Instantly resets auto-increment counters and purges old data without slow row-by-row deletes.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Keyset Pagination</strong></td>
+                    <td><code>WHERE ID &gt; %d ORDER BY ID ASC LIMIT 200</code></td>
+                    <td>Bypasses <code>OFFSET</code> performance decay. On a 100,000 product catalog, page 500 executes as fast as page 1.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Verification &amp; Flag</strong></td>
+                    <td><code>PPFX_Index_Schema::mark_built()</code></td>
+                    <td>Validates total indexed rows against published product counts and sets <code>ppfx_index_built = 1</code> in <code>wp_options</code>.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <pre><code>// Keyset Pagination Cursor Loop
+$last_id = 0;
+$batch   = 200;
+do {
+    $ids = $wpdb-&gt;get_col( $wpdb-&gt;prepare(
+        "SELECT ID FROM {$wpdb-&gt;posts} WHERE post_type = 'product' AND post_status = 'publish' AND ID &gt; %d ORDER BY ID ASC LIMIT %d",
+        $last_id,
+        $batch
+    ) );
+    foreach ( $ids as $id ) {
+        self::sync_product( (int) $id, false );
+    }
+    if ( ! empty( $ids ) ) {
+        $last_id = (int) end( $ids );
+    }
+} while ( count( $ids ) === $batch );</code></pre>
+          </div>
+
+          <!-- ================================================================
+               5.6 Persistent Query Cache Tier (PPFX_Query_Cache)
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-5-6">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">5.6 PERSISTENT CACHE</span>
+              <h3>Persistent Query Cache Tier (<code>PPFX_Query_Cache</code>)</h3>
+            </div>
+            <p>
+              Located in <code>includes/services/class-ppfx-query-cache.php</code>, this subsystem decouples SQL query compilation from cache persistence. To maximize Redis and Memcached hit rates, Pickory employs an <strong>ID-Only Caching Architecture</strong>:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">LIGHTWEIGHT PAYLOAD</span>
+                <h4 class="ui-card-title">ID-Only Array Storage</h4>
+                <p class="ui-card-desc">
+                  Instead of serializing heavy <code>WC_Product</code> objects or rendered HTML fragments into Redis, Pickory caches only matching post ID arrays (e.g. <code>[102, 105, 118]</code>), <code>found_posts</code>, and <code>max_num_pages</code>.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="success">DYNAMIC HYDRATION</span>
+                <h4 class="ui-card-title"><code>hydrate_query()</code> Engine</h4>
+                <p class="ui-card-desc">
+                  Reconstructs a live <code>WP_Query</code> instance using <code>'post__in' =&gt; $cached_ids</code>, <code>'orderby' =&gt; 'post__in'</code>, and restores pagination metadata. Dynamic cart rules, live currency switchers, and user-specific pricing apply seamlessly.
+                </p>
+              </div>
+            </div>
+
+            <p>
+              Cache keys are generated deterministically by normalizing and alphabetically sorting all incoming criteria:
+            </p>
+
+            <pre><code>// Deterministic Cache Key Formula
+$key = 'ppfx_query_' . PPFX_Query_Cache::get_query_cache_version() . '_' . md5( wp_json_encode( $normalized_params ) );</code></pre>
+          </div>
+
+          <!-- ================================================================
+               5.7 Cache Key Hashing & Invalidation on Save
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-5-7">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">5.7 CACHE INVALIDATION</span>
+              <h3>Cache Key Hashing &amp; Invalidation on Save</h3>
+            </div>
+            <p>
+              Standard caching plugins flush entire Redis databases or iterate through thousands of wildcard keys (e.g. <code>KEYS ppfx_query_*</code>) during product updates, causing severe CPU spikes and blocking single-threaded cache engines. Pickory solves this with <strong>O(1) Versioned Group Invalidation</strong>:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Component</th>
+                    <th>Mechanism</th>
+                    <th>Performance Characteristic</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Version Storage</strong></td>
+                    <td><code>update_option('ppfx_query_cache_version', (string) microtime(true))</code></td>
+                    <td>Stored in <code>wp_options</code> (autoloaded). Single scalar integer/float mutation.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Invalidation Cost</strong></td>
+                    <td><strong>O(1) Constant Time</strong></td>
+                    <td>Zero keyspace iterations. Previous cached keys immediately become orphaned and are evicted naturally by Redis LRU policy.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Session Bypass Guard</strong></td>
+                    <td><code>has_dynamic_session()</code></td>
+                    <td>Bypasses caching when a customer has items in their cart (<code>!WC()-&gt;cart-&gt;is_empty()</code>), is logged in, or has active session discount coupons.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Nightly Sale Cron</strong></td>
+                    <td><code>PPFX_Index_Scheduler::sync_expired_sales()</code></td>
+                    <td>Runs daily via <code>ppfx_sync_expired_sales</code> cron to gracefully update items whose scheduled sale period ended at midnight.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             TOPIC 5: REST API, FRAGMENT RENDERING & LIFECYCLE
+             ================================================================== -->
+        <section class="doc-section" id="rest-api-lifecycle">
+
+          <!-- Document Header Block -->
+          <header class="doc-header-block">
+            <h1 class="doc-main-title">5. REST API, Fragment Rendering &amp; Lifecycle</h1>
+            <p class="doc-lead-paragraph">
+              Operating over the dedicated endpoint <code>/wp-json/pickory-filter/v1/products</code>, the Pickory REST subsystem coordinates asynchronous client updates with atomic server-side HTML fragment compilation. Powered by <code>PPFX_Products_Controller</code> and <code>PPFX_Fragment_Renderer</code> with modern WordPress <code>WP_HTML_Tag_Processor</code> attribute injection, the engine renders and swaps product grids, pagination controls, result counters, and loop toolbars with zero Cumulative Layout Shift (CLS) and zero REST URL leakage.
+            </p>
+            <div class="doc-meta-pills">
+              <span class="ui-badge" data-variant="brand">WP REST API</span>
+              <span class="ui-badge">TOKEN RATE LIMIT</span>
+              <span class="ui-badge">HTML TAG PROCESSOR</span>
+              <span class="ui-badge">TARGETED DOM SWAP</span>
+              <span class="ui-badge">EVENT BUS API</span>
+              <span class="ui-badge">HPOS COMPATIBLE</span>
+            </div>
+          </header>
+
+          <!-- Feature Highlight Grid (UI Cards) -->
+          <div class="ui-card-grid">
+            <div class="ui-card" data-type="feature">
+              <span class="ui-badge" data-variant="brand">ENDPOINT ARCHITECTURE</span>
+              <h3 class="ui-card-title">Dedicated Public Route</h3>
+              <p class="ui-card-desc">
+                Exposes <code>pickory-filter/v1/products</code> via <code>WP_REST_Server::READABLE</code> with recursive argument sanitization, type casting, and schema validation.
+              </p>
+            </div>
+
+            <div class="ui-card" data-type="feature">
+              <span class="ui-badge" data-variant="brand">FRAGMENTATION</span>
+              <h3 class="ui-card-title">PPFX_Fragment_Renderer</h3>
+              <p class="ui-card-desc">
+                Renders isolated DOM replacement regions (product loop, pagination, result counters, toolbars) in a single response payload while overriding <code>$wp_query</code> in an isolated boundary.
+              </p>
+            </div>
+
+            <div class="ui-card" data-type="feature">
+              <span class="ui-badge" data-variant="brand">TAG INJECTION</span>
+              <h3 class="ui-card-title">WP_HTML_Tag_Processor</h3>
+              <p class="ui-card-desc">
+                Injects instance attributes (<code>data-ppfx-instance</code>) into wrapper tags safely using the native WordPress tag streaming engine without regex fragility.
+              </p>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               6.1 REST Endpoint & Schema (/pickory-filter/v1/products)
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-6-1">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">6.1 REST SPECIFICATION</span>
+              <h3>REST Endpoint &amp; Schema (<code>/pickory-filter/v1/products</code>)</h3>
+            </div>
+            <p>
+              Registered in <code>includes/class-ppfx-rest-api.php</code> and managed by <code>PPFX_Products_Controller</code> (<code>includes/rest/class-ppfx-products-controller.php</code>), the endpoint schema defines explicit types, sanitization callbacks, and enum boundaries for all filtering criteria:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>REST Argument</th>
+                    <th>Schema Type</th>
+                    <th>Sanitize Callback / Validation</th>
+                    <th>Default / Allowed Values</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>ppfx_page</code></td>
+                    <td><code>integer</code></td>
+                    <td><code>absint</code></td>
+                    <td>Default: <code>1</code>. Controls catalog pagination offset.</td>
+                  </tr>
+                  <tr>
+                    <td><code>per_page</code></td>
+                    <td><code>integer</code></td>
+                    <td><code>min(max(absint($v), 1), $max_per_page)</code></td>
+                    <td>Default: <code>0</code> (falls back to WooCommerce default). Filterable ceiling up to 100.</td>
+                  </tr>
+                  <tr>
+                    <td><code>instance_id</code></td>
+                    <td><code>string</code></td>
+                    <td><code>sanitize_key</code></td>
+                    <td>Unique widget instance ID. Stripped before query construction and cache hashing.</td>
+                  </tr>
+                  <tr>
+                    <td><code>toolbar_missing</code></td>
+                    <td><code>boolean</code></td>
+                    <td><code>rest_sanitize_boolean</code></td>
+                    <td>Default: <code>false</code>. Directs server to compile <code>.ppfx-loop-toolbar</code> if client page originally loaded empty.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx_category</code></td>
+                    <td><code>string</code></td>
+                    <td><code>sanitize_text_field</code></td>
+                    <td>Comma-separated category slugs for hierarchical taxonomy filtering.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx_orderby</code></td>
+                    <td><code>string</code></td>
+                    <td><code>sanitize_text_field</code> with enum whitelist</td>
+                    <td><code>menu_order</code>, <code>popularity</code>, <code>rating</code>, <code>date</code>, <code>price</code>, <code>price-desc</code>, <code>rand</code>, <code>title</code>, <code>id</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx_order</code></td>
+                    <td><code>string</code></td>
+                    <td><code>strtoupper(sanitize_text_field($v))</code></td>
+                    <td>Enum: <code>''</code>, <code>'ASC'</code>, <code>'DESC'</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx_min_price</code><br><code>ppfx_max_price</code></td>
+                    <td><code>number</code></td>
+                    <td><code>max(0.0, (float) $v)</code></td>
+                    <td>Default: <code>0.0</code>. Non-negative currency boundaries parsed as floats.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx_filter_{tax}</code></td>
+                    <td><code>string</code></td>
+                    <td><code>sanitize_text_field</code></td>
+                    <td>Dynamically registered for all active WooCommerce product attributes (e.g. <code>ppfx_filter_color</code>).</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              Before dispatching queries or computing cache keys, <code>PPFX_Utility::normalize_public_filter_params()</code> transforms public prefixed parameters into clean internal keys:
+            </p>
+
+            <pre><code>// Parameter Normalization & UI State Segregation
+$normalized_params = PPFX_Utility::normalize_public_filter_params( $request );
+// UI transport keys must never influence query logic or cache identity:
+unset( $normalized_params['toolbar_missing'], $normalized_params['instance_id'] );</code></pre>
+          </div>
+
+          <!-- ================================================================
+               6.2 Nonce Verification & Security
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-6-2">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">6.2 ACCESS CONTROL &amp; SECURITY</span>
+              <h3>Nonce Verification &amp; Security</h3>
+            </div>
+            <p>
+              Product filtering endpoints serve public catalog data that must remain fast and cacheable for unauthenticated guests, while remaining strictly protected against Denial-of-Service (DoS) scraping attacks:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Security Layer</th>
+                    <th>Implementation Mechanism</th>
+                    <th>Defensive Invariant</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Permission Callback</strong></td>
+                    <td><code>'permission_callback' =&gt; '__return_true'</code></td>
+                    <td>Permits anonymous catalog browsing. No user session cookies or CSRF nonces required for public reads.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Token Bucket Limiter</strong></td>
+                    <td><code>PPFX_Rate_Limiter::is_rate_limited('ppfx_rate', 80)</code></td>
+                    <td>Caps anonymous requests at <strong>80 requests/minute per client IP</strong> using transient buckets. Returns HTTP 429 when exceeded.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Proxy Cache Guard</strong></td>
+                    <td><code>$response-&gt;header('Cache-Control', 'no-store')</code></td>
+                    <td>Prevents intermediary reverse proxies (Cloudflare, Varnish) from caching dynamic REST fragment responses against client-specific URLs.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>SQL Injection Barrier</strong></td>
+                    <td>Strict Type Casting in <code>get_endpoint_args()</code></td>
+                    <td>All inputs are strictly cast to <code>absint</code>, <code>float</code>, or whitelisted against enum dictionaries before reaching the query builder.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               6.3 PPFX_Fragment_Renderer DOM Structure
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-6-3">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">6.3 FRAGMENT RENDERING</span>
+              <h3><code>PPFX_Fragment_Renderer</code> DOM Structure</h3>
+            </div>
+            <p>
+              Located in <code>includes/rest/class-ppfx-fragment-renderer.php</code>, this engine produces an isolated map of HTML fragments corresponding exactly to client-side DOM replacement targets:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Fragment Selector Key</th>
+                    <th>Template Helper / Output Source</th>
+                    <th>Architectural Responsibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>.woocommerce-result-count</code></td>
+                    <td>Localized text string (e.g. <code>Showing 1–12 of 36 results</code>)</td>
+                    <td>Updates catalog counter without triggering a layout reflow. Outputs <em>No products found</em> when count is 0.</td>
+                  </tr>
+                  <tr>
+                    <td><code>.ppfx-loop-toolbar</code></td>
+                    <td><code>do_action('woocommerce_before_shop_loop')</code></td>
+                    <td>Optional ordering dropdown and result count toolbar. Rendered only when requested via <code>toolbar_missing: true</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>.ppfx-products-wrapper</code></td>
+                    <td><code>woocommerce_product_loop_start()</code> &rarr; <code>wc_get_template_part('content', 'product')</code> &rarr; <code>woocommerce_product_loop_end()</code></td>
+                    <td>The core catalog product grid. Automatically wrapped in a container stamped with <code>data-ppfx-instance="$instance_id"</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>.woocommerce-pagination</code></td>
+                    <td><code>woocommerce_pagination()</code></td>
+                    <td>Standard pagination navigation. Outputs a hidden dummy nav element when results fit on a single page to maintain stable DOM hooks.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              To ensure WooCommerce template helpers execute correctly within a REST request context, the renderer executes inside an isolated <code>try ... finally</code> boundary:
+            </p>
+
+            <pre><code>// Isolated Global $wp_query Override
+global $wp_query, $post;
+$original_query = $wp_query;
+$original_post  = $post;
+
+try {
+    $wp_query = $query;
+    self::setup_loop_props( $query );
+    // Capture loop HTML fragments...
+} finally {
+    $wp_query = $original_query;
+    $post     = $original_post;
+    wc_reset_loop();
+    wp_reset_postdata();
+}</code></pre>
+          </div>
+
+          <!-- ================================================================
+               6.4 HTML Tag Processor Attribute Injection
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-6-4">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">6.4 MODERN HTML INJECTION</span>
+              <h3><code>WP_HTML_Tag_Processor</code> Attribute Injection</h3>
+            </div>
+            <p>
+              Injecting dynamic attributes into captured template markup via regular expressions (e.g. <code>preg_replace</code>) frequently corrupts HTML by mangling nested tags, quotes, or void elements. Pickory leverages WordPress 6.2+'s native streaming engine <code>WP_HTML_Tag_Processor</code>:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">PRECISION STREAMING</span>
+                <h4 class="ui-card-title">Deterministic Tag Traversal</h4>
+                <p class="ui-card-desc">
+                  Finds the outer wrapper tag via <code>$processor-&gt;next_tag(array('class_name' =&gt; 'ppfx-products-wrapper'))</code> and sets <code>data-ppfx-instance</code> with zero risk of broken markup.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="success">REST LEAKAGE GUARD</span>
+                <h4 class="ui-card-title">Referrer URL Normalization</h4>
+                <p class="ui-card-desc">
+                  Hooks <code>get_pagenum_link</code> and <code>woocommerce_product_add_to_cart_url</code> during fragment rendering to replace REST API endpoints with the actual page referrer URL.
+                </p>
+              </div>
+            </div>
+
+            <pre><code>// Safe Instance Attribute Injection via Tag Processor
+$processor = new WP_HTML_Tag_Processor( $captured_products );
+if ( $processor-&gt;next_tag( array( 'class_name' =&gt; 'ppfx-products-wrapper' ) ) ) {
+    $processor-&gt;set_attribute( 'data-ppfx-instance', $instance_id );
+    $captured_products = $processor-&gt;get_updated_html();
+}</code></pre>
+          </div>
+
+          <!-- ================================================================
+               6.5 Targeted DOM Container Swap
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-6-5">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">6.5 CLIENT DOM SWAP</span>
+              <h3>Targeted DOM Container Swap</h3>
+            </div>
+            <p>
+              When the REST response arrives on the client, <code>src/js/components/filter-form.js</code> performs targeted fragment replacement rather than an unconstrained innerHTML wipe:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Swap Sequence</th>
+                    <th>Target DOM Node</th>
+                    <th>Hydration Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>1. Resolution</strong></td>
+                    <td><code>.ppfx-products-wrapper[data-ppfx-instance="..."]</code></td>
+                    <td>Resolves target container using instance ID first, falling back to configured theme selector or standard <code>.products</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>2. Replace Wrapper</strong></td>
+                    <td><code>outerHTML</code> Swap</td>
+                    <td>Replaces existing products wrapper with incoming <code>fragments['.ppfx-products-wrapper']</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>3. Replace Nav</strong></td>
+                    <td><code>.woocommerce-pagination</code></td>
+                    <td>Swaps pagination controls. If results fit on a single page, injects hidden nav anchor so subsequent multi-page queries can remount.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>4. Update Counter</strong></td>
+                    <td><code>.woocommerce-result-count</code></td>
+                    <td>Updates text content without altering enclosing toolbar layout or filter toggles.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>5. Event Rebind</strong></td>
+                    <td><code>document.dispatchEvent()</code></td>
+                    <td>Fires <code>ppfx:filter-complete</code> and WooCommerce <code>wc_fragments_refreshed</code> to allow theme scripts to rebind tooltips and quickview modals.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               6.6 Plugin Bootstrap & Autoload
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-6-6">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">6.6 BOOTSTRAP LIFECYCLE</span>
+              <h3>Plugin Bootstrap &amp; Autoload</h3>
+            </div>
+            <p>
+              Located in the root <code>pickory-product-filter.php</code> file, the bootstrap process enforces strict dependency validation and resource efficiency:
+            </p>
+
+            <ol>
+              <li><strong>HPOS Compatibility</strong>: Declares compatibility with WooCommerce High-Performance Order Storage (HPOS) via <code>FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true)</code> before WooCommerce initializes.</li>
+              <li><strong>Version &amp; Path Constants</strong>: Defines <code>PPFX_VERSION</code>, <code>PPFX_INDEX_VERSION</code>, <code>PPFX_PLUGIN_DIR</code>, and <code>PPFX_PLUGIN_URL</code>.</li>
+              <li><strong>Lazy Class Loading</strong>: Hooks into <code>plugins_loaded</code>. If WooCommerce is absent, it halts loading immediately and displays an informative admin notice—consuming zero memory on non-eCommerce requests.</li>
+              <li><strong>Lifecycle Hooks</strong>:
+                <ul>
+                  <li><code>register_activation_hook</code>: Invokes <code>PPFX_Activator::activate()</code> to generate index tables and schedule the daily expired sales cron.</li>
+                  <li><code>register_deactivation_hook</code>: Unregisters scheduled cron events (<code>ppfx_sync_expired_sales</code>) and clears pending Action Scheduler jobs.</li>
+                </ul>
+              </li>
+            </ol>
+          </div>
+
+          <!-- ================================================================
+               6.7 Public Hooks & JS Events API
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-6-7">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">6.7 EXTENSION APIS</span>
+              <h3>Public Hooks &amp; JS Events API</h3>
+            </div>
+            <p>
+              Pickory provides comprehensive extension surfaces for third-party developers across both PHP and JavaScript runtimes:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Hook / Event Name</th>
+                    <th>Runtime</th>
+                    <th>Payload / Arguments</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>ppfx_rest_max_per_page</code></td>
+                    <td>PHP Filter</td>
+                    <td><code>int $max = 100</code></td>
+                    <td>Filters the maximum allowed products per page on the REST endpoint.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx_cache_key_context</code></td>
+                    <td>PHP Filter</td>
+                    <td><code>array $context, WP_REST_Request $request</code></td>
+                    <td>Appends custom scalar keys (e.g. B2B customer group, store region) to the cache key hash.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx_price_cache_currencies</code></td>
+                    <td>PHP Filter</td>
+                    <td><code>array $currencies</code></td>
+                    <td>Filters list of currency codes whose price range transients are purged on product save.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx:url-change</code></td>
+                    <td>JS Window Event</td>
+                    <td><code>{ detail: { params, source } }</code></td>
+                    <td>Dispatched whenever URL search parameters mutate (filter click, price slide, popstate).</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx:filter-request</code></td>
+                    <td>JS Window Event</td>
+                    <td><code>{ detail: { instanceId, params, requestId } }</code></td>
+                    <td>Dispatched immediately before an AJAX REST request is sent across the network.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx:filter-complete</code></td>
+                    <td>JS Window Event</td>
+                    <td><code>{ detail: { instanceId, response, fragments } }</code></td>
+                    <td>Dispatched after fragment replacement and DOM hydration completes.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx:filter-reset</code></td>
+                    <td>JS Window Event</td>
+                    <td><code>{ detail: { instanceId } }</code></td>
+                    <td>Dispatched when user clicks the "Clear All Filters" button.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             TOPIC 6: ADMIN ARCHITECTURE, SECURITY & EXTENSIBILITY
+             ================================================================== -->
+        <section class="doc-section" id="admin-security-extensibility">
+
+          <!-- Document Header Block -->
+          <header class="doc-header-block">
+            <h1 class="doc-main-title">6. Admin Architecture, Security &amp; Extensibility</h1>
+            <p class="doc-lead-paragraph">
+              The administrative and security foundation of Pickory Product Filter enforces strict runtime boundaries, cryptographic nonce validations, token bucket IP rate limiting, term meta persistence for visual color/image swatches, and enterprise guardrails against prototype pollution, CSS injection, and PHP memory exhaustion.
+            </p>
+            <div class="doc-meta-pills">
+              <span class="ui-badge" data-variant="brand">ADMIN ARCHITECTURE</span>
+              <span class="ui-badge">SWATCH TERM META</span>
+              <span class="ui-badge">TOKEN RATE LIMIT</span>
+              <span class="ui-badge">PROTOTYPE HARDENING</span>
+              <span class="ui-badge">CSS ESCAPING</span>
+              <span class="ui-badge">MEMORY GUARDRAILS</span>
+            </div>
+          </header>
+
+          <!-- Feature Highlight Grid (UI Cards) -->
+          <div class="ui-card-grid">
+            <div class="ui-card" data-type="feature">
+              <span class="ui-badge" data-variant="brand">ADMIN CONTROL</span>
+              <h3 class="ui-card-title">Settings Architecture</h3>
+              <p class="ui-card-desc">
+                Centralized settings registration managing filter modes, container selectors, debounce timings, and async Action Scheduler index rebuilds.
+              </p>
+            </div>
+
+            <div class="ui-card" data-type="feature">
+              <span class="ui-badge" data-variant="brand">SWATCH SYSTEM</span>
+              <h3 class="ui-card-title">Term Meta Swatches</h3>
+              <p class="ui-card-desc">
+                <code>PPFX_Term_Meta</code> binds Iris color pickers and media library uploaders directly to <code>pa_*</code> attribute terms with nonce security.
+              </p>
+            </div>
+
+            <div class="ui-card" data-type="feature">
+              <span class="ui-badge" data-variant="security">DoS DEFENSE</span>
+              <h3 class="ui-card-title">Token Bucket Limiter</h3>
+              <p class="ui-card-desc">
+                <code>PPFX_Rate_Limiter</code> throttles public REST traffic with Cloudflare IP parsing, proxy validation, and memory-backed rate buckets.
+              </p>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               7.1 Admin Settings Page Architecture
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-7-1">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">7.1 ADMIN CONTROL</span>
+              <h3>Admin Settings Page Architecture</h3>
+            </div>
+            <p>
+              Managed by <code>PPFX_Admin</code> (<code>includes/admin/class-ppfx-admin.php</code>) and rendered by <code>PPFX_Settings_Page</code>, the admin subsystem provides store managers with centralized control over frontend behavior and indexing operations:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Admin Action / Hook</th>
+                    <th>Execution Handler</th>
+                    <th>Security &amp; Processing Guarantee</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>admin_post_ppfx_rebuild_index</code></td>
+                    <td><code>handle_rebuild_index()</code></td>
+                    <td>Verifies <code>manage_options</code> capability and <code>ppfx_rebuild_index_nonce</code>. Dispatches asynchronous index rebuilding via <code>as_enqueue_async_action('ppfx_rebuild_index_action')</code> with fallback to <code>wp_schedule_single_event()</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>admin_post_ppfx_activate_license</code></td>
+                    <td><code>handle_activate_license()</code></td>
+                    <td>Verifies <code>ppfx_license_nonce_field</code>, validates license key against remote Lemon Squeezy API, and schedules recurring license verification cron.</td>
+                  </tr>
+                  <tr>
+                    <td><code>admin_post_ppfx_deactivate_license</code></td>
+                    <td><code>handle_deactivate_license()</code></td>
+                    <td>Revokes store registration on Lemon Squeezy and cleans up local license options and transients.</td>
+                  </tr>
+                  <tr>
+                    <td><code>admin_notices</code></td>
+                    <td><code>show_admin_notices()</code></td>
+                    <td>Renders contextual status banners (e.g. index queued, license activated, WooCommerce missing).</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              When rebuilding the product index from the admin interface, operations are strictly offloaded to background workers to prevent browser HTTP timeout errors on large catalogs:
+            </p>
+
+            <pre><code>// Asynchronous Index Rebuild Enqueueing
+if ( function_exists( 'as_enqueue_async_action' ) ) {
+    as_enqueue_async_action( 'ppfx_rebuild_index_action' );
+} elseif ( ! wp_next_scheduled( 'ppfx_rebuild_index_action' ) ) {
+    wp_schedule_single_event( time(), 'ppfx_rebuild_index_action' );
+}</code></pre>
+          </div>
+
+          <!-- ================================================================
+               7.2 Swatch Taxonomy Term Meta
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-7-2">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">7.2 SWATCH PERSISTENCE</span>
+              <h3>Swatch Taxonomy Term Meta</h3>
+            </div>
+            <p>
+              The <code>PPFX_Term_Meta</code> class (<code>includes/admin/class-ppfx-term-meta.php</code>) extends all public product attribute taxonomies (e.g. <code>pa_color</code>, <code>pa_pattern</code>) with visual swatch metadata:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Field Name</th>
+                    <th>Meta Key</th>
+                    <th>UI Component</th>
+                    <th>Sanitization &amp; Storage Type</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Swatch Color</strong></td>
+                    <td><code>ppfx_color</code></td>
+                    <td>Iris Color Picker input with hex code validation.</td>
+                    <td><code>sanitize_hex_color()</code> &rarr; stored as string (e.g. <code>#2563eb</code>) in <code>wp_termmeta</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Swatch Image</strong></td>
+                    <td><code>ppfx_image</code></td>
+                    <td>WordPress Media Library modal uploader with live thumbnail preview.</td>
+                    <td><code>absint()</code> &rarr; stored as WordPress media attachment ID in <code>wp_termmeta</code>.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              Saving swatch metadata is strictly guarded by capability checks and cryptographic nonces:
+            </p>
+
+            <pre><code>// Term Meta Persistence Security Guard
+if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ppfx_term_meta_nonce_field'] ) ), 'ppfx_term_meta_nonce' ) ) {
+    return;
+}
+if ( ! current_user_can( 'edit_term', $term_id ) ) {
+    return;
+}
+if ( isset( $_POST['ppfx_color'] ) ) {
+    update_term_meta( $term_id, 'ppfx_color', sanitize_hex_color( wp_unslash( $_POST['ppfx_color'] ) ) );
+}
+if ( isset( $_POST['ppfx_image'] ) ) {
+    update_term_meta( $term_id, 'ppfx_image', absint( wp_unslash( $_POST['ppfx_image'] ) ) );
+}</code></pre>
+          </div>
+
+          <!-- ================================================================
+               7.3 Token Bucket Rate Limiter
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-7-3">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">7.3 RATE LIMITING</span>
+              <h3>Token Bucket Rate Limiter</h3>
+            </div>
+            <p>
+              Located in <code>includes/services/class-ppfx-rate-limiter.php</code>, <code>PPFX_Rate_Limiter</code> protects the REST endpoint against scrapers and denial-of-service attempts:
+            </p>
+
+            <div class="doc-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">IP SPOOFING DEFENSE</span>
+                <h4 class="ui-card-title">Robust Client IP Detection</h4>
+                <p class="ui-card-desc">
+                  Prioritizes Cloudflare's <code>HTTP_CF_CONNECTING_IP</code>. Validates addresses with <code>FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE</code>. Generic headers (<code>X-Forwarded-For</code>) require explicit opt-in via <code>PPFX_TRUST_PROXY</code>.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="success">MEMORY EFFICIENCY</span>
+                <h4 class="ui-card-title">Atomic Object Cache Tier</h4>
+                <p class="ui-card-desc">
+                  When Redis or Memcached is active (<code>wp_using_ext_object_cache()</code>), rate counters increment atomically via <code>wp_cache_incr()</code>. Automatically bypasses database transient writes to eliminate <code>wp_options</code> bloat.
+                </p>
+              </div>
+            </div>
+
+            <pre><code>// Atomic Cache Rate Check
+$hit_count = wp_cache_incr( $transient_key, 1, 'pickory-product-filter' );
+if ( false === $hit_count ) {
+    wp_cache_set( $transient_key, 1, 'pickory-product-filter', $window_in_seconds );
+    $hit_count = 1;
+}
+return $hit_count > $max_hits; // Returns true when rate exceeded</code></pre>
+          </div>
+
+          <!-- ================================================================
+               7.4 Strict Parameter Sanitization
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-7-4">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">7.4 SANITIZATION PIPELINE</span>
+              <h3>Strict Parameter Sanitization &amp; Whitelisting</h3>
+            </div>
+            <p>
+              Every incoming request parameter undergoes strict type coercion and defensive validation across both REST endpoint ingestion and SSR query parsing:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Parameter Category</th>
+                    <th>Sanitization Routine</th>
+                    <th>Enforced Boundary</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Pagination &amp; Page Limits</strong></td>
+                    <td><code>absint($v)</code></td>
+                    <td>Non-negative integers strictly bounded between <code>1</code> and <code>$max_per_page</code> (100).</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Price Slider Bounds</strong></td>
+                    <td><code>max(0.0, (float) $v)</code></td>
+                    <td>Guaranteed non-negative float numbers, preventing negative price injection or non-numeric strings.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Catalog Sorting Order</strong></td>
+                    <td>Enum whitelist check</td>
+                    <td>Strictly whitelisted against allowed WooCommerce sort keys (<code>menu_order</code>, <code>popularity</code>, <code>rating</code>, <code>date</code>, <code>price</code>, <code>price-desc</code>). Unrecognized values fall back to catalog default.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Taxonomy &amp; Attribute Slugs</strong></td>
+                    <td><code>sanitize_text_field(wp_unslash($v))</code></td>
+                    <td>Strips tags, invalid characters, and escapes quotes before SQL query compilation.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               7.5 Prototype Pollution Defenses
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-7-5">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">7.5 CLIENT HARDENING</span>
+              <h3>Prototype Pollution Defenses</h3>
+            </div>
+            <p>
+              URL parameter parsing is a common vector for Prototype Pollution attacks in JavaScript applications. If an attacker injects query keys like <code>?__proto__[isAdmin]=true</code> or <code>?constructor[prototype][polluted]=yes</code>, naive object assignment mutates the global Object prototype.
+            </p>
+
+            <div class="ui-callout" data-type="guardrail" role="note">
+              <div class="ui-callout-header">
+                <span class="ui-badge" data-variant="success">[DEFENSIVE INVARIANT]</span>
+                <h4 class="ui-callout-title">Key Denylist in <code>src/js/utils/url.js</code></h4>
+              </div>
+              <div class="ui-callout-body">
+                Both <code>toPublicParams()</code> and <code>toInternalParams()</code> enforce an unconditional guard that discards hazardous property keys before any object mutation takes place:
+                <pre class="ui-callout-code"><code>if (key === '__proto__' || key === 'constructor' || key === 'prototype') return;</code></pre>
+              </div>
+            </div>
+
+            <p>
+              Additionally, dynamic CSS selector matching uses <code>cssEscape()</code> to sanitize attribute values before querying the DOM, neutralizing CSS injection exploits:
+            </p>
+
+            <pre><code>// Safe CSS Selector Escaping
+export const cssEscape = (value) => {
+  const stringValue = String(value);
+  if (window.CSS && typeof window.CSS.escape === 'function') {
+    return window.CSS.escape(stringValue);
+  }
+  return stringValue.replace(/[^a-zA-Z0-9_-]/g, '\\$&');
+};</code></pre>
+          </div>
+
+          <!-- ================================================================
+               7.6 Memory Thresholds & Guardrails
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-7-6">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">7.6 PERFORMANCE GUARDRAILS</span>
+              <h3>Memory Thresholds &amp; Guardrails</h3>
+            </div>
+            <p>
+              Engineers extending or deploying Pickory in large-scale enterprise environments must adhere to strict runtime boundaries:
+            </p>
+
+            <div class="ui-callout" data-type="guardrail" role="note">
+              <div class="ui-callout-header">
+                <span class="ui-badge" data-variant="success">[GUARDRAIL 1]</span>
+                <h4 class="ui-callout-title">Direct postmeta joins strictly prohibited</h4>
+              </div>
+              <div class="ui-callout-body">
+                All frontend product filtering queries must resolve exclusively against <code>wp_ppfx_product_index</code> and <code>wp_ppfx_product_terms</code>. Bypassing the flat index to execute raw <code>WP_Query</code> meta queries in catalog loops causes catastrophic table locks and CPU saturation during flash-sale spikes.
+              </div>
+            </div>
+
+            <div class="ui-callout" data-type="warning" role="alert">
+              <div class="ui-callout-header">
+                <span class="ui-badge" data-variant="warning">[GUARDRAIL 2]</span>
+                <h4 class="ui-callout-title">Batch Reindexing Memory Thresholds</h4>
+              </div>
+              <div class="ui-callout-body">
+                When executing CLI re-indexing (<code>wp pickory reindex</code>) on catalogs exceeding 50,000 SKUs, always specify keyset batch sizing (<code>--batch-size=200</code>) and sleep pauses (<code>--sleep=2</code>) to prevent Redis object cache eviction storms and PHP memory limit exhaustion.
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               7.7 Third-Party Compatibility Bridge
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-7-7">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">7.7 COMPATIBILITY</span>
+              <h3>Third-Party Compatibility Bridge</h3>
+            </div>
+            <p>
+              Pickory Product Filter is engineered to operate seamlessly alongside the broader WooCommerce ecosystem:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Integration Surface</th>
+                    <th>Compatibility Mechanism</th>
+                    <th>Architectural Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>High-Performance Order Storage (HPOS)</strong></td>
+                    <td><code>FeaturesUtil::declare_compatibility()</code></td>
+                    <td>Full native support for WooCommerce custom order tables with zero legacy postmeta dependencies.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Multi-Currency Switchers</strong></td>
+                    <td><code>ppfx_price_cache_currencies</code> &amp; Context Hashing</td>
+                    <td>Price transients and query cache hashes automatically incorporate the active currency symbol and exchange rate context.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Custom Themes &amp; Builders</strong></td>
+                    <td><code>wc_fragments_refreshed</code> &amp; Custom Events</td>
+                    <td>Fires standard WooCommerce refresh events on every DOM swap, allowing Divi, Elementor, and custom theme scripts to reinitialize quickviews, wishlists, and hover effects.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Action Scheduler</strong></td>
+                    <td>Async Queueing</td>
+                    <td>Long-running indexing tasks execute via Action Scheduler queues, preventing HTTP gateway timeout aborts.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- ======================================================================
+         COLUMN 3: RIGHT CONTEXTUAL TOPICS SIDEBAR (Sticky, Fixed Width ~220px)
+         ====================================================================== -->
+    <aside class="doc-sidebar-right" aria-label="Contextual Topics and Navigation">
+
+      <div class="doc-toc-section-title" id="dynamic-toc-section">Core Architecture &amp; System Foundation</div>
+
+      <ul class="doc-toc-list" id="dynamic-toc-list">
+        <li class="doc-toc-item is-active" data-target-id="subtopic-1-1">
+          <a href="#subtopic-1-1" class="doc-toc-link">1.1 Plugin Anatomy &amp; Directory Contract</a>
+        </li>
+        <li class="doc-toc-item" data-target-id="subtopic-1-2">
+          <a href="#subtopic-1-2" class="doc-toc-link">1.2 Dual-Path Execution Model</a>
+        </li>
+        <li class="doc-toc-item" data-target-id="subtopic-1-3">
+          <a href="#subtopic-1-3" class="doc-toc-link">1.3 ppfx_ Namespace Convention</a>
+        </li>
+        <li class="doc-toc-item" data-target-id="subtopic-1-4">
+          <a href="#subtopic-1-4" class="doc-toc-link">1.4 WooCommerce Integration Surface</a>
+        </li>
+        <li class="doc-toc-item" data-target-id="subtopic-1-5">
+          <a href="#subtopic-1-5" class="doc-toc-link">1.5 Data Flow: Browser &rarr; REST &rarr; DOM</a>
+        </li>
+        <li class="doc-toc-item" data-target-id="subtopic-1-6">
+          <a href="#subtopic-1-6" class="doc-toc-link">1.6 Class Responsibility Map</a>
+        </li>
+      </ul>
+
+      <!-- External Quick Links -->
+      <div class="doc-toc-footer">
+        <a href="https://wordpress.org/plugins/pickory-product-filter/" class="doc-toc-ext-link" target="_blank" rel="noopener noreferrer">
+          <span>Plugin Repository</span>
+          <svg class="doc-toc-ext-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M4.22 11.78a.75.75 0 0 1 0-1.06L9.44 5.5H5.75a.75.75 0 0 1 0-1.5h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V6.56l-5.22 5.22a.75.75 0 0 1-1.06 0Z" clip-rule="evenodd"/>
+          </svg>
+        </a>
+        <a href="#changelog" class="doc-toc-ext-link">
+          <span>Changelog (v1.0.1)</span>
+          <svg class="doc-toc-ext-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M4.22 11.78a.75.75 0 0 1 0-1.06L9.44 5.5H5.75a.75.75 0 0 1 0-1.5h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V6.56l-5.22 5.22a.75.75 0 0 1-1.06 0Z" clip-rule="evenodd"/>
+          </svg>
+        </a>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- Vanilla JavaScript Interactive Runtime -->
+  <script src="app.js" defer></script>
+</body>
+</html>
