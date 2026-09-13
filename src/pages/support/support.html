@@ -1,0 +1,153 @@
+    <!-- ======================================================================
+         FORUM & SUPPORT PAGE (Clean Centered Layout - No Sidebar)
+         ====================================================================== -->
+    <main class="forum-container" id="main-content" tabindex="-1">
+      
+      <!-- Forum Page Header -->
+      <header class="forum-header">
+        <div class="forum-badge-row">
+          <span class="ui-badge" data-variant="brand">DEVELOPER FORUM</span>
+          <span class="ui-badge" data-variant="success"><span class="doc-pill-dot"></span>COMMUNITY HUB</span>
+        </div>
+        <h1 class="forum-title">Pickory Support &amp; Forum</h1>
+        <p class="forum-lead">
+          Connect with the community, explore solutions, report bugs, and discuss architectural extensions for the Pickory ecosystem.
+        </p>
+
+        <!-- Search & New Topic Actions -->
+        <div class="forum-action-bar">
+          <div class="forum-search-box">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+            </svg>
+            <input type="text" class="forum-search-input" placeholder="Search forum topics, discussions, or error codes..." aria-label="Search forum topics">
+          </div>
+          <button type="button" class="forum-btn-primary">
+            <span>+ New Discussion</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Forum Category Channels -->
+      <section class="forum-categories" aria-label="Forum Categories">
+        <h2 class="forum-section-heading">Browse Categories</h2>
+        
+        <div class="forum-grid">
+          <div class="forum-card">
+            <div class="forum-card-icon">⚡</div>
+            <div class="forum-card-content">
+              <div class="forum-card-header">
+                <h3 class="forum-card-title">Pickory Product Filter</h3>
+                <span class="ui-badge" data-variant="brand">142 topics</span>
+              </div>
+              <p class="forum-card-desc">Faceted indexing queries, WooCommerce HPOS compatibility, REST API filters, and custom taxonomies.</p>
+            </div>
+          </div>
+
+          <div class="forum-card">
+            <div class="forum-card-icon">🎨</div>
+            <div class="forum-card-content">
+              <div class="forum-card-header">
+                <h3 class="forum-card-title">Pickory Theme</h3>
+                <span class="ui-badge" data-variant="success">86 topics</span>
+              </div>
+              <p class="forum-card-desc">Template hierarchy, W3C CSS token customization, container queries, and child theme engineering.</p>
+            </div>
+          </div>
+
+          <div class="forum-card">
+            <div class="forum-card-icon">🐛</div>
+            <div class="forum-card-content">
+              <div class="forum-card-header">
+                <h3 class="forum-card-title">Bugs &amp; Diagnostics</h3>
+                <span class="ui-badge">53 topics</span>
+              </div>
+              <p class="forum-card-desc">Error logs, reproducible test cases, transient cache issues, and environment diagnostics.</p>
+            </div>
+          </div>
+
+          <div class="forum-card">
+            <div class="forum-card-icon">💡</div>
+            <div class="forum-card-content">
+              <div class="forum-card-header">
+                <h3 class="forum-card-title">Feature Requests &amp; Ideas</h3>
+                <span class="ui-badge">69 topics</span>
+              </div>
+              <p class="forum-card-desc">Community proposals, architectural feedback, and roadmap discussion for upcoming releases.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Recent Discussions List -->
+      <section class="forum-discussions" aria-label="Recent Discussions">
+        <div class="forum-discussions-header">
+          <h2 class="forum-section-heading">Recent Discussions</h2>
+          <div class="forum-filter-tags">
+            <button type="button" class="forum-tag-btn is-active">All</button>
+            <button type="button" class="forum-tag-btn">Unresolved</button>
+            <button type="button" class="forum-tag-btn">Solved</button>
+          </div>
+        </div>
+
+        <div class="forum-thread-list">
+          <div class="forum-thread-item">
+            <div class="forum-thread-main">
+              <span class="ui-badge" data-variant="brand">PRODUCT FILTER</span>
+              <h4 class="forum-thread-title">
+                <a href="#thread-1">Handling custom attribute slugs with hyphenated keys in flat index</a>
+              </h4>
+              <p class="forum-thread-meta">Started by <strong>dev_alex</strong> &bull; 2 hours ago</p>
+            </div>
+            <div class="forum-thread-stats">
+              <span class="forum-stat-count">14 replies</span>
+              <span class="ui-badge" data-variant="success">Solved</span>
+            </div>
+          </div>
+
+          <div class="forum-thread-item">
+            <div class="forum-thread-main">
+              <span class="ui-badge" data-variant="success">THEME</span>
+              <h4 class="forum-thread-title">
+                <a href="#thread-2">Overriding CSS custom properties dynamically inside child theme blocks</a>
+              </h4>
+              <p class="forum-thread-meta">Started by <strong>sarah_ui</strong> &bull; 5 hours ago</p>
+            </div>
+            <div class="forum-thread-stats">
+              <span class="forum-stat-count">8 replies</span>
+            </div>
+          </div>
+
+          <div class="forum-thread-item">
+            <div class="forum-thread-main">
+              <span class="ui-badge">DIAGNOSTICS</span>
+              <h4 class="forum-thread-title">
+                <a href="#thread-3">REST query timeout during batch reindexing with 80k WooCommerce SKUs</a>
+              </h4>
+              <p class="forum-thread-meta">Started by <strong>mark_ops</strong> &bull; 1 day ago</p>
+            </div>
+            <div class="forum-thread-stats">
+              <span class="forum-stat-count">23 replies</span>
+              <span class="ui-badge" data-variant="success">Solved</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Community Channels Banner -->
+      <section class="forum-channels-banner">
+        <div class="forum-channel-col">
+          <h3>Need Real-Time Help?</h3>
+          <p>Join the Pickory Discord server for live chat with core contributors and community engineers.</p>
+        </div>
+        <div class="forum-channel-links">
+          <a href="https://discord.com" class="ui-badge" data-variant="brand" target="_blank" rel="noopener noreferrer">
+            Join Discord Community &rarr;
+          </a>
+          <a href="https://github.com" class="ui-badge" target="_blank" rel="noopener noreferrer">
+            GitHub Discussions &rarr;
+          </a>
+        </div>
+      </section>
+
+    </main>

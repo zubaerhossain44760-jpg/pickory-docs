@@ -1,0 +1,93 @@
+        <!-- ==================================================================
+             TOPIC 1: THEME ARCHITECTURE & TEMPLATE HIERARCHY
+             ================================================================== -->
+        <section class="doc-section" id="theme-architecture" aria-labelledby="heading-theme-architecture">
+          <div class="doc-section-header">
+            <span class="ui-badge" data-variant="brand">SECTION 1</span>
+            <h2 id="heading-theme-architecture" class="doc-section-title">Theme Anatomy &amp; Template Hierarchy</h2>
+            <p class="doc-section-desc">
+              Directory structure, file responsibilities, and non-destructive WordPress/WooCommerce template resolution.
+            </p>
+          </div>
+
+          <div class="doc-content-block">
+            <h3 class="doc-subsection-title" id="theme-subtopic-1-1">1.1 Directory Contract</h3>
+            <p class="doc-paragraph">
+              Pickory Theme adheres to an enterprise theme layout isolating presentation templates, assets, and PHP business logic into strict namespaces:
+            </p>
+
+            <div class="code-window">
+              <div class="code-window-header">
+                <span class="code-window-dot" style="background:#ff5f56;"></span>
+                <span class="code-window-dot" style="background:#ffbd2e;"></span>
+                <span class="code-window-dot" style="background:#27c93f;"></span>
+                <span class="code-window-title">Directory Anatomy — pickory-theme/</span>
+              </div>
+              <pre class="code-block"><code class="language-bash">pickory-theme/
+├── assets/
+│   ├── css/
+│   │   ├── tokens.css             # Primitive and semantic CSS custom properties
+│   │   ├── layout.css             # CSS Grid canvas &amp; header/footer wrappers
+│   │   ├── woocommerce.css        # Product card, cart drawer, checkout styling
+│   │   └── theme.css              # Assembled production stylesheet
+│   └── js/
+│       ├── navigation.js          # Native accessible mobile drawer &amp; flyout menus
+│       └── mini-cart.js           # Lightweight reactive side-cart dispatcher
+├── inc/
+│   ├── class-theme-setup.php      # Theme supports (title-tag, post-thumbnails, HTML5)
+│   ├── class-woocommerce.php      # Action hooks, customizer defaults, HPOS flags
+│   ├── class-customizer.php       # Live preview theme settings &amp; color tokens
+│   └── template-tags.php          # Reusable semantic markup helpers
+├── template-parts/
+│   ├── header/                    # Main bar, announcement banner, search bar
+│   ├── footer/                    # Multi-column footer &amp; copyright strip
+│   └── product/                   # Grid item card, badge chips, rating stars
+├── woocommerce/                   # Strict, selective WooCommerce template overrides
+│   ├── archive-product.php        # Shop &amp; category grid with Pickory Filter mount
+│   └── single-product.php         # Gallery &amp; buy box container
+├── functions.php                  # Theme bootstrap &amp; autoloader
+└── style.css                      # WordPress theme metadata header</code></pre>
+            </div>
+          </div>
+
+          <div class="doc-content-block">
+            <h3 class="doc-subsection-title" id="theme-subtopic-1-2">1.2 WooCommerce Overrides vs. Action Hooks</h3>
+            <p class="doc-paragraph">
+              Rather than copying dozens of fragile WooCommerce PHP template files into the theme (which break on every major WooCommerce release), Pickory Theme utilizes an <strong>Action-Hook-First strategy</strong>. Core loops are modified by manipulating action queues:
+            </p>
+
+            <div class="code-window">
+              <div class="code-window-header">
+                <span class="code-window-title">inc/class-woocommerce.php — Action Queue Normalization</span>
+              </div>
+              <pre class="code-block"><code class="language-php">&lt;?php
+declare(strict_types=1);
+
+namespace Pickory\Theme;
+
+final class WooCommerce_Engine {
+
+    public static function init(): void {
+        // Strip legacy WooCommerce wrappers
+        remove_action('woocommerce_before_main_content', 'woocommerce_output_content_wrapper', 10);
+        remove_action('woocommerce_after_main_content', 'woocommerce_output_content_wrapper_end', 10);
+
+        // Mount semantic Pickory canvas
+        add_action('woocommerce_before_main_content', [__CLASS__, 'render_canvas_open'], 10);
+        add_action('woocommerce_after_main_content', [__CLASS__, 'render_canvas_close'], 10);
+
+        // Inject Pickory Product Filter sidebar hook safely
+        add_action('woocommerce_before_shop_loop', [__CLASS__, 'inject_active_filter_chips'], 15);
+    }
+
+    public static function render_canvas_open(): void {
+        echo '&lt;main id="pickory-shop-canvas" class="pickory-shop-grid" role="main"&gt;';
+    }
+
+    public static function render_canvas_close(): void {
+        echo '&lt;/main&gt;';
+    }
+}</code></pre>
+            </div>
+          </div>
+        </section>

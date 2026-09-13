@@ -1,0 +1,69 @@
+        <!-- ==================================================================
+             TOPIC 3: EXTENSIBILITY HOOKS & CUSTOMIZER
+             ================================================================== -->
+        <section class="doc-section" id="theme-hooks-extensibility" aria-labelledby="heading-theme-hooks">
+          <div class="doc-section-header">
+            <span class="ui-badge" data-variant="brand">SECTION 3</span>
+            <h2 id="heading-theme-hooks" class="doc-section-title">Hooks, Filters &amp; Customizer API</h2>
+            <p class="doc-section-desc">
+              Developer extension surfaces for injecting markup, altering query loops, and customizing token values.
+            </p>
+          </div>
+
+          <div class="doc-content-block">
+            <h3 class="doc-subsection-title" id="theme-subtopic-3-1">3.1 Action Hook Reference</h3>
+            <p class="doc-paragraph">
+              Key WordPress action hooks fired throughout the lifecycle of the Pickory Theme layout:
+            </p>
+
+            <table class="doc-data-table" style="width: 100%; margin-bottom: var(--space-6);">
+              <thead>
+                <tr>
+                  <th>Hook Name</th>
+                  <th>Parameters</th>
+                  <th>Execution Point / Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>pickory_theme_before_header</code></td>
+                  <td>None</td>
+                  <td>Fires immediately after <code>&lt;body&gt;</code> opening tag (suitable for analytics/announcement bars).</td>
+                </tr>
+                <tr>
+                  <td><code>pickory_theme_archive_before_loop</code></td>
+                  <td><code>$query</code></td>
+                  <td>Fires before the WooCommerce product grid renders on shop &amp; taxonomy archives.</td>
+                </tr>
+                <tr>
+                  <td><code>pickory_theme_product_card_badges</code></td>
+                  <td><code>$product_id</code></td>
+                  <td>Allows custom badge injection (e.g., 'NEW', 'SALE', 'OUT OF STOCK') on the product card.</td>
+                </tr>
+                <tr>
+                  <td><code>pickory_theme_after_footer</code></td>
+                  <td>None</td>
+                  <td>Fires immediately before the closing <code>&lt;/body&gt;</code> tag.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="doc-content-block">
+            <h3 class="doc-subsection-title" id="theme-subtopic-3-2">3.2 Hooking the Pickory Product Filter</h3>
+            <p class="doc-paragraph">
+              When Pickory Product Filter is active, Pickory Theme automatically wires up the reactive filter container without requiring shortcodes or widgets. Developers can customize this placement using the <code>pickory_theme_filter_container_id</code> filter:
+            </p>
+
+            <div class="code-window">
+              <div class="code-window-header">
+                <span class="code-window-title">functions.php — Custom Filter Placement</span>
+              </div>
+              <pre class="code-block"><code class="language-php">&lt;?php
+// Customize the DOM mount target for the reactive filter sidebar
+add_filter('pickory_theme_filter_container_id', function(string $default_id): string {
+    return 'custom-sticky-filter-drawer';
+});</code></pre>
+            </div>
+          </div>
+        </section>

@@ -1,0 +1,377 @@
+<!-- ======================================================================
+     PICKORY PRODUCT FILTER - COMMERCIAL PRODUCT PAGE
+     Structure matching JetBrains / Modern SaaS Showcase
+     ====================================================================== -->
+<main class="pf-page-container" id="main-content" tabindex="-1">
+
+  <!-- 1. Hero Section: Headline, Subtitle, Pill CTA, Microcopy -->
+  <section class="pf-hero-center" aria-label="Product Hero">
+    <h1 class="pf-hero-headline">The Fastest WooCommerce Filter</h1>
+    <p class="pf-hero-subheadline">For High-Volume Stores and Scale</p>
+
+    <a href="#pricing" class="pf-hero-cta-pill">
+      <span>Download Pickory Filter</span>
+    </a>
+
+    <p class="pf-hero-microcopy">Compatible with WooCommerce 8+ &mdash; 30-Day Money Back Guarantee</p>
+  </section>
+
+  <!-- 2. Blue Showcase Canvas with Store Mockup -->
+  <section class="pf-showcase-wrapper" aria-label="Interactive Showcase">
+    <h2 class="pf-showcase-title">The Ultimate Filtering Experience</h2>
+
+    <!-- App Window Container -->
+    <div class="pf-app-window">
+      <!-- Titlebar / Header -->
+      <div class="pf-app-titlebar">
+        <div class="pf-app-controls">
+          <span class="pf-app-dot pf-app-dot-red"></span>
+          <span class="pf-app-dot pf-app-dot-yellow"></span>
+          <span class="pf-app-dot pf-app-dot-green"></span>
+          <div class="pf-app-project-tag">
+            <span class="pf-app-badge-pill">Store</span>
+            <span>pickory-store ~/shop</span>
+          </div>
+        </div>
+
+        <div class="pf-app-tabs">
+          <div class="pf-app-tab is-active">
+            <span>FilterPreview.tsx</span>
+          </div>
+        </div>
+
+        <div class="pf-app-actions">
+          <button type="button" class="pf-app-run-btn" aria-label="Live preview">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M4 2v12l10-6z"/>
+            </svg>
+            <span>Live Filter</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- App Main Canvas -->
+      <div class="pf-app-body">
+        <!-- Left Filter Facets Sidebar -->
+        <aside class="pf-app-sidebar">
+          <div>
+            <div class="pf-app-filter-group-title">Categories</div>
+            <div class="pf-app-checkbox-list">
+              <label class="pf-app-checkbox-item">
+                <span><input type="checkbox" checked> Electronics</span>
+                <span class="pf-app-count">(1,420)</span>
+              </label>
+              <label class="pf-app-checkbox-item">
+                <span><input type="checkbox"> Accessories</span>
+                <span class="pf-app-count">(890)</span>
+              </label>
+              <label class="pf-app-checkbox-item">
+                <span><input type="checkbox"> Apparel</span>
+                <span class="pf-app-count">(3,105)</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <div class="pf-app-filter-group-title">Price Range</div>
+            <div class="pf-app-slider-wrap">
+              <div class="pf-app-slider-track">
+                <div class="pf-app-slider-fill"></div>
+              </div>
+              <div class="pf-app-slider-labels">
+                <span>$40</span>
+                <span>$280</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="pf-app-filter-group-title">Color Swatches</div>
+            <div class="pf-app-swatches">
+              <span class="pf-swatch pf-swatch-blue is-selected" aria-label="Blue"></span>
+              <span class="pf-swatch pf-swatch-red" aria-label="Red"></span>
+              <span class="pf-swatch pf-swatch-green" aria-label="Green"></span>
+              <span class="pf-swatch pf-swatch-amber" aria-label="Amber"></span>
+              <span class="pf-swatch pf-swatch-purple" aria-label="Purple"></span>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Right Storefront Grid Canvas -->
+        <div class="pf-app-canvas">
+          <div class="pf-app-canvas-header">
+            <span class="pf-app-status-text">Showing 24 of 50,000 items</span>
+            <span class="pf-app-status-badge">⚡ Instant Filter Speed</span>
+          </div>
+
+          <!-- Product Cards Matrix -->
+          <div class="pf-app-products-grid">
+            <div class="pf-app-product-card">
+              <div class="pf-app-product-img">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>
+              </div>
+              <div class="pf-app-product-name">Wireless ANC Studio Pro</div>
+              <div class="pf-app-product-price">$249.00</div>
+            </div>
+            <div class="pf-app-product-card">
+              <div class="pf-app-product-img">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="7"></circle><polyline points="12 9 12 12 13.5 13.5"></polyline><path d="M16.51 17.35l-.35 3.83a2 2 0 0 1-2 1.82H9.83a2 2 0 0 1-2-1.82l-.35-3.83m.01-10.7l.35-3.83A2 2 0 0 1 9.83 1h4.35a2 2 0 0 1 2 1.82l.35 3.83"></path></svg>
+              </div>
+              <div class="pf-app-product-name">Titanium Smart Chrono</div>
+              <div class="pf-app-product-price">$399.00</div>
+            </div>
+            <div class="pf-app-product-card">
+              <div class="pf-app-product-img">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="6" y2="8.01"></line><line x1="10" y1="8" x2="10" y2="8.01"></line><line x1="14" y1="8" x2="14" y2="8.01"></line><line x1="18" y1="8" x2="18" y2="8.01"></line><line x1="6" y1="12" x2="6" y2="12.01"></line><line x1="18" y1="12" x2="18" y2="12.01"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>
+              </div>
+              <div class="pf-app-product-name">Mechanical Tactile Board</div>
+              <div class="pf-app-product-price">$169.00</div>
+            </div>
+          </div>
+
+          <!-- Floating Callout Bubble -->
+          <div class="pf-app-callout-bubble" role="tooltip">
+            <div class="pf-app-callout-arrow"></div>
+            <div class="pf-app-callout-step">Highlights</div>
+            <p class="pf-app-callout-text">Filter 50,000 products in real time with zero page reloads.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Interactive Walkthrough Section -->
+  <section class="pf-feature-walkthrough" aria-label="Interactive Product Walkthrough">
+    <div class="pf-walkthrough-panel">
+      <!-- Left: Features List + Action CTA -->
+      <div class="pf-walkthrough-nav">
+        <div class="pf-walkthrough-list" role="tablist" aria-label="Key Product Features">
+          
+          <!-- Item 1: Inactive -->
+          <div class="pf-walkthrough-item" role="tab" aria-selected="false" data-yt="M7lc1UVf-VE">
+            <h3 class="pf-walkthrough-title">Fast, instant filtering without store slowdown</h3>
+            <p class="pf-walkthrough-desc">Give your customers lightning-fast search without slowing down your store or overloading your web hosting.</p>
+          </div>
+
+          <!-- Item 2: Inactive -->
+          <div class="pf-walkthrough-item" role="tab" aria-selected="false" data-yt="ysz5S6PUM-U">
+            <h3 class="pf-walkthrough-title">Built for large stores and growing catalogs</h3>
+            <p class="pf-walkthrough-desc">Easily handle thousands of products, variations, and complex categories without lag or delays.</p>
+          </div>
+
+          <!-- Item 3: Active Card -->
+          <div class="pf-walkthrough-item is-active" role="tab" aria-selected="true" data-yt="jNQXAC9IVRw">
+            <h3 class="pf-walkthrough-title">Instant results right out of the box</h3>
+            <p class="pf-walkthrough-desc">Set up in minutes and enjoy fast, responsive product filtering from day one &mdash; no complex configuration needed.</p>
+          </div>
+
+          <!-- Item 4: Inactive -->
+          <div class="pf-walkthrough-item" role="tab" aria-selected="false" data-yt="L_LUpnjgPso">
+            <h3 class="pf-walkthrough-title">Shareable search links for your customers</h3>
+            <p class="pf-walkthrough-desc">Every filter selection updates the link in the browser so shoppers can easily bookmark and share their results.</p>
+          </div>
+
+          <!-- Item 5: Inactive -->
+          <div class="pf-walkthrough-item" role="tab" aria-selected="false" data-yt="21X5lGlDOfg">
+            <h3 class="pf-walkthrough-title">All the filter styles and controls you need</h3>
+            <p class="pf-walkthrough-desc">Price sliders, color swatches, category trees, star ratings, and in-stock toggles ready to match your store.</p>
+          </div>
+
+        </div>
+
+        <!-- Walkthrough CTA Buttons -->
+        <div class="pf-walkthrough-action">
+          <a href="#pricing" class="pf-walkthrough-cta">Description</a>
+          <a href="product-filter-docs.html" class="pf-walkthrough-cta pf-walkthrough-cta-docs">Docs</a>
+        </div>
+      </div>
+
+      <!-- Right: Stage Canvas + Video Player -->
+      <div class="pf-walkthrough-stage">
+        <div class="pf-stage-canvas">
+          <div class="pf-window">
+            <div class="pf-window-header">
+              <div class="pf-window-controls">
+                <span class="pf-window-dot pf-dot-close"></span>
+                <span class="pf-window-dot pf-dot-minimize"></span>
+                <span class="pf-window-dot pf-dot-expand"></span>
+              </div>
+              <div class="pf-window-title">Pickory Filter &mdash; Feature Overview</div>
+              <div class="pf-window-tag">
+                <span class="pf-window-badge">HD</span>
+              </div>
+            </div>
+            <div class="pf-window-screen">
+              <iframe 
+                id="pf-youtube-player"
+                class="pf-window-player"
+                src="https://www.youtube-nocookie.com/embed/jNQXAC9IVRw?enablejsapi=1&rel=0&modestbranding=1" 
+                title="Pickory Product Filter Video Walkthrough" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                referrerpolicy="strict-origin-when-cross-origin" 
+                allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Plan Comparison Table: Free vs Pro (Pro Exclusive Features) -->
+  <section class="pf-comparison-section" id="pricing" aria-label="Plan Comparison">
+    <div class="pf-comparison-header">
+      <h2 class="pf-comparison-title">Compare Free vs. Pro</h2>
+      <p class="pf-comparison-desc">Start free for small stores, or upgrade to Pro to unlock advanced filtering, unlimited products, and priority support.</p>
+    </div>
+
+    <div class="pf-comparison-table-wrapper">
+      <table class="pf-comparison-table">
+        <thead>
+          <tr>
+            <th class="pf-col-feature" scope="col">Pro Exclusive Features</th>
+            <th class="pf-col-plan pf-col-free" scope="col">
+              <div class="pf-plan-card-header">
+                <span class="pf-plan-name">Free Version</span>
+                <span class="pf-plan-price">$0 <span>/ forever</span></span>
+              </div>
+            </th>
+            <th class="pf-col-plan pf-col-pro" scope="col">
+              <div class="pf-plan-card-header">
+                <span class="pf-plan-name">PRO</span>
+                <span class="pf-plan-price">$79 <span>/ year</span></span>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Feature 1 -->
+          <tr class="pf-feature-row">
+            <td class="pf-feature-title">
+              <strong>Unlimited Products Support (100,000+ items)</strong>
+              <span>Filter stores of any catalog size with zero speed limits or slowdown</span>
+            </td>
+            <td class="pf-feature-val pf-col-free"><span class="pf-cross-icon" aria-label="Not available in Free">&times;</span></td>
+            <td class="pf-feature-val pf-col-pro"><span class="pf-tic-icon" aria-label="Included in Pro">&#10003;</span></td>
+          </tr>
+          <!-- Feature 2 -->
+          <tr class="pf-feature-row">
+            <td class="pf-feature-title">
+              <strong>Sub-50ms Instant Search Speed</strong>
+              <span>Instant query resolution without full page reloading</span>
+            </td>
+            <td class="pf-feature-val pf-col-free"><span class="pf-cross-icon" aria-label="Not available in Free">&times;</span></td>
+            <td class="pf-feature-val pf-col-pro"><span class="pf-tic-icon" aria-label="Included in Pro">&#10003;</span></td>
+          </tr>
+          <!-- Feature 3 -->
+          <tr class="pf-feature-row">
+            <td class="pf-feature-title">
+              <strong>Unlimited Filters &amp; Facet Groups</strong>
+              <span>Create as many attribute, category, and tag filters as your store needs</span>
+            </td>
+            <td class="pf-feature-val pf-col-free"><span class="pf-cross-icon" aria-label="Not available in Free">&times;</span></td>
+            <td class="pf-feature-val pf-col-pro"><span class="pf-tic-icon" aria-label="Included in Pro">&#10003;</span></td>
+          </tr>
+          <!-- Feature 4 -->
+          <tr class="pf-feature-row">
+            <td class="pf-feature-title">
+              <strong>Interactive Dual-Handle Price Slider</strong>
+              <span>Smooth price range slider with dynamic min/max bounds and live update</span>
+            </td>
+            <td class="pf-feature-val pf-col-free"><span class="pf-cross-icon" aria-label="Not available in Free">&times;</span></td>
+            <td class="pf-feature-val pf-col-pro"><span class="pf-tic-icon" aria-label="Included in Pro">&#10003;</span></td>
+          </tr>
+          <!-- Feature 5 -->
+          <tr class="pf-feature-row">
+            <td class="pf-feature-title">
+              <strong>Visual Hex Color &amp; Image Swatches</strong>
+              <span>Show clickable color dots, image thumbnails, and visual style swatches</span>
+            </td>
+            <td class="pf-feature-val pf-col-free"><span class="pf-cross-icon" aria-label="Not available in Free">&times;</span></td>
+            <td class="pf-feature-val pf-col-pro"><span class="pf-tic-icon" aria-label="Included in Pro">&#10003;</span></td>
+          </tr>
+          <!-- Feature 6 -->
+          <tr class="pf-feature-row">
+            <td class="pf-feature-title">
+              <strong>Live In-Facet Keyword Search</strong>
+              <span>Built-in search box to quickly filter long lists of brands or attributes</span>
+            </td>
+            <td class="pf-feature-val pf-col-free"><span class="pf-cross-icon" aria-label="Not available in Free">&times;</span></td>
+            <td class="pf-feature-val pf-col-pro"><span class="pf-tic-icon" aria-label="Included in Pro">&#10003;</span></td>
+          </tr>
+          <!-- Feature 7 -->
+          <tr class="pf-feature-row">
+            <td class="pf-feature-title">
+              <strong>Nested Hierarchical Category Trees</strong>
+              <span>Multi-level collapsible category trees with live item count badges</span>
+            </td>
+            <td class="pf-feature-val pf-col-free"><span class="pf-cross-icon" aria-label="Not available in Free">&times;</span></td>
+            <td class="pf-feature-val pf-col-pro"><span class="pf-tic-icon" aria-label="Included in Pro">&#10003;</span></td>
+          </tr>
+          <!-- Feature 8 -->
+          <tr class="pf-feature-row">
+            <td class="pf-feature-title">
+              <strong>Shareable &amp; Bookmarkable URL Links</strong>
+              <span>Live browser URL update so shoppers can share filtered results easily</span>
+            </td>
+            <td class="pf-feature-val pf-col-free"><span class="pf-cross-icon" aria-label="Not available in Free">&times;</span></td>
+            <td class="pf-feature-val pf-col-pro"><span class="pf-tic-icon" aria-label="Included in Pro">&#10003;</span></td>
+          </tr>
+          <!-- Feature 9 -->
+          <tr class="pf-feature-row">
+            <td class="pf-feature-title">
+              <strong>Mobile-Optimized Slide-Out Filter Drawer</strong>
+              <span>Responsive drawer designed for seamless shopping on phones and tablets</span>
+            </td>
+            <td class="pf-feature-val pf-col-free"><span class="pf-cross-icon" aria-label="Not available in Free">&times;</span></td>
+            <td class="pf-feature-val pf-col-pro"><span class="pf-tic-icon" aria-label="Included in Pro">&#10003;</span></td>
+          </tr>
+          <!-- Feature 10 -->
+          <tr class="pf-feature-row">
+            <td class="pf-feature-title">
+              <strong>Priority 24/7 Dedicated Support &amp; Updates</strong>
+              <span>Direct technical assistance from core engineers and continuous updates</span>
+            </td>
+            <td class="pf-feature-val pf-col-free"><span class="pf-cross-icon" aria-label="Not available in Free">&times;</span></td>
+            <td class="pf-feature-val pf-col-pro"><span class="pf-tic-icon" aria-label="Included in Pro">&#10003;</span></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="pf-col-feature"></td>
+            <td class="pf-col-plan pf-col-free">
+              <a href="#download-free" class="pf-plan-btn pf-plan-btn-outline">Download Free</a>
+            </td>
+            <td class="pf-col-plan pf-col-pro">
+              <a href="#get-pro" class="pf-plan-btn pf-plan-btn-primary">Get Pickory Pro</a>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script>
+  (function () {
+    const walkthroughItems = document.querySelectorAll('.pf-walkthrough-item');
+    const ytPlayer = document.getElementById('pf-youtube-player');
+
+    walkthroughItems.forEach((item) => {
+      item.addEventListener('click', () => {
+        walkthroughItems.forEach((el) => {
+          el.classList.remove('is-active');
+          el.setAttribute('aria-selected', 'false');
+        });
+
+        item.classList.add('is-active');
+        item.setAttribute('aria-selected', 'true');
+
+        const ytId = item.getAttribute('data-yt');
+        if (ytPlayer && ytId) {
+          ytPlayer.src = 'https://www.youtube-nocookie.com/embed/' + ytId + '?enablejsapi=1&autoplay=1&rel=0&modestbranding=1';
+        }
+      });
+    });
+  })();
+</script>

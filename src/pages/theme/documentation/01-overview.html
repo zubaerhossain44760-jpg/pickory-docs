@@ -1,0 +1,48 @@
+        <!-- ==================================================================
+             PICKORY THEME: ARCHITECTURE OVERVIEW & HEADER
+             ================================================================== -->
+        <header class="doc-header-block doc-overview-header" id="theme-overview">
+          <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-2);">
+            <a href="index.html" class="ui-badge" style="text-decoration: none;">&larr; Home</a>
+            <span class="ui-badge" data-variant="brand">PICKORY THEME</span>
+            <span class="ui-badge" data-variant="success">v1.1.0</span>
+          </div>
+          <h1 class="doc-main-title">Pickory Theme — <span class="doc-main-title-sub">Architecture &amp; Developer Reference</span></h1>
+          <p class="doc-lead-paragraph">
+            Pickory Theme is a modern, high-performance WooCommerce storefront theme engineered for high conversion rates and sub-second paint times. Built strictly around CSS Custom Properties, semantic HTML5, and native browser APIs, it eradicates bloated client frameworks while providing a seamless foundation for the Pickory Product Filter engine.
+          </p>
+          <div class="doc-meta-pills">
+            <span class="ui-badge" data-variant="success"><span class="doc-pill-dot"></span>Production Ready</span>
+            <span class="ui-badge">Zero jQuery Dependency</span>
+            <span class="ui-badge">Native CSS Grid Layouts</span>
+            <span class="ui-badge">W3C Design Token Compliant</span>
+            <span class="ui-badge">Lighthouse 100/100</span>
+          </div>
+        </header>
+
+        <!-- Feature Highlight Grid (UI Cards) -->
+        <div class="ui-card-grid doc-overview-grid">
+          <div class="ui-card" data-type="feature" id="theme-perf-feature">
+            <span class="ui-badge" data-variant="brand">PERFORMANCE</span>
+            <h3 class="ui-card-title">Lean Asset Pipeline</h3>
+            <p class="ui-card-desc">
+              Total CSS payload under 28 KB gzipped with zero utility bloat. Eliminates layout shifts (CLS &lt; 0.01) with native CSS aspect-ratio containment.
+            </p>
+          </div>
+
+          <div class="ui-card" data-type="feature" id="theme-woo-feature">
+            <span class="ui-badge" data-variant="brand">WOOCOMMERCE</span>
+            <h3 class="ui-card-title">Decoupled Templates</h3>
+            <p class="ui-card-desc">
+              Non-destructive WooCommerce overrides using standard action hooks (<code>woocommerce_before_shop_loop</code>, etc.) preventing template deprecation headaches.
+            </p>
+          </div>
+
+          <div class="ui-card" data-type="feature" id="theme-tokens-feature">
+            <span class="ui-badge" data-variant="brand">DESIGN SYSTEM</span>
+            <h3 class="ui-card-title">W3C Design Tokens</h3>
+            <p class="ui-card-desc">
+              Fully customized via pure CSS variables. Instant runtime theme adjustments and dark/light switching without CSS preprocessors.
+            </p>
+          </div>
+        </div>

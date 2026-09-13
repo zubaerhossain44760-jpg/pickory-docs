@@ -1,0 +1,125 @@
+/* ============================================================================
+   PAGE STYLES: HOME PORTAL
+   File: src/styles/pages/home.css
+   Scope: Main Landing, Product Matrix, Ecosystem Directory
+   ============================================================================ */
+
+/* Home Hero Block */
+.home-hero-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-8) 0 var(--space-6);
+}
+
+.home-hero-badge-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.home-portal-lead {
+  font-size: var(--font-md);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  max-width: 720px;
+}
+
+/* Quick Start / Roadmap Card */
+.home-roadmap-card {
+  background: linear-gradient(135deg, rgba(37, 37, 40, 0.9) 0%, rgba(25, 25, 28, 0.95) 100%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  margin-bottom: var(--space-8);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.home-roadmap-card:hover {
+  border-color: var(--color-border-hover);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Product Showcase Grid */
+.home-product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-6);
+  margin: var(--space-6) 0 var(--space-10);
+}
+
+.home-product-card {
+  background-color: var(--bg-card-dark);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+
+.home-product-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-brand);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px -2px var(--effect-brand-glow-small);
+}
+
+.home-product-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.home-product-card-title {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.home-product-card-desc {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.home-product-card-footer {
+  margin-top: auto;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Ecosystem Integrations Matrix */
+.home-ecosystem-section {
+  margin-top: var(--space-10);
+}
+
+.home-ecosystem-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+}
+
+.home-ecosystem-pill {
+  background: var(--color-surface-subtle);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--font-xs);
+  color: var(--color-text);
+  transition: border-color var(--transition);
+}
+
+.home-ecosystem-pill:hover {
+  border-color: var(--color-border-hover);
+}

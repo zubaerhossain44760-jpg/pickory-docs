@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pickory Product Filter — Developer Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Skip Navigation Link for Accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- ======================================================================
+       TOP GLOBAL NAVIGATION HEADER (Commercial Tech Company Header)
+       ====================================================================== -->
+  <header class="doc-top-header" aria-label="Main Navigation">
+    <div class="doc-header-left">
+      <a href="index.html" class="doc-header-brand" aria-label="Pickory Home">
+        <span class="doc-header-logo" aria-hidden="true">P</span>
+        <span class="doc-header-title">Pickory</span>
+      </a>
+    </div>
+
+    <nav class="doc-header-nav" aria-label="Primary Navigation">
+      <a href="product-filter.html" class="doc-header-link" data-page="product-filter.html">
+        <span>Product Filter</span>
+      </a>
+      <a href="theme.html" class="doc-header-link" data-page="theme.html">
+        <span>Theme</span>
+      </a>
+      <a href="product-filter-docs.html" class="doc-header-link" data-page="product-filter-docs.html" target="_blank" rel="noopener noreferrer">
+        <span>Documentation</span>
+      </a>
+      <a href="support.html" class="doc-header-link" data-page="support.html">
+        <span>Support &amp; Community</span>
+      </a>
+    </nav>
+
+    <div class="doc-header-right">
+      <div class="doc-header-actions">
+        <button type="button" class="doc-header-search-btn" id="header-search-trigger" aria-label="Search">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+          </svg>
+          <span>Search...</span>
+          <kbd class="doc-header-kbd">⌘K</kbd>
+        </button>
+
+        <a href="https://github.com" class="doc-header-icon-btn" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+        </a>
+
+        <a href="product-filter.html#get-started" class="doc-header-cta-btn">
+          <span>Get Pickory</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+<!-- ======================================================================
+     PICKORY THEME SHOWCASE PAGE
+     Layout: Title & Short Description -> Feature Thumbnails -> Interactive Q&A Video Module
+     ====================================================================== -->
+<main class="theme-page-container" id="main-content" tabindex="-1">
+
+  <!-- 1. Hero Section: Title & Short Description -->
+  <header class="theme-hero-header">
+    <div class="theme-badge-group">
+      <span class="ui-badge" data-variant="brand">WOOCOMMERCE THEME</span>
+      <span class="ui-badge" data-variant="success"><span class="doc-pill-dot"></span>LIGHTHOUSE 100/100</span>
+    </div>
+    <h1 class="theme-title">Pickory Theme</h1>
+    <p class="theme-lead-description">
+      An ultra-lean modern WooCommerce starter and production theme. Built with native CSS Grid, W3C design tokens, semantic HTML5, and non-destructive template hooks for maximum conversion rates and sub-second load times.
+    </p>
+  </header>
+
+  <!-- 2. Thumbnails Section: At Least 3 Thumbnails with Title -->
+  <section class="theme-thumbnails-section" aria-label="Theme Feature Thumbnails">
+    <div class="theme-thumbnails-grid">
+      <!-- Thumbnail 1 -->
+      <article class="theme-thumbnail-card">
+        <div class="theme-thumbnail-media">
+          <svg class="theme-placeholder-svg" viewBox="0 0 400 225" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="W3C Design Token Hierarchy Preview">
+            <rect width="400" height="225" fill="#18181b"/>
+            <rect x="25" y="25" width="165" height="85" rx="4" fill="#252528" stroke="#303033" stroke-width="1"/>
+            <circle cx="55" cy="55" r="14" fill="#06b6d4"/>
+            <rect x="80" y="45" width="90" height="8" rx="2" fill="#f4f4f4"/>
+            <rect x="80" y="58" width="70" height="6" rx="2" fill="#424248"/>
+            <rect x="210" y="25" width="165" height="85" rx="4" fill="#252528" stroke="#303033" stroke-width="1"/>
+            <circle cx="240" cy="55" r="14" fill="#5359f8"/>
+            <rect x="265" y="45" width="90" height="8" rx="2" fill="#f4f4f4"/>
+            <rect x="265" y="58" width="70" height="6" rx="2" fill="#424248"/>
+            <rect x="25" y="125" width="350" height="75" rx="4" fill="#252528" stroke="#303033" stroke-width="1"/>
+            <rect x="45" y="145" width="110" height="10" rx="2" fill="#06b6d4"/>
+            <rect x="45" y="165" width="280" height="8" rx="2" fill="#424248"/>
+            <rect x="45" y="180" width="220" height="8" rx="2" fill="#424248"/>
+          </svg>
+          <span class="theme-thumbnail-overlay-tag">PREVIEW 01</span>
+        </div>
+        <div class="theme-thumbnail-info">
+          <h3 class="theme-thumbnail-title">W3C Design Token Engine</h3>
+          <p class="theme-thumbnail-desc">Pure CSS variables architecture for instant runtime typography, spacing, and dark/light switching.</p>
+        </div>
+      </article>
+
+      <!-- Thumbnail 2 -->
+      <article class="theme-thumbnail-card">
+        <div class="theme-thumbnail-media">
+          <svg class="theme-placeholder-svg" viewBox="0 0 400 225" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Decoupled Hook Templates Preview">
+            <rect width="400" height="225" fill="#18181b"/>
+            <rect x="30" y="25" width="340" height="40" rx="4" fill="#252528" stroke="#303033" stroke-width="1"/>
+            <rect x="45" y="40" width="80" height="10" rx="2" fill="#5359f8"/>
+            <rect x="140" y="40" width="120" height="10" rx="2" fill="#22c55e"/>
+            <rect x="30" y="80" width="340" height="120" rx="4" fill="#252528" stroke="#303033" stroke-width="1"/>
+            <line x1="50" y1="105" x2="350" y2="105" stroke="#424248" stroke-width="1" stroke-dasharray="4 4"/>
+            <rect x="50" y="120" width="140" height="10" rx="2" fill="#06b6d4"/>
+            <rect x="50" y="140" width="280" height="8" rx="2" fill="#424248"/>
+            <rect x="50" y="156" width="230" height="8" rx="2" fill="#424248"/>
+            <rect x="50" y="172" width="190" height="8" rx="2" fill="#424248"/>
+          </svg>
+          <span class="theme-thumbnail-overlay-tag">PREVIEW 02</span>
+        </div>
+        <div class="theme-thumbnail-info">
+          <h3 class="theme-thumbnail-title">Decoupled Hook Templates</h3>
+          <p class="theme-thumbnail-desc">Non-destructive WooCommerce hook overrides preventing template deprecation headaches.</p>
+        </div>
+      </article>
+
+      <!-- Thumbnail 3 -->
+      <article class="theme-thumbnail-card">
+        <div class="theme-thumbnail-media">
+          <svg class="theme-placeholder-svg" viewBox="0 0 400 225" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Zero-Bloat Performance Metrics Preview">
+            <rect width="400" height="225" fill="#18181b"/>
+            <circle cx="100" cy="112" r="50" fill="none" stroke="#22c55e" stroke-width="8"/>
+            <text x="100" y="120" fill="#22c55e" font-family="monospace" font-size="24" font-weight="bold" text-anchor="middle">100</text>
+            <rect x="180" y="65" width="190" height="16" rx="3" fill="#252528" stroke="#303033" stroke-width="1"/>
+            <rect x="180" y="65" width="180" height="16" rx="3" fill="#22c55e"/>
+            <rect x="180" y="100" width="190" height="16" rx="3" fill="#252528" stroke="#303033" stroke-width="1"/>
+            <rect x="180" y="100" width="170" height="16" rx="3" fill="#22c55e"/>
+            <rect x="180" y="135" width="190" height="16" rx="3" fill="#252528" stroke="#303033" stroke-width="1"/>
+            <rect x="180" y="135" width="185" height="16" rx="3" fill="#22c55e"/>
+          </svg>
+          <span class="theme-thumbnail-overlay-tag">PREVIEW 03</span>
+        </div>
+        <div class="theme-thumbnail-info">
+          <h3 class="theme-thumbnail-title">Sub-Second Paint Times</h3>
+          <p class="theme-thumbnail-desc">CLS under 0.01 with total CSS under 28 KB gzipped and zero runtime dependencies.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 3. Interactive Section: Left Questions List + Right Video -->
+  <section class="theme-interactive-section" aria-label="Theme Interactive Video Answers">
+    <div class="theme-interactive-header">
+      <h2 class="theme-section-title">Interactive Q&amp;A Walkthrough</h2>
+      <p class="theme-section-desc">Select a question on the left to watch the corresponding walkthrough on the right.</p>
+    </div>
+
+    <div class="theme-interactive-grid">
+      <!-- Left: Interactive Vertical Questions List -->
+      <div class="theme-qsn-column" role="tablist" aria-label="Pickory Theme Questions">
+        <button type="button" class="theme-qsn-item is-active" role="tab" aria-selected="true" aria-controls="theme-video-panel" data-title="Eliminating Template Override Deprecations" data-desc="See how Pickory Theme hooks into standard WooCommerce actions without copying rigid PHP template files into child themes." data-badge="HOOKS 01" data-time="02:45" data-progress="25%">
+          <span class="theme-qsn-marker">01</span>
+          <div class="theme-qsn-content">
+            <span class="theme-qsn-title">How does the theme avoid template deprecations?</span>
+            <span class="theme-qsn-meta">Hook-first architecture &bull; 02:45</span>
+          </div>
+          <span class="theme-qsn-arrow" aria-hidden="true">&rarr;</span>
+        </button>
+
+        <button type="button" class="theme-qsn-item" role="tab" aria-selected="false" aria-controls="theme-video-panel" data-title="W3C Design Token Integration & Live Styling" data-desc="Learn how brand tokens, spacing intervals, and typography automatically cascade through shop loops and product details." data-badge="TOKENS 02" data-time="03:10" data-progress="50%">
+          <span class="theme-qsn-marker">02</span>
+          <div class="theme-qsn-content">
+            <span class="theme-qsn-title">How does the design token pipeline function?</span>
+            <span class="theme-qsn-meta">W3C Tokens &bull; 03:10</span>
+          </div>
+          <span class="theme-qsn-arrow" aria-hidden="true">&rarr;</span>
+        </button>
+
+        <button type="button" class="theme-qsn-item" role="tab" aria-selected="false" aria-controls="theme-video-panel" data-title="Achieving 100/100 Core Web Vitals" data-desc="Detailed walkthrough of critical CSS inlining, font display swap strategies, and native layout aspect-ratio containment." data-badge="PERF 03" data-time="01:55" data-progress="75%">
+          <span class="theme-qsn-marker">03</span>
+          <div class="theme-qsn-content">
+            <span class="theme-qsn-title">How is sub-second First Contentful Paint achieved?</span>
+            <span class="theme-qsn-meta">Zero-bloat assets &bull; 01:55</span>
+          </div>
+          <span class="theme-qsn-arrow" aria-hidden="true">&rarr;</span>
+        </button>
+
+        <button type="button" class="theme-qsn-item" role="tab" aria-selected="false" aria-controls="theme-video-panel" data-title="Pickory Product Filter DOM Synchronization" data-desc="How Pickory Theme provides zero-CLS containers for filter facets, pagination, and sorting loops without jarring layout shifts." data-badge="SYNC 04" data-time="03:30" data-progress="100%">
+          <span class="theme-qsn-marker">04</span>
+          <div class="theme-qsn-content">
+            <span class="theme-qsn-title">How does the theme synchronize with the filter?</span>
+            <span class="theme-qsn-meta">DOM container parity &bull; 03:30</span>
+          </div>
+          <span class="theme-qsn-arrow" aria-hidden="true">&rarr;</span>
+        </button>
+      </div>
+
+      <!-- Right: Video Player Canvas -->
+      <div class="theme-video-column" id="theme-video-panel" role="tabpanel" aria-label="Theme Video Player Showcase">
+        <div class="theme-video-screen">
+          <div class="theme-video-glow"></div>
+          
+          <div class="theme-video-overlay-bar">
+            <span class="theme-video-badge" id="theme-active-badge">HOOKS 01</span>
+            <span class="theme-video-time" id="theme-active-time">02:45</span>
+          </div>
+
+          <!-- Video Play Trigger -->
+          <button type="button" class="theme-video-play-btn" id="theme-play-btn" aria-label="Play theme video walkthrough">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </button>
+
+          <!-- Interactive Progress Rail -->
+          <div class="theme-video-progress-rail">
+            <div class="theme-video-progress-fill" id="theme-active-progress" style="width: 25%;"></div>
+          </div>
+        </div>
+
+        <div class="theme-video-details">
+          <h3 class="theme-video-title" id="theme-active-title">Eliminating Template Override Deprecations</h3>
+          <p class="theme-video-desc" id="theme-active-desc">See how Pickory Theme hooks into standard WooCommerce actions without copying rigid PHP template files into child themes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  (function () {
+    const qsnItems = document.querySelectorAll('.theme-qsn-item');
+    const videoTitle = document.getElementById('theme-active-title');
+    const videoDesc = document.getElementById('theme-active-desc');
+    const videoBadge = document.getElementById('theme-active-badge');
+    const videoTime = document.getElementById('theme-active-time');
+    const videoProgress = document.getElementById('theme-active-progress');
+
+    qsnItems.forEach((item) => {
+      item.addEventListener('click', () => {
+        qsnItems.forEach((btn) => {
+          btn.classList.remove('is-active');
+          btn.setAttribute('aria-selected', 'false');
+        });
+
+        item.classList.add('is-active');
+        item.setAttribute('aria-selected', 'true');
+
+        const title = item.getAttribute('data-title');
+        const desc = item.getAttribute('data-desc');
+        const badge = item.getAttribute('data-badge');
+        const time = item.getAttribute('data-time');
+        const progress = item.getAttribute('data-progress') || '30%';
+
+        if (videoTitle) videoTitle.textContent = title;
+        if (videoDesc) videoDesc.textContent = desc;
+        if (videoBadge) videoBadge.textContent = badge;
+        if (videoTime) videoTime.textContent = time;
+        if (videoProgress) videoProgress.style.width = progress;
+      });
+    });
+  })();
+</script>
+
+  <!-- Vanilla JavaScript Interactive Runtime -->
+  <script src="app.js" defer></script>
+</body>
+</html>

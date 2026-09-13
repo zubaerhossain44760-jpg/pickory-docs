@@ -1,0 +1,208 @@
+/* ============================================================================
+   TOP GLOBAL NAVIGATION HEADER
+   File: src/styles/header.css
+   ============================================================================ */
+
+.doc-top-header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 56px;
+  background-color: var(--gray-900);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-6);
+  z-index: 100;
+  user-select: none;
+}
+
+.doc-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.doc-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--color-text);
+  font-weight: 700;
+  transition: opacity var(--transition);
+}
+
+.doc-header-brand:hover {
+  opacity: 0.9;
+}
+
+.doc-header-logo {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--color-brand) 0%, #6366f1 100%);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 14px;
+  font-family: var(--font-mono);
+  box-shadow: 0 0 12px var(--color-brand-alpha);
+}
+
+.doc-header-title {
+  font-size: var(--font-base);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+
+.doc-header-title-sub {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+/* Navigation Links (Tabs) */
+.doc-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+}
+
+.doc-header-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 14px;
+  font-size: var(--font-sm);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  transition: color var(--transition), background-color var(--transition);
+  position: relative;
+  white-space: nowrap;
+}
+
+.doc-header-link:hover {
+  color: var(--color-text);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.doc-header-link.is-active {
+  color: var(--color-text);
+  background-color: rgba(255, 255, 255, 0.08);
+  font-weight: 600;
+}
+
+.doc-header-link.is-active::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  background-color: var(--color-brand);
+  border-radius: 2px;
+}
+
+/* Header Right Actions */
+.doc-header-right {
+  display: flex;
+  align-items: center;
+}
+
+.doc-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.doc-header-search-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  padding: 6px 12px;
+  font-size: var(--font-xs);
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.doc-header-search-btn:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-text);
+}
+
+.doc-header-kbd {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  background-color: rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.doc-header-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition);
+  text-decoration: none;
+}
+
+.doc-header-icon-btn:hover {
+  color: var(--color-text);
+}
+
+.doc-header-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  color: #0c0e14;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  transition: opacity var(--transition), transform var(--transition);
+  white-space: nowrap;
+}
+
+.doc-header-cta-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+@media screen and (max-width: 768px) {
+  .doc-top-header {
+    padding: 0 var(--space-4);
+    height: auto;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    padding-top: var(--space-3);
+    padding-bottom: var(--space-3);
+  }
+
+  .doc-header-nav {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+}

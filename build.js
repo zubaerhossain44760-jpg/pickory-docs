@@ -1,61 +1,109 @@
 const fs = require('fs');
 const path = require('path');
 
-const HTML_PARTS = [
-  'src/layout/head.html',
-  'src/layout/sidebar-left.html',
-  'src/layout/main-start.html',
-  'src/sections/00-overview.html',
-  'src/sections/01-core-architecture.html',
-  'src/sections/02-client-reactive-engine.html',
-  'src/sections/03-code-implementation.html',
-  'src/sections/04-ssr-query-engine.html',
-  'src/sections/05-database-indexing-storage.html',
-  'src/sections/06-rest-api-lifecycle.html',
-  'src/sections/07-admin-security-extensibility.html',
-  'src/layout/main-end.html',
-  'src/layout/sidebar-right.html',
-  'src/layout/footer.html'
-];
-
 const CSS_PARTS = [
   'src/styles/01-tokens.css',
-  'src/styles/02-base.css',
-  'src/styles/03-sidebar-left.css',
-  'src/styles/04-content.css',
-  'src/styles/05-components.css',
-  'src/styles/06-sidebar-right.css',
-  'src/styles/07-responsive.css'
+  'src/styles/header.css',
+  'src/styles/documentation/base.css',
+  'src/styles/sidebar.css',
+  'src/styles/documentation/04-content.css',
+  'src/styles/documentation/05-components.css',
+  'src/styles/pages/support.css',
+  'src/styles/pages/product-filter.css',
+  'src/styles/pages/theme.css'
 ];
 
+const PAGES = {
+  'index.html': [
+    'src/layout/head.html',
+    'src/layout/header.html',
+    'src/layout/documentation/doc-start.html',
+    'src/pages/product-filter/documentation/sidebar.html',
+    'src/layout/documentation/main-start.html',
+    'src/pages/product-filter/documentation/00-overview.html',
+    'src/pages/product-filter/documentation/01-core-architecture.html',
+    'src/pages/product-filter/documentation/02-client-reactive-engine.html',
+    'src/pages/product-filter/documentation/03-code-implementation.html',
+    'src/pages/product-filter/documentation/04-ssr-query-engine.html',
+    'src/pages/product-filter/documentation/05-database-indexing-storage.html',
+    'src/pages/product-filter/documentation/06-rest-api-lifecycle.html',
+    'src/pages/product-filter/documentation/07-admin-security-extensibility.html',
+    'src/layout/documentation/main-end.html',
+    'src/layout/documentation/sidebar-right.html',
+    'src/layout/documentation/doc-end.html',
+    'src/layout/footer.html'
+  ],
+  'product-filter.html': [
+    'src/layout/head.html',
+    'src/layout/header.html',
+    'src/pages/product-filter/product-filter.html',
+    'src/layout/footer.html'
+  ],
+  'theme.html': [
+    'src/layout/head.html',
+    'src/layout/header.html',
+    'src/pages/theme/theme.html',
+    'src/layout/footer.html'
+  ],
+  'product-filter-docs.html': [
+    'src/layout/head.html',
+    'src/layout/documentation/doc-start.html',
+    'src/pages/product-filter/documentation/sidebar.html',
+    'src/layout/documentation/main-start.html',
+    'src/pages/product-filter/documentation/00-overview.html',
+    'src/pages/product-filter/documentation/01-core-architecture.html',
+    'src/pages/product-filter/documentation/02-client-reactive-engine.html',
+    'src/pages/product-filter/documentation/03-code-implementation.html',
+    'src/pages/product-filter/documentation/04-ssr-query-engine.html',
+    'src/pages/product-filter/documentation/05-database-indexing-storage.html',
+    'src/pages/product-filter/documentation/06-rest-api-lifecycle.html',
+    'src/pages/product-filter/documentation/07-admin-security-extensibility.html',
+    'src/layout/documentation/main-end.html',
+    'src/layout/documentation/sidebar-right.html',
+    'src/layout/documentation/doc-end.html',
+    'src/layout/footer.html'
+  ],
+  'support.html': [
+    'src/layout/head.html',
+    'src/layout/header.html',
+    'src/pages/support/support.html',
+    'src/layout/footer.html'
+  ]
+};
+
+function readPartial(relPath) {
+  const fullPath = path.resolve(__dirname, relPath);
+  if (!fs.existsSync(fullPath)) {
+    throw new Error(`Missing partial file: ${relPath}`);
+  }
+  return fs.readFileSync(fullPath, 'utf8').trimEnd();
+}
+
 function buildHtml() {
-  const startTime = Date.now();
-  const buffers = HTML_PARTS.map((file) => {
-    const fullPath = path.resolve(__dirname, file);
-    if (!fs.existsSync(fullPath)) {
-      throw new Error(`Missing HTML partial: ${file}`);
-    }
-    return fs.readFileSync(fullPath, 'utf8').trimEnd();
-  });
+  const totalStartTime = Date.now();
+  let compiledCount = 0;
 
-  const output = buffers.join('\n\n') + '\n';
-  const outputPath = path.resolve(__dirname, 'index.html');
-  fs.writeFileSync(outputPath, output, 'utf8');
+  for (const [outputFile, partials] of Object.entries(PAGES)) {
+    const pageStartTime = Date.now();
+    const buffers = partials.map((file) => readPartial(file));
+    const fullPageContent = buffers.join('\n\n') + '\n';
 
-  const duration = Date.now() - startTime;
-  const sizeKb = (Buffer.byteLength(output, 'utf8') / 1024).toFixed(1);
-  console.log(`[build] index.html compiled (${sizeKb} KB) in ${duration}ms`);
+    const outputPath = path.resolve(__dirname, outputFile);
+    fs.writeFileSync(outputPath, fullPageContent, 'utf8');
+
+    const duration = Date.now() - pageStartTime;
+    const sizeKb = (Buffer.byteLength(fullPageContent, 'utf8') / 1024).toFixed(1);
+    console.log(`[build:html] ${outputFile.padEnd(20)} (${sizeKb.padStart(6)} KB) in ${duration}ms`);
+    compiledCount++;
+  }
+
+  const totalDuration = Date.now() - totalStartTime;
+  console.log(`[build:html] Compiled ${compiledCount} pages successfully in ${totalDuration}ms`);
 }
 
 function buildCss() {
   const startTime = Date.now();
-  const buffers = CSS_PARTS.map((file) => {
-    const fullPath = path.resolve(__dirname, file);
-    if (!fs.existsSync(fullPath)) {
-      throw new Error(`Missing CSS partial: ${file}`);
-    }
-    return fs.readFileSync(fullPath, 'utf8').trimEnd();
-  });
+  const buffers = CSS_PARTS.map((file) => readPartial(file));
 
   const output = buffers.join('\n\n') + '\n';
   const outputPath = path.resolve(__dirname, 'styles.css');
@@ -63,7 +111,7 @@ function buildCss() {
 
   const duration = Date.now() - startTime;
   const sizeKb = (Buffer.byteLength(output, 'utf8') / 1024).toFixed(1);
-  console.log(`[build] styles.css compiled (${sizeKb} KB) in ${duration}ms`);
+  console.log(`[build:css]  styles.css           (${sizeKb.padStart(6)} KB) in ${duration}ms`);
 }
 
 function buildAll(target) {

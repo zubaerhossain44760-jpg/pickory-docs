@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pickory Product Filter — Developer Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Skip Navigation Link for Accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- ======================================================================
+       TOP GLOBAL NAVIGATION HEADER (Commercial Tech Company Header)
+       ====================================================================== -->
+  <header class="doc-top-header" aria-label="Main Navigation">
+    <div class="doc-header-left">
+      <a href="index.html" class="doc-header-brand" aria-label="Pickory Home">
+        <span class="doc-header-logo" aria-hidden="true">P</span>
+        <span class="doc-header-title">Pickory</span>
+      </a>
+    </div>
+
+    <nav class="doc-header-nav" aria-label="Primary Navigation">
+      <a href="product-filter.html" class="doc-header-link" data-page="product-filter.html">
+        <span>Product Filter</span>
+      </a>
+      <a href="theme.html" class="doc-header-link" data-page="theme.html">
+        <span>Theme</span>
+      </a>
+      <a href="product-filter-docs.html" class="doc-header-link" data-page="product-filter-docs.html" target="_blank" rel="noopener noreferrer">
+        <span>Documentation</span>
+      </a>
+      <a href="support.html" class="doc-header-link" data-page="support.html">
+        <span>Support &amp; Community</span>
+      </a>
+    </nav>
+
+    <div class="doc-header-right">
+      <div class="doc-header-actions">
+        <button type="button" class="doc-header-search-btn" id="header-search-trigger" aria-label="Search">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+          </svg>
+          <span>Search...</span>
+          <kbd class="doc-header-kbd">⌘K</kbd>
+        </button>
+
+        <a href="https://github.com" class="doc-header-icon-btn" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+        </a>
+
+        <a href="product-filter.html#get-started" class="doc-header-cta-btn">
+          <span>Get Pickory</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+    <!-- ======================================================================
+         FORUM & SUPPORT PAGE (Clean Centered Layout - No Sidebar)
+         ====================================================================== -->
+    <main class="forum-container" id="main-content" tabindex="-1">
+      
+      <!-- Forum Page Header -->
+      <header class="forum-header">
+        <div class="forum-badge-row">
+          <span class="ui-badge" data-variant="brand">DEVELOPER FORUM</span>
+          <span class="ui-badge" data-variant="success"><span class="doc-pill-dot"></span>COMMUNITY HUB</span>
+        </div>
+        <h1 class="forum-title">Pickory Support &amp; Forum</h1>
+        <p class="forum-lead">
+          Connect with the community, explore solutions, report bugs, and discuss architectural extensions for the Pickory ecosystem.
+        </p>
+
+        <!-- Search & New Topic Actions -->
+        <div class="forum-action-bar">
+          <div class="forum-search-box">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+            </svg>
+            <input type="text" class="forum-search-input" placeholder="Search forum topics, discussions, or error codes..." aria-label="Search forum topics">
+          </div>
+          <button type="button" class="forum-btn-primary">
+            <span>+ New Discussion</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Forum Category Channels -->
+      <section class="forum-categories" aria-label="Forum Categories">
+        <h2 class="forum-section-heading">Browse Categories</h2>
+        
+        <div class="forum-grid">
+          <div class="forum-card">
+            <div class="forum-card-icon">⚡</div>
+            <div class="forum-card-content">
+              <div class="forum-card-header">
+                <h3 class="forum-card-title">Pickory Product Filter</h3>
+                <span class="ui-badge" data-variant="brand">142 topics</span>
+              </div>
+              <p class="forum-card-desc">Faceted indexing queries, WooCommerce HPOS compatibility, REST API filters, and custom taxonomies.</p>
+            </div>
+          </div>
+
+          <div class="forum-card">
+            <div class="forum-card-icon">🎨</div>
+            <div class="forum-card-content">
+              <div class="forum-card-header">
+                <h3 class="forum-card-title">Pickory Theme</h3>
+                <span class="ui-badge" data-variant="success">86 topics</span>
+              </div>
+              <p class="forum-card-desc">Template hierarchy, W3C CSS token customization, container queries, and child theme engineering.</p>
+            </div>
+          </div>
+
+          <div class="forum-card">
+            <div class="forum-card-icon">🐛</div>
+            <div class="forum-card-content">
+              <div class="forum-card-header">
+                <h3 class="forum-card-title">Bugs &amp; Diagnostics</h3>
+                <span class="ui-badge">53 topics</span>
+              </div>
+              <p class="forum-card-desc">Error logs, reproducible test cases, transient cache issues, and environment diagnostics.</p>
+            </div>
+          </div>
+
+          <div class="forum-card">
+            <div class="forum-card-icon">💡</div>
+            <div class="forum-card-content">
+              <div class="forum-card-header">
+                <h3 class="forum-card-title">Feature Requests &amp; Ideas</h3>
+                <span class="ui-badge">69 topics</span>
+              </div>
+              <p class="forum-card-desc">Community proposals, architectural feedback, and roadmap discussion for upcoming releases.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Recent Discussions List -->
+      <section class="forum-discussions" aria-label="Recent Discussions">
+        <div class="forum-discussions-header">
+          <h2 class="forum-section-heading">Recent Discussions</h2>
+          <div class="forum-filter-tags">
+            <button type="button" class="forum-tag-btn is-active">All</button>
+            <button type="button" class="forum-tag-btn">Unresolved</button>
+            <button type="button" class="forum-tag-btn">Solved</button>
+          </div>
+        </div>
+
+        <div class="forum-thread-list">
+          <div class="forum-thread-item">
+            <div class="forum-thread-main">
+              <span class="ui-badge" data-variant="brand">PRODUCT FILTER</span>
+              <h4 class="forum-thread-title">
+                <a href="#thread-1">Handling custom attribute slugs with hyphenated keys in flat index</a>
+              </h4>
+              <p class="forum-thread-meta">Started by <strong>dev_alex</strong> &bull; 2 hours ago</p>
+            </div>
+            <div class="forum-thread-stats">
+              <span class="forum-stat-count">14 replies</span>
+              <span class="ui-badge" data-variant="success">Solved</span>
+            </div>
+          </div>
+
+          <div class="forum-thread-item">
+            <div class="forum-thread-main">
+              <span class="ui-badge" data-variant="success">THEME</span>
+              <h4 class="forum-thread-title">
+                <a href="#thread-2">Overriding CSS custom properties dynamically inside child theme blocks</a>
+              </h4>
+              <p class="forum-thread-meta">Started by <strong>sarah_ui</strong> &bull; 5 hours ago</p>
+            </div>
+            <div class="forum-thread-stats">
+              <span class="forum-stat-count">8 replies</span>
+            </div>
+          </div>
+
+          <div class="forum-thread-item">
+            <div class="forum-thread-main">
+              <span class="ui-badge">DIAGNOSTICS</span>
+              <h4 class="forum-thread-title">
+                <a href="#thread-3">REST query timeout during batch reindexing with 80k WooCommerce SKUs</a>
+              </h4>
+              <p class="forum-thread-meta">Started by <strong>mark_ops</strong> &bull; 1 day ago</p>
+            </div>
+            <div class="forum-thread-stats">
+              <span class="forum-stat-count">23 replies</span>
+              <span class="ui-badge" data-variant="success">Solved</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Community Channels Banner -->
+      <section class="forum-channels-banner">
+        <div class="forum-channel-col">
+          <h3>Need Real-Time Help?</h3>
+          <p>Join the Pickory Discord server for live chat with core contributors and community engineers.</p>
+        </div>
+        <div class="forum-channel-links">
+          <a href="https://discord.com" class="ui-badge" data-variant="brand" target="_blank" rel="noopener noreferrer">
+            Join Discord Community &rarr;
+          </a>
+          <a href="https://github.com" class="ui-badge" target="_blank" rel="noopener noreferrer">
+            GitHub Discussions &rarr;
+          </a>
+        </div>
+      </section>
+
+    </main>
+
+  <!-- Vanilla JavaScript Interactive Runtime -->
+  <script src="app.js" defer></script>
+</body>
+</html>
