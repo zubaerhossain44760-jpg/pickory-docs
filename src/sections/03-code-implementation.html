@@ -1,0 +1,128 @@
+        <!-- ==================================================================
+             MULTI-TAB CODE WINDOW (JetBrains / Stripe Inspired)
+             ================================================================== -->
+        <section class="doc-section" id="code-implementation">
+          <h2>
+            <span>Multi-Tab Implementation Reference</span>
+            <a href="#code-implementation" class="section-anchor" aria-label="Permalink to Implementation Reference">#</a>
+          </h2>
+          <p>
+            Inspect the core execution logic across server PHP integration, frontend reactive state orchestration, and compiled index SQL queries:
+          </p>
+
+          <div class="ui-code-window">
+            <div class="code-window-header">
+              <div class="code-tab-group" role="tablist" aria-label="Code Implementation Languages">
+                <button type="button" class="code-tab-btn is-active" data-target="code-php" data-file="includes/services/class-ppfx-product-query-builder.php" role="tab" aria-selected="true">
+                  <span>PHP (Priority 20 Scope)</span>
+                </button>
+                <button type="button" class="code-tab-btn" data-target="code-js" data-file="src/js/utils/url.js" role="tab" aria-selected="false">
+                  <span>JavaScript (URL State Machine)</span>
+                </button>
+                <button type="button" class="code-tab-btn" data-target="code-sql" data-file="includes/services/class-ppfx-query-clause-compiler.php" role="tab" aria-selected="false">
+                  <span>Compiled SQL (Index Query)</span>
+                </button>
+              </div>
+              <div class="code-window-meta">
+                <span class="code-window-filename" id="active-filename">includes/services/class-ppfx-product-query-builder.php</span>
+                <button type="button" class="copy-btn" id="copy-code-btn" aria-label="Copy active code snippet">
+                  <svg class="copy-icon copy-default-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25v-7.5Z"/>
+                    <path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25v-7.5Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25h-7.5Z"/>
+                  </svg>
+                  <svg class="copy-icon checkmark-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M12.416 3.376a.75.75 0 0 1 .208 1.04l-5 7.5a.75.75 0 0 1-1.154.114l-3-3a.75.75 0 0 1 1.06-1.06l2.353 2.353 4.493-6.74a.75.75 0 0 1 1.04-.207Z" clip-rule="evenodd"/>
+                  </svg>
+                  <span class="copy-text">Copy Code</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Pane 1: PHP -->
+            <div class="code-tab-pane is-active" id="code-php" role="tabpanel">
+              <pre><code><span class="token-keyword">&lt;?php</span>
+<span class="token-comment">/**
+ * includes/services/class-ppfx-product-query-builder.php
+ * Orchestrates query compilation and scoped SQL lifecycle for filtered WooCommerce catalog queries.
+ */</span>
+<span class="token-keyword">final class</span> <span class="token-function">PPFX_Product_Query_Builder</span> {
+    <span class="token-keyword">private</span> <span class="token-variable">$compiler</span> = <span class="token-keyword">null</span>;
+
+    <span class="token-comment">/**
+     * Applies compiled index filters to WooCommerce's WP_Query instance.
+     * SQL hooks stay attached until this exact query has completed, preventing
+     * nested or secondary queries from removing them prematurely.
+     */</span>
+    <span class="token-keyword">public function</span> <span class="token-function">apply_to_query</span>( \<span class="token-type">WP_Query</span> <span class="token-variable">$query</span> ): <span class="token-type">void</span> {
+        <span class="token-variable">$compilation</span> = <span class="token-variable">$this</span>-&gt;<span class="token-function">compiler</span>()-&gt;<span class="token-function">compile</span>( <span class="token-variable">$this</span>-&gt;<span class="token-function">get_params</span>() );
+        <span class="token-variable">$args</span>        = <span class="token-variable">$compilation</span>[<span class="token-string">'args'</span>];
+
+        <span class="token-comment">// Flag the target query instance to activate hook scope guards</span>
+        <span class="token-variable">$query</span>-&gt;<span class="token-function">set</span>( <span class="token-string">'ppfx_is_filter_query'</span>, <span class="token-keyword">true</span> );
+
+        <span class="token-keyword">if</span> ( ! <span class="token-keyword">empty</span>( <span class="token-variable">$args</span>[<span class="token-string">'tax_query'</span>] ) ) {
+            <span class="token-variable">$query</span>-&gt;<span class="token-function">set</span>( <span class="token-string">'tax_query'</span>, <span class="token-variable">$args</span>[<span class="token-string">'tax_query'</span>] );
+        }
+
+        <span class="token-comment">// Attach temporary scoped SQL clauses to the posts_clauses filter</span>
+        <span class="token-variable">$scope</span> = <span class="token-variable">$compilation</span>[<span class="token-string">'scope'</span>];
+        <span class="token-variable">$scope</span>-&gt;<span class="token-function">attach</span>( <span class="token-variable">$query</span> );
+    }
+}</code></pre>
+            </div>
+
+            <!-- Pane 2: JavaScript -->
+            <div class="code-tab-pane" id="code-js" role="tabpanel">
+              <pre><code><span class="token-comment">/**
+ * src/js/utils/url.js &amp; src/js/components/filter-form.js
+ * Central transactional write gate enforcing URL as Single Source of Truth (SSOT).
+ */</span>
+<span class="token-keyword">export const</span> <span class="token-function">commitFilterUpdate</span> = (modifierFn, options = {}) =&gt; {
+  <span class="token-keyword">const</span> { resetPage = <span class="token-keyword">true</span>, pushHistory = <span class="token-keyword">true</span>, source = <span class="token-string">"user"</span> } = options;
+  <span class="token-keyword">const</span> current = PPFX_URL_State.<span class="token-function">getCanonicalState</span>();
+  <span class="token-keyword">const</span> next = { ...current };
+
+  <span class="token-comment">// Automatic page reset invariant: facet mutations always revert to page 1</span>
+  <span class="token-keyword">if</span> (resetPage) {
+    <span class="token-keyword">delete</span> next.page;
+    <span class="token-keyword">delete</span> next.paged;
+  }
+
+  <span class="token-comment">// Execute caller's transactional mutation on detached state clone</span>
+  <span class="token-function">modifierFn</span>(next);
+
+  <span class="token-keyword">if</span> (isAutoFilter || source === <span class="token-string">"submit"</span> || source === <span class="token-string">"pagination"</span> || source === <span class="token-string">"sort"</span> || source === <span class="token-string">"reset"</span>) {
+    PPFX_URL_State.<span class="token-function">setCanonicalState</span>(next, { pushHistory, source });
+  }
+};</code></pre>
+            </div>
+
+            <!-- Pane 3: SQL -->
+            <div class="code-tab-pane" id="code-sql" role="tabpanel">
+              <pre><code><span class="token-comment">-- includes/services/class-ppfx-query-clause-compiler.php
+-- Compiled posts_clauses query targeting denormalized flat index tables (ppfxi &amp; ppfxt)
+-- Bypasses wp_postmeta joins to achieve sub-50ms query execution across 50,000+ SKUs</span>
+
+<span class="token-keyword">SELECT DISTINCT</span> wp_posts.ID
+<span class="token-keyword">FROM</span> wp_posts
+<span class="token-keyword">INNER JOIN</span> wp_ppfx_product_index <span class="token-keyword">AS</span> ppfxi 
+    <span class="token-keyword">ON</span> ppfxi.product_id = wp_posts.ID
+<span class="token-keyword">INNER JOIN</span> wp_ppfx_product_terms <span class="token-keyword">AS</span> ppfxt_cat 
+    <span class="token-keyword">ON</span> ppfxt_cat.product_id = wp_posts.ID 
+   <span class="token-keyword">AND</span> ppfxt_cat.taxonomy = <span class="token-string">'product_cat'</span> 
+   <span class="token-keyword">AND</span> ppfxt_cat.term_id <span class="token-keyword">IN</span> (18, 24)
+<span class="token-keyword">WHERE</span> wp_posts.post_type = <span class="token-string">'product'</span>
+  <span class="token-keyword">AND</span> wp_posts.post_status = <span class="token-string">'publish'</span>
+  <span class="token-keyword">AND</span> ppfxi.stock_status = <span class="token-string">'instock'</span>
+  <span class="token-keyword">AND</span> ppfxi.min_price &gt;= 25.00
+  <span class="token-keyword">AND</span> ppfxi.max_price &lt;= 150.00
+  <span class="token-keyword">AND</span> ppfxi.rating_average &gt;= 4.00
+<span class="token-keyword">ORDER BY</span> ppfxi.min_price <span class="token-keyword">ASC</span>
+<span class="token-keyword">LIMIT</span> 0, 24;</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             TOPIC 3: SSR & QUERY EXECUTION ENGINE
+             ================================================================== -->

@@ -1,0 +1,1056 @@
+        <section class="doc-section" id="client-reactive-engine">
+
+          <!-- Document Header Block -->
+          <header class="doc-header-block">
+            <h2 class="doc-main-title">2. Client Reactive Engine &amp; UI Layer</h2>
+            <p class="doc-lead-paragraph">
+              Pickory Product Filter treats the browser URL address bar as the absolute, immutable Single Source of Truth (SSOT). All user interactions—from dual-thumb price drags to taxonomy swatch toggles—are serialized into canonical parameters, routed through a centralized write gate, and broadcast across a decoupled event bus. This architecture guarantees zero client-state drift between multiple desktop and mobile widgets while ensuring 100% bookmarkable, shareable catalog views.
+            </p>
+            <div class="doc-meta-pills">
+              <span class="ui-badge" data-variant="brand">SSOT INVARIANT</span>
+              <span class="ui-badge">Event Bus</span>
+              <span class="ui-badge">History API</span>
+              <span class="ui-badge">Zero Client Drift</span>
+              <span class="ui-badge">Multi-Instance Sync</span>
+            </div>
+          </header>
+
+          <!-- Interactive Flowchart Component (State Machine Visualizer) -->
+          <div class="ui-flowchart" id="state-machine-container">
+            <div class="flowchart-header">
+              <div class="flowchart-heading">
+                <span class="ui-badge" data-variant="success">INTERACTIVE</span>
+                <span>Reactive State Machine Lifecycle</span>
+              </div>
+              <span class="flowchart-hint">Click a pipeline node to inspect invariant logic</span>
+            </div>
+
+            <div class="flowchart-canvas">
+              <svg class="flowchart-svg" viewBox="0 0 868 98" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="region" aria-label="Reactive State Machine Architecture Flow">
+                <defs>
+                  <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 1.5 L 8 5 L 0 8.5 z" class="flow-arrowhead" />
+                  </marker>
+                </defs>
+
+                <!-- Node 1: User Interaction -->
+                <g class="flow-node is-active" data-node-id="user-interaction" tabindex="0" role="button" aria-selected="true" aria-label="Node 1: User Interaction">
+                  <rect x="10" y="20" width="136" height="58" rx="8" />
+                  <text x="22" y="41" class="node-step">01. INGESTION</text>
+                  <text x="22" y="60" class="node-title">User Interaction</text>
+                </g>
+
+                <!-- Arrow 1 -> 2 -->
+                <path class="flow-connector" d="M 146 49 L 182 49" marker-end="url(#arrow)" />
+
+                <!-- Node 2: URL SearchParams -->
+                <g class="flow-node" data-node-id="url-params" tabindex="0" role="button" aria-selected="false" aria-label="Node 2: URL SearchParams">
+                  <rect x="186" y="20" width="138" height="58" rx="8" />
+                  <text x="198" y="41" class="node-step">02. SERIALIZE</text>
+                  <text x="198" y="60" class="node-title">URL SearchParams</text>
+                </g>
+
+                <!-- Arrow 2 -> 3 -->
+                <path class="flow-connector" d="M 324 49 L 360 49" marker-end="url(#arrow)" />
+
+                <!-- Node 3: ppfx:url-change Event -->
+                <g class="flow-node" data-node-id="url-change-event" tabindex="0" role="button" aria-selected="false" aria-label="Node 3: ppfx:url-change Event">
+                  <rect x="364" y="20" width="144" height="58" rx="8" />
+                  <text x="376" y="41" class="node-step">03. EVENT BUS</text>
+                  <text x="376" y="60" class="node-title">ppfx:url-change</text>
+                </g>
+
+                <!-- Arrow 3 -> 4 -->
+                <path class="flow-connector" d="M 508 49 L 544 49" marker-end="url(#arrow)" />
+
+                <!-- Node 4: Primary Coordinator -->
+                <g class="flow-node" data-node-id="coordinator" tabindex="0" role="button" aria-selected="false" aria-label="Node 4: Primary Coordinator">
+                  <rect x="548" y="20" width="142" height="58" rx="8" />
+                  <text x="560" y="41" class="node-step">04. ORCHESTRATE</text>
+                  <text x="560" y="60" class="node-title">Coordinator</text>
+                </g>
+
+                <!-- Arrow 4 -> 5 -->
+                <path class="flow-connector" d="M 690 49 L 726 49" marker-end="url(#arrow)" />
+
+                <!-- Node 5: REST Engine -->
+                <g class="flow-node" data-node-id="rest-engine" tabindex="0" role="button" aria-selected="false" aria-label="Node 5: REST Engine">
+                  <rect x="730" y="20" width="128" height="58" rx="8" />
+                  <text x="742" y="41" class="node-step">05. RESOLUTION</text>
+                  <text x="742" y="60" class="node-title">REST Engine</text>
+                </g>
+              </svg>
+            </div>
+
+            <!-- Adjacent Inspector Micro-Card (UI Card) -->
+            <div class="ui-card" data-type="inspector" id="state-inspector-card" aria-live="polite">
+              <div class="ui-card-header">
+                <span class="ui-badge" data-variant="brand">[PIPELINE STAGE INSPECTOR]</span>
+                <span class="ui-badge">ACTIVE TARGET</span>
+              </div>
+              <h3 class="ui-card-title">User Interaction</h3>
+              <div class="ui-card-row">
+                <span class="ui-card-label">Source File:</span>
+                <code class="ui-card-filepath">src/js/components/filter-form.js</code>
+              </div>
+              <div class="ui-card-row">
+                <span class="ui-card-label">Lifecycle Role:</span>
+                <span class="ui-card-role">Synchronous Event Capture &amp; Debounce</span>
+              </div>
+              <div class="ui-card-box">
+                <strong>Architectural Invariant:</strong>
+                <p class="ui-card-invariant">
+                  UI events (dual-thumb slider drag, checkbox toggle, swatch selection) are captured synchronously and debounced at 300ms for continuous sliders. Presentation components are strictly decoupled from network dispatchers and never initiate direct fetch operations.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               2.1 The URL as Single Source of Truth
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-1">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.1 ARCHITECTURAL INVARIANT</span>
+              <h3>The URL as Single Source of Truth</h3>
+            </div>
+            <p>
+              In complex WooCommerce themes, filter controls frequently exist simultaneously across multiple DOM subtrees: a desktop sidebar, a mobile off-canvas drawer, a top-bar sort dropdown, and breadcrumb chips. Traditional filtering plugins store filter state in component-level memory or ad-hoc jQuery objects, leading to synchronization drift, duplicate REST fetches, and broken browser history.
+            </p>
+            <p>
+              Pickory resolves this by declaring the <strong>browser window URL search parameters</strong> as the sole authoritative state container. Components possess zero independent filter state; they act strictly as <em>readers</em> and <em>writers</em> of the canonical URL string:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Dimension</th>
+                    <th>Traditional In-Memory Store</th>
+                    <th>Pickory URL SSOT Architecture</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Authority</strong></td>
+                    <td>Component state / JS variables in memory</td>
+                    <td>Browser address bar (<code>window.location.search</code>)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Multi-Widget Sync</strong></td>
+                    <td>Imperative DOM event spaghetti across widgets</td>
+                    <td>Automatic reactive hydration via <code>syncAllUIs()</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>History Navigation</strong></td>
+                    <td>Requires custom state serialization &amp; stack recovery</td>
+                    <td>Native <code>popstate</code> listener re-hydrates UI automatically</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Shareability</strong></td>
+                    <td>State is lost on copy/paste or page refresh</td>
+                    <td>100% deterministic link fidelity with SSR parity</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               2.2 PPFXURLStateManager — Observer Contract & Event Bus
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-2">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.2 OBSERVER CONTRACT</span>
+              <h3><code>PPFXURLStateManager</code> — Observer Contract &amp; Event Bus</h3>
+            </div>
+            <p>
+              Located in <code>src/js/utils/url.js</code>, the <code>PPFXURLStateManager</code> class manages the observer registry and event bus. It exports a singleton instance, <code>PPFX_URL_State</code>, that decouples UI widget controllers from network fetchers:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">OBSERVER REGISTRY</span>
+                <h4 class="ui-card-title"><code>subscribe(listener)</code></h4>
+                <p class="ui-card-desc">
+                  Accepts a callback function <code>fn(params, detail)</code> and registers it within an internal <code>Set</code>. Returns a clean unsubscription closure to prevent memory leaks during component destruction.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">EVENT BUS</span>
+                <h4 class="ui-card-title"><code>ppfx:url-change</code></h4>
+                <p class="ui-card-desc">
+                  Whenever the canonical state transitions, the manager dispatches a native <code>CustomEvent('ppfx:url-change')</code> with <code>{ detail: { params, source, url } }</code> to the global <code>window</code> object.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">CANONICAL READER</span>
+                <h4 class="ui-card-title"><code>getCanonicalState()</code></h4>
+                <p class="ui-card-desc">
+                  Synchronously reads <code>window.location.search</code>, converts public <code>ppfx_</code> query variables into internal parameter objects, and returns an immutable state snapshot.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               2.3 Internal ↔ Public Parameter Translation Layer
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-3">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.3 TRANSLATION LAYER</span>
+              <h3>Internal &harr; Public Parameter Translation Layer</h3>
+            </div>
+            <p>
+              Pickory enforces a strict boundary between clean internal property names used within JavaScript widgets and public query parameters exposed in the browser URL and HTTP REST requests:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Internal Facet Key</th>
+                    <th>Public URL Parameter</th>
+                    <th>Serialization Format</th>
+                    <th>Example Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>category</code></td>
+                    <td><code>ppfx_category</code></td>
+                    <td>Comma-separated slugs</td>
+                    <td><code>hoodies,accessories</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>product_tag</code></td>
+                    <td><code>ppfx_product_tag</code></td>
+                    <td>Comma-separated slugs</td>
+                    <td><code>summer,clearance</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>min_price</code></td>
+                    <td><code>ppfx_min_price</code></td>
+                    <td>Numeric float string</td>
+                    <td><code>25.00</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>max_price</code></td>
+                    <td><code>ppfx_max_price</code></td>
+                    <td>Numeric float string</td>
+                    <td><code>150.00</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>rating</code></td>
+                    <td><code>ppfx_rating</code></td>
+                    <td>Integer string (1&ndash;5)</td>
+                    <td><code>4</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>on_sale</code></td>
+                    <td><code>ppfx_on_sale</code></td>
+                    <td>Binary flag (<code>1</code> or omitted)</td>
+                    <td><code>1</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>orderby</code> / <code>order</code></td>
+                    <td><code>ppfx_orderby</code> / <code>ppfx_order</code></td>
+                    <td>String sorting key</td>
+                    <td><code>price</code> / <code>DESC</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>page</code></td>
+                    <td><code>ppfx_page</code></td>
+                    <td>Positive integer string</td>
+                    <td><code>2</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>filter_{taxonomy}</code></td>
+                    <td><code>ppfx_attr_{taxonomy}</code></td>
+                    <td>Comma-separated term slugs</td>
+                    <td><code>blue,red</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="ui-callout" data-type="security" role="note">
+              <div class="ui-callout-header">
+                <span class="ui-badge" data-variant="cyan">[SECURITY]</span>
+                <h4 class="ui-callout-title">Prototype Pollution Hardening</h4>
+              </div>
+              <div class="ui-callout-body">
+                Both <code>toPublicParams()</code> and <code>toInternalParams()</code> explicitly drop reserved object keys (<code>__proto__</code>, <code>constructor</code>, <code>prototype</code>) during translation to defend against prototype pollution attacks injected via crafted URL query strings.
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               2.4 commitFilterUpdate — The Unidirectional Write Gate
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-4">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.4 UNIDIRECTIONAL WRITE GATE</span>
+              <h3><code>commitFilterUpdate</code> — The Unidirectional Write Gate</h3>
+            </div>
+            <p>
+              To maintain absolute determinism, no UI component directly calls <code>window.history.pushState()</code>. Instead, all mutations in <code>filter-form.js</code> must pass through the <code>commitFilterUpdate</code> gate:
+            </p>
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Execution Step</th>
+                    <th>Subsystem Action</th>
+                    <th>Architectural Purpose</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>1. Read Current</strong></td>
+                    <td><code>PPFX_URL_State.getCanonicalState()</code></td>
+                    <td>Reads the existing parameters directly from the browser URL address bar.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>2. Clone State</strong></td>
+                    <td><code>next = { ...current }</code></td>
+                    <td>Creates a detached copy to ensure state mutations are isolated and transactional.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>3. Automatic Page Reset</strong></td>
+                    <td><code>delete next.page; delete next.paged;</code></td>
+                    <td>If <code>resetPage: true</code> (default), clearing pagination guarantees the user lands on page 1 of new filter results.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>4. Execute Mutator</strong></td>
+                    <td><code>modifierFn(next)</code></td>
+                    <td>Applies specific facet additions, deletions, or range changes to the mutable clone.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>5. Gate Evaluation</strong></td>
+                    <td><code>if (isAutoFilter || source === "submit")</code></td>
+                    <td>In auto-filter mode, commits immediately to URL. In manual submit mode, holds staging state until submit is clicked.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               2.5 setCanonicalState — History Push vs. Replace Strategy
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-5">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.5 HISTORY API STRATEGY</span>
+              <h3><code>setCanonicalState</code> — History Push vs. Replace Strategy</h3>
+            </div>
+            <p>
+              The <code>setCanonicalState</code> method constructs a clean <code>URL</code> object, purges obsolete <code>ppfx_*</code> keys, and writes the new query string using an intentional history management strategy:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="success">PUSH STATE (pushHistory: true)</span>
+                <h4 class="ui-card-title">Discrete User Selections</h4>
+                <p class="ui-card-desc">
+                  Used for distinct user choices (clicking category checkboxes, color swatches, star ratings, or pagination links). Creates a new entry in the browser session history so users can click the browser Back button to revert the selection.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">REPLACE STATE (pushHistory: false)</span>
+                <h4 class="ui-card-title">Continuous Inputs &amp; Normalization</h4>
+                <p class="ui-card-desc">
+                  Used during dual-thumb price slider drag movements, text search debounces, or initial boot normalization. Replaces the current history entry in-place to avoid polluting the browser history with dozens of micro-step drag entries.
+                </p>
+              </div>
+            </div>
+
+            <div class="ui-callout" data-type="guardrail" role="note">
+              <div class="ui-callout-header">
+                <span class="ui-badge" data-variant="success">[NON-FILTER PRESERVATION]</span>
+                <h4 class="ui-callout-title">Preservation of Foreign Parameters</h4>
+              </div>
+              <div class="ui-callout-body">
+                <code>setCanonicalState()</code> only purges known filter keys and <code>ppfx_</code> prefixed parameters. Foreign query parameters (such as marketing UTM tags <code>utm_source</code>, affiliate tokens, or WordPress search <code>s</code>) are strictly preserved across state transitions.
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               2.6 popstate Handling & Browser Back/Forward Integration
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-6">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.6 BROWSER NAVIGATION</span>
+              <h3><code>popstate</code> Handling &amp; Browser Back/Forward Integration</h3>
+            </div>
+            <p>
+              When a user clicks the browser Back or Forward button, the browser triggers a native <code>popstate</code> event. Pickory intercepts this via an immutable lifecycle loop:
+            </p>
+            <ol>
+              <li><code>_initPopstate()</code> listener receives the native <code>popstate</code> event from the window.</li>
+              <li>Calls <code>getCanonicalState()</code> to parse the newly active URL search string.</li>
+              <li>Dispatches <code>ppfx:url-change</code> with <code>source: 'popstate'</code> and the event's history state.</li>
+              <li>The state coordinator receives the event and initiates an AJAX fragment fetch matching the historical URL.</li>
+              <li><strong>History Cycle Protection:</strong> Because the navigation was initiated by the browser itself, the coordinator never calls <code>pushState()</code> or <code>replaceState()</code>, avoiding infinite loop traps.</li>
+            </ol>
+          </div>
+
+          <!-- ================================================================
+               2.7 Multi-Instance Synchronization via syncAllUIs
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-7">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.7 MULTI-INSTANCE SYNC</span>
+              <h3>Multi-Instance Synchronization via <code>syncAllUIs</code></h3>
+            </div>
+            <p>
+              In responsive WooCommerce themes, desktop sidebar filters and mobile drawer filters exist as independent DOM instances. Pickory maintains a global instance registry (<code>filterFormInstances</code> Set in <code>filter-globals.js</code>) to enforce bilateral UI synchrony:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Control Type</th>
+                    <th>Hydration Mechanism in <code>applyFilterState()</code></th>
+                    <th>Focus &amp; Input Guard</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Checkboxes &amp; Radios</strong></td>
+                    <td>Matches input <code>value</code> against deserialized array. Toggles <code>checked</code> and sets <code>data-was-checked</code>.</td>
+                    <td>Does not disrupt focus if user is tabbing.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Select Dropdowns</strong></td>
+                    <td>Sets <code>select.value</code> to canonical string; synchronizes WooCommerce catalog ordering dropdowns.</td>
+                    <td>Bypasses <code>select === document.activeElement</code> to prevent closing open dropdown menus.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Swatches &amp; Buttons</strong></td>
+                    <td>Toggles <code>.is-active</code> class and updates <code>aria-pressed</code> attribute on matching <code>data-value</code> elements.</td>
+                    <td>Syncs hidden companion input values for form submission compatibility.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Price Slider Inputs</strong></td>
+                    <td>Updates min/max input values and dispatches synthetic <code>input</code> event to reposition slider thumbs.</td>
+                    <td>Bypasses active slider thumb if currently being dragged by user.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Text Search Inputs</strong></td>
+                    <td>Updates input string to match canonical query.</td>
+                    <td>Preserves <code>selectionStart</code> and <code>selectionEnd</code> caret positions if input is active.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               2.8 Reserved Key Partition: Filters vs. Sort & Pagination
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-8">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.8 KEY PARTITIONING</span>
+              <h3>Reserved Key Partition: Filters vs. Sort &amp; Pagination</h3>
+            </div>
+            <p>
+              Not all parameters in the URL represent product facets. Pickory establishes a strict key partition through <code>RESERVED_FILTER_KEYS</code>:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">FACET KEYS</span>
+                <h4 class="ui-card-title">Criteria Modifiers</h4>
+                <p class="ui-card-desc">
+                  <code>category</code>, <code>product_tag</code>, <code>min_price</code>, <code>max_price</code>, <code>rating</code>, <code>on_sale</code>, and dynamic <code>filter_*</code> attributes. Mutating any facet key triggers an automatic reset of pagination (<code>page=1</code>) and recalculates facet term counts.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">RESERVED KEYS</span>
+                <h4 class="ui-card-title">Traversal &amp; Presentation</h4>
+                <p class="ui-card-desc">
+                  <code>orderby</code>, <code>order</code>, <code>page</code>, <code>paged</code>, <code>ppfx_instance_id</code>. Mutating reserved keys changes catalog presentation or pagination page without altering facet boundaries or generating active filter chips.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               2.9 Auto-Filter Mode vs. Manual Submit Mode
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-9">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.9 OPERATIONAL MODES</span>
+              <h3>Auto-Filter Mode vs. Manual Submit Mode</h3>
+            </div>
+            <p>
+              Pickory supports two operational modes configurable via shortcode attribute or admin panel:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Feature</th>
+                    <th>Auto-Filter Mode (<code>auto_filter="1"</code>)</th>
+                    <th>Manual Submit Mode (<code>auto_filter="0"</code>)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Execution Trigger</strong></td>
+                    <td>Instantaneous upon user gesture or slider debounce timeout.</td>
+                    <td>User clicks the explicit "Apply Filters" submit button.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>URL Mutation</strong></td>
+                    <td>Immediate. URL updates on every selection.</td>
+                    <td>Deferred. URL remains unchanged until submit button is pressed.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Network Profile</strong></td>
+                    <td>High reactivity; aborts in-flight requests on rapid changes.</td>
+                    <td>Batched; exactly one REST request dispatched per submission.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Mobile Suitability</strong></td>
+                    <td>Ideal for high-speed Wi-Fi and fast catalogs.</td>
+                    <td>Recommended for cellular data or heavily multi-faceted mobile drawers.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               2.10 Debounce & Delay Semantics by Interaction Source
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-2-10">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">2.10 LATENCY CONTRACT</span>
+              <h3>Debounce &amp; Delay Semantics by Interaction Source</h3>
+            </div>
+            <p>
+              To protect the server against request floods while delivering an instantaneous tactile feel, Pickory enforces source-specific delay semantics:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Interaction Source</th>
+                    <th>Debounce Delay</th>
+                    <th>Execution Semantics</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Checkbox / Radio / Swatch / Rating</strong></td>
+                    <td><code>0ms</code> (Instant)</td>
+                    <td>Immediately commits to URL and dispatches REST request. Previous in-flight request is cancelled via <code>AbortController</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Price Range Dual Slider</strong></td>
+                    <td><code>300ms</code> (Trailing)</td>
+                    <td>Continuous thumb movement updates local labels in real-time; URL commit and REST dispatch are deferred until dragging ceases for 300ms.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Keyword / SKU Search Input</strong></td>
+                    <td><code>300ms</code> (Trailing)</td>
+                    <td>Debounces keyboard keystrokes to prevent partial prefix database queries while user is actively typing.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Reset / Clear All Filters</strong></td>
+                    <td><code>0ms</code> (Instant)</td>
+                    <td>Immediately purges all facet parameters, resets pagination, and requests clean catalog baseline.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- ================================================================
+               PART II: FILTER FORM CONTROLLER & WIDGET ARCHITECTURE
+               ================================================================ -->
+          <div class="doc-module-divider" id="filter-form-engine">
+            <h2 class="doc-module-divider-title">Part II: Filter Form Controller &amp; Widget Architecture</h2>
+            <p class="doc-lead-paragraph doc-module-divider-desc">
+              The Filter Form Engine (<code>src/js/components/filter-form.js</code>) serves as the primary input controller across all Pickory instances. It manages the complete component lifecycle, resolves dynamic catalog product loops via multi-tier container heuristics, delegates native input events, maps custom UI controls (swatches, button grids, star ratings, dual-thumb sliders), and enforces deterministic request cancellation via <code>AbortController</code>.
+            </p>
+            <div class="doc-meta-pills">
+              <span class="ui-badge" data-variant="brand">EVENT DELEGATION</span>
+              <span class="ui-badge">DOM HYDRATION</span>
+              <span class="ui-badge">ABORT CONTROLLER</span>
+              <span class="ui-badge">CONTAINER RESOLVER</span>
+              <span class="ui-badge">RADIO UNCHECK</span>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               3.1 initFilterForm — Instance Lifecycle & Initialization Guard
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-1">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.1 LIFECYCLE GUARD</span>
+              <h3><code>initFilterForm</code> — Instance Lifecycle &amp; Initialization Guard</h3>
+            </div>
+            <p>
+              The entry point <code>initFilterForm(formElement, productsContainer, options)</code> bootstraps an isolated filter instance. To prevent duplicate listeners during AJAX container re-renders or dynamic theme scripts, the engine binds an instance-level <code>AbortController</code> (<code>domAbortController</code>) and registers the instance with the global tracking set:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Lifecycle Stage</th>
+                    <th>Execution Routine</th>
+                    <th>Architectural Responsibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>1. Bootstrap Guard</strong></td>
+                    <td><code>formElement.dataset.ppfxInstance</code></td>
+                    <td>Reads unique instance ID and assigns scoped target selector (<code>data-ppfx-target</code>).</td>
+                  </tr>
+                  <tr>
+                    <td><strong>2. Scope Attachment</strong></td>
+                    <td><code>new AbortController() &rarr; { signal }</code></td>
+                    <td>Passes a scoped DOM abort signal to every event listener, ensuring clean bulk detachment upon teardown.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>3. Registry Enrolment</strong></td>
+                    <td><code>registerGlobalInstance(globalInstance)</code></td>
+                    <td>Appends instance to <code>filterFormInstances</code> Set for multi-instance bilateral synchronization.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>4. Boot Hydration</strong></td>
+                    <td><code>syncStateFromUrl()</code></td>
+                    <td>Performs initial idempotent DOM input reconciliation from URL parameters without firing unnecessary HTTP requests.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>5. Teardown Protocol</strong></td>
+                    <td><code>destroy()</code></td>
+                    <td>Aborts DOM signal, tears down active chips, unregisters global instance, and aborts pending in-flight REST fetches.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               3.2 Container Resolution Strategy (Instance -> Root -> Global)
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-2">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.2 RESOLUTION HEURISTIC</span>
+              <h3>Container Resolution Strategy (Instance &rarr; Root &rarr; Global Fallback)</h3>
+            </div>
+            <p>
+              In diverse WooCommerce themes, the catalog product grid container varies widely across page builders (Elementor, Divi, Gutenberg blocks, or classic template loops). Pickory implements a 4-tier resolution heuristic in <code>getLiveProductsContainer()</code>:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Priority</th>
+                    <th>Resolution Stage</th>
+                    <th>Selector Heuristic</th>
+                    <th>Target Theme Context</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>1. Live Cache</strong></td>
+                    <td>DOM Attachment Check</td>
+                    <td><code>document.body.contains(currentProductsContainer)</code></td>
+                    <td>Reuses existing container reference if not replaced by third-party DOM mutation.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>2. Explicit Target</strong></td>
+                    <td>Instance Target Selector</td>
+                    <td><code>document.querySelector(formElement.dataset.ppfxTarget)</code></td>
+                    <td>Explicit custom container selector passed via shortcode or block attribute.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>3. Scoped Instance</strong></td>
+                    <td>Instance ID Attribute</td>
+                    <td><code>.ppfx-products-wrapper[data-ppfx-instance="{id}"]</code></td>
+                    <td>Multi-catalog pages where multiple independent filter forms target specific loops.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>4. Universal Fallback</strong></td>
+                    <td>Progressive Cascade</td>
+                    <td><code>.ppfx-products-wrapper</code> &rarr; <code>.products</code> &rarr; <code>.woocommerce-no-products</code> &rarr; <code>.woocommerce-info</code></td>
+                    <td>Standard WooCommerce templates, block archives, and zero-results state views.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               3.3 toggleMultiValue vs. setSingleValue — State Mutation Primitives
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-3">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.3 MUTATION PRIMITIVES</span>
+              <h3><code>toggleMultiValue</code> vs. <code>setSingleValue</code> — State Mutation Primitives</h3>
+            </div>
+            <p>
+              All interactive inputs channel their state changes through two foundational primitives that manage serialized array vs. scalar facet states:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">MULTI-VALUE PRIMITIVE</span>
+                <h4 class="ui-card-title"><code>toggleMultiValue(name, value, isChecked)</code></h4>
+                <p class="ui-card-desc">
+                  Used by checkboxes, color swatches, and button grids. Deserializes existing comma-separated terms into a Set, adds or removes the target slug, re-serializes as a sorted, deduplicated string, and purges the key if empty. Automatically triggers a pagination reset.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">SCALAR PRIMITIVE</span>
+                <h4 class="ui-card-title"><code>setSingleValue(name, value, options)</code></h4>
+                <p class="ui-card-desc">
+                  Used by radio buttons, dropdown selects, star ratings, and toggle switches. Assigns the scalar string directly or completely deletes the key if value is empty, null, or <code>"0"</code>. Supports custom history push/replace flags.
+                </p>
+              </div>
+            </div>
+
+            <div class="ui-callout" data-type="security" role="note">
+              <div class="ui-callout-header">
+                <span class="ui-badge" data-variant="cyan">[SECURITY &amp; RESERVED KEY GUARD]</span>
+                <h4 class="ui-callout-title">Mutation Boundary Enforcement</h4>
+              </div>
+              <div class="ui-callout-body">
+                Both primitives enforce an immediate return guard if <code>name</code> matches prototype keys (<code>__proto__</code>, <code>constructor</code>, <code>prototype</code>) or falls within the <code>RESERVED_FILTER_KEYS</code> set (<code>orderby</code>, <code>order</code>, <code>page</code>), preventing accidental pollution of core traversal properties.
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               3.4 Native Input Handler Architecture (change delegation)
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-4">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.4 EVENT DELEGATION</span>
+              <h3>Native Input Handler Architecture (Change Delegation)</h3>
+            </div>
+            <p>
+              Rather than attaching hundreds of individual event listeners to native DOM form inputs—which exhausts memory and breaks when inner HTML is re-rendered—the engine binds a single delegated <code>change</code> listener to the root <code>formElement</code>:
+            </p>
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Target Input Type</th>
+                    <th>Evaluation Condition</th>
+                    <th>State Mutation Mapping</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>input[type="checkbox"]</code></td>
+                    <td><code>e.target.type === 'checkbox'</code></td>
+                    <td>Delegates to <code>toggleMultiValue(target.name, target.value, target.checked)</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>input[type="radio"]</code></td>
+                    <td><code>e.target.type === 'radio'</code></td>
+                    <td>Delegates to <code>setSingleValue(target.name, target.checked ? target.value : '')</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>select (facet select)</code></td>
+                    <td><code>e.target.type === 'select-one' &amp;&amp; target.name !== 'orderby'</code></td>
+                    <td>Delegates to <code>setSingleValue(target.name, target.value)</code>. Orderby is explicitly intercepted separately.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               3.5 Non-Native Widget Handlers
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-5">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.5 CUSTOM WIDGETS</span>
+              <h3>Non-Native Widget Handlers: Button Grid, Swatches, Toggle, Star Rating</h3>
+            </div>
+            <p>
+              Pickory delivers high-performance custom widgets that operate without native form elements, maintaining accessibility via ARIA state attributes:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Widget Type</th>
+                    <th>DOM Selector</th>
+                    <th>Event Contract &amp; ARIA State</th>
+                    <th>Associated Hidden Input</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Button Grid</strong></td>
+                    <td><code>.ppfx-grid-btn</code></td>
+                    <td>Click event toggles <code>.is-active</code> class and updates <code>aria-pressed</code>. Supports multi-selection.</td>
+                    <td><code>.ppfx-grid-hidden-input</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Color / Image Swatches</strong></td>
+                    <td><code>.ppfx-swatch-item</code></td>
+                    <td>Click event toggles visual ring, updates <code>aria-pressed</code>, and serializes term slug.</td>
+                    <td><code>.ppfx-swatch-hidden-input</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Toggle Switch</strong></td>
+                    <td><code>.ppfx-frontend-toggle</code></td>
+                    <td>Click and Keyboard (<code>Space</code> / <code>Enter</code>) listener toggles binary state (<code>1</code> or <code>""</code>) with <code>aria-checked</code>.</td>
+                    <td><code>.ppfx-toggle-input</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Star Rating List</strong></td>
+                    <td><code>.ppfx-star-row</code></td>
+                    <td>Click event selects minimum rating threshold (1&ndash;5 stars), toggling active row state.</td>
+                    <td><code>.ppfx-rating-input</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               3.6 Radio Uncheck Toggle Pattern
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-6">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.6 UX PATTERN</span>
+              <h3>Radio Uncheck Toggle Pattern</h3>
+            </div>
+            <p>
+              In native HTML, radio buttons are latching inputs: once selected, clicking an already-checked radio button does nothing. This produces poor UX in faceted search when users wish to deselect a singular facet option without clicking a global reset button.
+            </p>
+            <p>
+              Pickory solves this via a pre-change click interceptor tracking transient selection states through <code>target.dataset.wasChecked</code>:
+            </p>
+            <ol>
+              <li>A delegated <code>click</code> listener intercepts clicks on <code>input[type="radio"]</code> before the <code>change</code> event fires.</li>
+              <li>If <code>target.dataset.wasChecked === "true"</code>, the user is clicking an already-active radio:
+                <ul>
+                  <li>Forces <code>target.checked = false</code>.</li>
+                  <li>Sets <code>target.dataset.wasChecked = "false"</code>.</li>
+                  <li>Calls <code>setSingleValue(target.name, "")</code> to purge the parameter from state.</li>
+                </ul>
+              </li>
+              <li>Otherwise, sets <code>target.dataset.wasChecked = "true"</code> and resets companion sibling radios in the same group to <code>wasChecked = "false"</code>.</li>
+            </ol>
+          </div>
+
+          <!-- ================================================================
+               3.7 Form Serialization for Manual Submit Mode
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-7">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.7 FORM SERIALIZER</span>
+              <h3>Form Serialization for Manual Submit Mode</h3>
+            </div>
+            <p>
+              When <code>isAutoFilter: false</code> is configured, widget interactions mutate internal input staging states without altering the canonical URL. When the user clicks "Apply Filters", <code>serializeFormState()</code> compiles the entire form snapshot:
+            </p>
+            <ol>
+              <li>Gathers all checked <code>input[type="checkbox"]</code>, grouping common names into comma-delimited arrays.</li>
+              <li>Gathers checked <code>input[type="radio"]</code> and non-empty <code>select:not([name="orderby"])</code> values.</li>
+              <li>Extracts values from hidden inputs corresponding to custom button grids, swatches, star ratings, and toggle switches.</li>
+              <li>Inspects price slider inputs: if prices differ from default boundary datasets (<code>data-min</code>, <code>data-max</code>), serializes <code>min_price</code> and <code>max_price</code>.</li>
+              <li>Preserves existing sort order (<code>orderby</code>, <code>order</code>) from canonical URL state.</li>
+              <li>Purges pagination (<code>page</code>, <code>paged</code>) and commits to URL via <code>setCanonicalState(state, { pushHistory: true, source: "submit" })</code>.</li>
+            </ol>
+          </div>
+
+          <!-- ================================================================
+               3.8 applyFilterState — Idempotent UI Hydration Engine
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-8">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.8 IDEMPOTENT HYDRATION</span>
+              <h3><code>applyFilterState</code> — Idempotent UI Hydration Engine</h3>
+            </div>
+            <p>
+              When the URL changes via browser navigation or secondary widgets, <code>applyFilterState(formElement, filters)</code> reconciles all form controls without destructive side-effects. It enforces strict non-interference guards:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">FOCUS PRESERVATION</span>
+                <h4 class="ui-card-title">Active Element Guard</h4>
+                <p class="ui-card-desc">
+                  Compares elements against <code>document.activeElement</code>. If a user is actively typing in a search input or has an open dropdown select, the hydration engine skips value reassignment or restores caret selection ranges (<code>setSelectionRange</code>).
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">SLIDER DRAG PROTECTION</span>
+                <h4 class="ui-card-title">Active Thumb Protection</h4>
+                <p class="ui-card-desc">
+                  If either min or max price input currently possesses keyboard or pointer focus, background hydration does not disrupt the active thumb handle or overwrite transient input values.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               3.9 Price Slider State & Default Bound Detection
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-9">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.9 BOUND DETECTION</span>
+              <h3>Price Slider State &amp; Default Bound Detection</h3>
+            </div>
+            <p>
+              A major source of query bloat in WooCommerce filtering is sending price constraints that match the catalog's absolute min/max limits (e.g. <code>min_price=0&amp;max_price=500</code> when all products fall within that range).
+            </p>
+            <p>
+              Pickory solves this via <code>isPriceAtDefaultBounds(formElement, params)</code>:
+            </p>
+            <ul>
+              <li>Reads dataset bounds <code>data-min</code> and <code>data-max</code> from the parent <code>.ppfx-price-group</code> container.</li>
+              <li>Compares current values against these bounds.</li>
+              <li>If <code>currentMin === minBound &amp;&amp; currentMax === maxBound</code>, the price parameters are completely deleted from the request payload and URL query string.</li>
+              <li>Bypasses unnecessary SQL price range clauses entirely, allowing the database query to execute without indexed price comparisons.</li>
+            </ul>
+          </div>
+
+          <!-- ================================================================
+               3.10 applySortState — Sort Dropdown Sync Across Contexts
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-10">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.10 SORT SYNCHRONIZATION</span>
+              <h3><code>applySortState</code> — Sort Dropdown Sync Across Contexts</h3>
+            </div>
+            <p>
+              The <code>applySortState(root, sort)</code> utility synchronizes WooCommerce catalog ordering dropdowns (<code>select[name="orderby"]</code>, <code>select.orderby</code>, <code>.woocommerce-ordering select</code>) across both sidebar widgets and main loop toolbars:
+            </p>
+            <ul>
+              <li>Escapes target orderby values with <code>cssEscape()</code> before executing DOM queries.</li>
+              <li>Matches target values against child <code>&lt;option&gt;</code> elements.</li>
+              <li><strong>Safe Fallback:</strong> If target orderby is empty, resolves to the default option (<code>value=""</code>, <code>option[selected]</code>, or <code>option[value="menu_order"]</code>) rather than leaving the dropdown in an unselected blank state.</li>
+            </ul>
+          </div>
+
+          <!-- ================================================================
+               3.11 AbortController Pattern for In-Flight Request Cancellation
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-11">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.11 MUTEX CONTROL</span>
+              <h3>AbortController Pattern for In-Flight Request Cancellation</h3>
+            </div>
+            <p>
+              When users interact rapidly with faceted filters, multiple asynchronous HTTP fetches are dispatched in close succession. Without concurrency control, slower network responses can resolve out of order, overwriting newer filter states with stale catalog fragments.
+            </p>
+            <p>
+              Pickory eliminates network race conditions using a dual-mutex strategy in <code>executeFilterChange()</code>:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Mechanism</th>
+                    <th>Implementation</th>
+                    <th>Concurrency Protection</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>AbortController Mutex</strong></td>
+                    <td><code>if (currentAbortController) currentAbortController.abort();</code></td>
+                    <td>Cancels the pending in-flight browser network request immediately, stopping client socket processing.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Monotonic Request ID</strong></td>
+                    <td><code>const requestId = ++activeRequestId; if (requestId !== activeRequestId) return;</code></td>
+                    <td>Discards any asynchronous response payload whose ID does not match the latest dispatched request ID.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               3.12 Pagination Intercept & AJAX-Driven Page Transitions
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-12">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.12 PAGINATION HOOK</span>
+              <h3>Pagination Intercept &amp; AJAX-Driven Page Transitions</h3>
+            </div>
+            <p>
+              The <code>onPaginationClick(e)</code> handler captures clicks on catalog pagination links (<code>.woocommerce-pagination a</code>) and converts them into seamless AJAX transitions:
+            </p>
+            <ul>
+              <li><strong>Instance Scoping:</strong> Confirms the clicked link belongs to the active filter instance by checking container relationships and instance attributes.</li>
+              <li><strong>Path &amp; Query Parsing:</strong> Extracts target page numbers using regex matching on WordPress pretty permalinks (<code>/\/page\/(\d+)\/?/</code>) and query string fallbacks (<code>product-page</code>, <code>paged</code>, <code>page</code>).</li>
+              <li><strong>Preservation Invariant:</strong> Invokes <code>commitFilterUpdate</code> with <code>resetPage: false</code> and <code>source: "pagination"</code>, preserving all active facet criteria while advancing the page offset.</li>
+            </ul>
+          </div>
+
+          <!-- ================================================================
+               3.13 Sort Dropdown Intercept & stopImmediatePropagation Contract
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-13">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.13 EVENT TRAPPING</span>
+              <h3>Sort Dropdown Intercept &amp; <code>stopImmediatePropagation</code> Contract</h3>
+            </div>
+            <p>
+              Standard WooCommerce themes attach hard page reload scripts to the <code>woocommerce-ordering</code> form (e.g. <code>jQuery('.woocommerce-ordering').submit()</code> on change).
+            </p>
+            <p>
+              Pickory overrides this default theme behavior through a strict event trapping contract in <code>onSortChange(e)</code>:
+            </p>
+            <ol>
+              <li>Intercepts the native <code>change</code> event on <code>select[name="orderby"]</code>.</li>
+              <li>Executes <code>e.preventDefault()</code> to halt form submission.</li>
+              <li>Executes <code>e.stopPropagation()</code> to prevent bubbling to theme wrapper elements.</li>
+              <li>Executes <code>e.stopImmediatePropagation()</code> to prevent subsequent jQuery or vanilla event listeners on the same element from firing.</li>
+              <li>Commits the selected sort order via <code>commitFilterUpdate</code> with <code>resetPage: true</code> and <code>source: "sort"</code>, executing a smooth AJAX re-order.</li>
+            </ol>
+          </div>
+
+          <!-- ================================================================
+               3.14 domAbortController Listener Cleanup & Teardown Protocol
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-3-14">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">3.14 TEARDOWN PROTOCOL</span>
+              <h3><code>domAbortController</code> Listener Cleanup &amp; Component Teardown</h3>
+            </div>
+            <p>
+              In Single-Page Applications (SPAs), quick-view modals, and dynamic drawer toggles, filter forms are frequently instantiated and discarded without a full page refresh. Without explicit listener teardown, dangling DOM references cause catastrophic memory leaks.
+            </p>
+            <p>
+              Pickory routes every single DOM listener (clicks, keydowns, changes, and submit events) through a single instance signal: <code>{ signal: domAbortController.signal }</code>. The exported <code>destroy()</code> closure executes an atomic teardown:
+            </p>
+            <ol>
+              <li>Executes <code>domAbortController.abort()</code>, which instantly detaches every DOM listener across the form and root containers without manual <code>removeEventListener</code> boilerplate.</li>
+              <li>Invokes <code>formElement._ppfxActiveFilters?.destroy()</code> to clean active chip containers.</li>
+              <li>Destroys companion mobile drawers via <code>window.__ppfxDrawerInstance?.destroy()</code>.</li>
+              <li>Removes the instance from <code>filterFormInstances</code> via <code>unregisterGlobalInstance()</code>.</li>
+              <li>Cancels any pending REST requests via <code>currentAbortController?.abort()</code> and clears debounce timers via <code>clearTimeout(filterTimeout)</code>.</li>
+            </ol>
+          </div>
+        </section>
+

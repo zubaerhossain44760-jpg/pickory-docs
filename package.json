@@ -1,0 +1,17 @@
+{
+  "name": "pickory-docs",
+  "version": "1.0.0",
+  "description": "Pickory Product Filter - Developer Documentation System",
+  "scripts": {
+    "build": "node build.js",
+    "watch": "node build.js --watch",
+    "serve": "python -m http.server 3000"
+  },
+  "keywords": [
+    "documentation",
+    "woocommerce",
+    "faceted-filter"
+  ],
+  "author": "Pickory",
+  "license": "GPL-2.0-or-later"
+}

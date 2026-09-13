@@ -1,0 +1,369 @@
+        <section class="doc-section" id="core-architecture">
+
+          <!-- Section Header Block -->
+          <header class="doc-header-block">
+            <h2 class="doc-main-title">1. Core Architecture &amp; System Foundation</h2>
+            <p class="doc-lead-paragraph">
+              The core architecture governs the plugin lifecycle, PSR-compliant directory layout, execution boundaries, and namespacing standards across WordPress and WooCommerce environments.
+            </p>
+            <div class="doc-meta-pills">
+              <span class="ui-badge" data-variant="brand">CORE ARCHITECTURE</span>
+              <span class="ui-badge">PSR-4 Layout</span>
+              <span class="ui-badge">Singleton Lifecycles</span>
+              <span class="ui-badge">ppfx_ Namespace</span>
+              <span class="ui-badge">Priority 20 Hooks</span>
+            </div>
+          </header>
+
+          <!-- ================================================================
+               1.1 Plugin Anatomy & Directory Contract
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-1-1">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">1.1 SPECIFICATION</span>
+              <h3>Plugin Anatomy &amp; Directory Contract</h3>
+            </div>
+            <p>
+              The codebase adheres to a strict separation of concerns across the PHP/JavaScript boundary. The backend isolates data management, query compilation, and REST endpoints into modular PSR-compliant classes, while the frontend is structured as state-decoupled ES6 modules built via Vite:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Directory / File Path</th>
+                    <th>Runtime Boundary</th>
+                    <th>Architectural Responsibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>pickory-product-filter.php</code></td>
+                    <td>Plugin Bootstrap</td>
+                    <td>Declares HPOS compatibility, defines core constants (<code>PPFX_VERSION</code>, <code>PPFX_INDEX_VERSION</code>), and guards bootstrapping behind <code>plugins_loaded</code> and <code>class_exists('WooCommerce')</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>includes/services/</code></td>
+                    <td>Query &amp; Cache Engine</td>
+                    <td>Houses the 5 core backend services: <code>PPFX_Product_Query_Builder</code>, <code>PPFX_Query_Clause_Compiler</code>, <code>PPFX_Query_Hook_Scope</code>, <code>PPFX_Query_Cache</code>, and <code>PPFX_Rate_Limiter</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>includes/api/</code></td>
+                    <td>REST Controller</td>
+                    <td>Endpoint registration and request handling for <code>/wp-json/pickory-filter/v1/products</code> with schema verification and argument sanitization.</td>
+                  </tr>
+                  <tr>
+                    <td><code>includes/frontend/</code></td>
+                    <td>Fragment Assembly</td>
+                    <td><code>PPFX_Fragment_Renderer</code> producing isolated DOM replacement regions (product loop, pagination, result counters, active chips) with HTML tag attribute injection.</td>
+                  </tr>
+                  <tr>
+                    <td><code>includes/class-ppfx-index.php</code></td>
+                    <td>Storage &amp; Sync</td>
+                    <td>Flat table schema installation, product lifecycle event listeners, and chunked background indexing routines.</td>
+                  </tr>
+                  <tr>
+                    <td><code>src/js/components/</code></td>
+                    <td>Reactive Client Layer</td>
+                    <td>Zero-dependency UI controllers: <code>filter-form.js</code> (form controller), <code>active-filters.js</code> (chip manager), <code>filter-globals.js</code> (instance registry), <code>price-slider.js</code>, and <code>mobile-drawer.js</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>src/js/utils/</code></td>
+                    <td>Functional Utilities</td>
+                    <td>URL query parsing/serialization (<code>url.js</code>) and client-side MD5 hashing (<code>hash.js</code>) for SSR state comparison.</td>
+                  </tr>
+                  <tr>
+                    <td><code>build/</code></td>
+                    <td>Distribution</td>
+                    <td>Production-ready bundled assets generated via Vite (<code>pickory-filter.js</code> and <code>pickory-filter.css</code>) with source map generation.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               1.2 The Dual-Path Execution Model (SSR vs. AJAX)
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-1-2">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">1.2 ARCHITECTURE</span>
+              <h3>The Dual-Path Execution Model (SSR vs. AJAX)</h3>
+            </div>
+            <p>
+              To guarantee zero cumulative layout shift (CLS) for human visitors and complete content visibility for search engine crawlers, Pickory executes via two deterministic execution pipelines:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="success">PATH A: SERVER-SIDE (SSR)</span>
+                <h4 class="ui-card-title">Initial Page Load &amp; Crawlers</h4>
+                <p class="ui-card-desc">
+                  Executed by <code>PPFX_Server_Filter</code>. Binds to WordPress core <code>pre_get_posts</code> on WooCommerce catalog archives. It reads public <code>ppfx_</code> query variables directly from the global request, rewrites the main query using the flat index, and delivers pre-filtered HTML before client JavaScript executes.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">PATH B: CLIENT-SIDE (AJAX)</span>
+                <h4 class="ui-card-title">Reactive User Interactions</h4>
+                <p class="ui-card-desc">
+                  Executed by <code>PPFXURLStateManager</code> and REST fetchers. User gestures immediately mutate the browser URL, dispatch synthetic <code>ppfx:url-change</code> events, abort pending in-flight requests, and fetch surgical HTML fragments from <code>/pickory-filter/v1/products</code> to update DOM containers without page reload.
+                </p>
+              </div>
+            </div>
+
+            <div class="ui-callout" data-type="guardrail" role="note">
+              <div class="ui-callout-header">
+                <span class="ui-badge" data-variant="success">[DETERMINISTIC FIDELITY]</span>
+                <h4 class="ui-callout-title">SSR and AJAX Parity Invariant</h4>
+              </div>
+              <div class="ui-callout-body">
+                Both Path A and Path B delegate to the same underlying <code>PPFX_Query_Clause_Compiler</code> SQL compiler. Whether a filtered catalog URL is loaded freshly via hard browser reload or transitioned into via client clicks, the returned product set and pagination counters are mathematically identical.
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               1.3 The ppfx_ Namespace Convention
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-1-3">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">1.3 CONVENTIONS</span>
+              <h3>The <code>ppfx_</code> Namespace Convention</h3>
+            </div>
+            <p>
+              To eliminate collision vectors with WordPress core query variables, theme parameters, and companion WooCommerce extensions, Pickory enforces an immutable prefix contract across every subsystem:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Domain</th>
+                    <th>Namespace Pattern</th>
+                    <th>Concrete Implementation Examples</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>PHP Classes &amp; Constants</td>
+                    <td><code>PPFX_*</code> / <code>ppfx_*</code></td>
+                    <td><code>PPFX_Product_Indexer</code>, <code>PPFX_VERSION</code>, <code>PPFX_INDEX_VERSION</code>, <code>ppfx_bootstrap()</code></td>
+                  </tr>
+                  <tr>
+                    <td>Database Tables</td>
+                    <td><code>{$wpdb->prefix}ppfx_*</code></td>
+                    <td><code>wp_ppfx_product_index</code> (aliased as <code>ppfxi</code>), <code>wp_ppfx_product_terms</code> (aliased as <code>ppfxt</code>)</td>
+                  </tr>
+                  <tr>
+                    <td>Public URL Query Parameters</td>
+                    <td><code>ppfx_{facet}</code></td>
+                    <td><code>ppfx_category</code>, <code>ppfx_min_price</code>, <code>ppfx_max_price</code>, <code>ppfx_rating</code>, <code>ppfx_stock</code>, <code>ppfx_on_sale</code>, <code>ppfx_attr_{taxonomy}</code></td>
+                  </tr>
+                  <tr>
+                    <td>Custom DOM Events</td>
+                    <td><code>ppfx:*</code> / <code>ppfx_*</code></td>
+                    <td><code>ppfx:url-change</code>, <code>ppfx-filters-updated</code>, <code>ppfx_products_rendered</code>, <code>ppfx:ajax_loaded</code>, <code>ppfx:destroy</code></td>
+                  </tr>
+                  <tr>
+                    <td>Localized JS Global</td>
+                    <td><code>window.ppfxFilterData</code></td>
+                    <td>Exposes REST root, nonce, currency symbols, archive context, localized labels, and section manifests.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               1.4 WooCommerce Integration Surface
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-1-4">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">1.4 INTEGRATION</span>
+              <h3>WooCommerce Integration Surface</h3>
+            </div>
+            <p>
+              Pickory operates as a native extension of WooCommerce rather than an isolated external layer. It integrates cleanly with core hooks and respect store configurations:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">CORE COMPATIBILITY</span>
+                <h4 class="ui-card-title">HPOS Custom Order Tables</h4>
+                <p class="ui-card-desc">
+                  Declares full compatibility with WooCommerce High-Performance Order Storage via <code>FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true)</code>.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">HOOK INTERCEPTION</span>
+                <h4 class="ui-card-title">Priority 20 Execution</h4>
+                <p class="ui-card-desc">
+                  Hooks <code>woocommerce_product_query</code> and <code>posts_clauses</code> at Priority 20 to safely intercept queries after WooCommerce core Priority 10 orderby and visibility mutations.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">LIFECYCLE HOOKS</span>
+                <h4 class="ui-card-title">Real-Time Synchronization</h4>
+                <p class="ui-card-desc">
+                  Monitors <code>woocommerce_product_object_updated_props</code>, <code>woocommerce_trash_product</code>, and stock update hooks to trigger immediate atomic index refreshes and cache invalidations.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               1.5 Data Flow: Browser -> REST -> Query -> Fragment -> DOM
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-1-5">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">1.5 DATA PIPELINE</span>
+              <h3>Data Flow: Browser &rarr; REST &rarr; Query &rarr; Fragment &rarr; DOM</h3>
+            </div>
+            <p>
+              Dynamic filter interactions follow a unidirectional reactive loop across 6 discrete architectural stages:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Stage</th>
+                    <th>Component</th>
+                    <th>Operational Responsibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>1. Ingestion</strong></td>
+                    <td><code>filter-form.js</code></td>
+                    <td>Captures user gestures (swatch clicks, checkbox toggles, dual-slider drag). Debounces continuous slider updates at 300ms.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>2. Serialization</strong></td>
+                    <td><code>url.js (PPFXURLStateManager)</code></td>
+                    <td>Maps internal facet keys to public <code>ppfx_</code> parameters. Commits state to browser history via <code>pushState()</code> or <code>replaceState()</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>3. Event Broadcast</strong></td>
+                    <td><code>window (EventBus)</code></td>
+                    <td>Dispatches custom synthetic event <code>ppfx:url-change</code> with active parameters, synchronizing desktop sidebar and mobile drawer widgets.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>4. REST Transport</strong></td>
+                    <td><code>api.js &amp; Products_Controller</code></td>
+                    <td>Initiates abortable fetch to <code>/wp-json/pickory-filter/v1/products</code> with nonce validation and token bucket rate limiting (80 req/min).</td>
+                  </tr>
+                  <tr>
+                    <td><strong>5. Query &amp; Cache</strong></td>
+                    <td><code>Query_Builder &amp; Query_Cache</code></td>
+                    <td>Computes normalized MD5 key in persistent object cache. On cache miss, compiles optimized SQL against <code>wp_ppfx_product_index</code> via Priority 20 hook scope.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>6. Fragment Patch</strong></td>
+                    <td><code>Fragment_Renderer &amp; DOM</code></td>
+                    <td>Renders isolated HTML fragments (products loop, pagination, chip container). Client replaces target DOM containers, manages ARIA live states, and fires <code>ppfx_products_rendered</code>.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               1.6 Class Responsibility Map
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-1-6">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">1.6 REFERENCE</span>
+              <h3>Class Responsibility Map</h3>
+            </div>
+            <p>
+              The table below maps the core PHP classes and JavaScript modules to their single architectural responsibilities:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Class / Module</th>
+                    <th>Subsystem</th>
+                    <th>Single Architectural Responsibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>PPFX_Server_Filter</code></td>
+                    <td>PHP Core</td>
+                    <td>Intercepts main archive query during initial SSR page loads, preventing filtered shop 404s and canonical redirects.</td>
+                  </tr>
+                  <tr>
+                    <td><code>PPFX_Products_Controller</code></td>
+                    <td>REST API</td>
+                    <td>Validates and routes requests to <code>/pickory-filter/v1/products</code>, enforcing parameter schemas and sanitization.</td>
+                  </tr>
+                  <tr>
+                    <td><code>PPFX_Product_Query_Builder</code></td>
+                    <td>Query Service</td>
+                    <td>Orchestrates query assembly, coordinates cache lookups, and applies compiled clauses to <code>WP_Query</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>PPFX_Query_Clause_Compiler</code></td>
+                    <td>Query Service</td>
+                    <td>Compiles multi-facet parameters into optimized SQL clauses targeting the flat index table (<code>ppfxi</code>).</td>
+                  </tr>
+                  <tr>
+                    <td><code>PPFX_Query_Hook_Scope</code></td>
+                    <td>Query Service</td>
+                    <td>Provides scoped attachment to <code>posts_clauses</code> with object hash guards (<code>spl_object_hash</code>) to prevent global query pollution.</td>
+                  </tr>
+                  <tr>
+                    <td><code>PPFX_Query_Cache</code></td>
+                    <td>Cache Service</td>
+                    <td>Generates normalized MD5 cache keys and manages ID-only transient caching and group invalidation.</td>
+                  </tr>
+                  <tr>
+                    <td><code>PPFX_Rate_Limiter</code></td>
+                    <td>Security</td>
+                    <td>Protects the REST API against DoS scraping by enforcing transient token buckets per client IP address.</td>
+                  </tr>
+                  <tr>
+                    <td><code>PPFX_Fragment_Renderer</code></td>
+                    <td>View Layer</td>
+                    <td>Executes partial rendering for product loops, pagination links, and result counts with <code>WP_HTML_Tag_Processor</code> attribute tagging.</td>
+                  </tr>
+                  <tr>
+                    <td><code>PPFX_Index</code></td>
+                    <td>Storage</td>
+                    <td>Maintains table schemas, synchronizes products on post mutations, and manages batch indexing with transient locks.</td>
+                  </tr>
+                  <tr>
+                    <td><code>PPFXURLStateManager</code></td>
+                    <td>JS Core</td>
+                    <td>Serves as the client-side Single Source of Truth, translating internal widget state to canonical URL query strings.</td>
+                  </tr>
+                  <tr>
+                    <td><code>filter-form.js</code></td>
+                    <td>JS UI</td>
+                    <td>Delegates input change events, serializes widgets, coordinates form hydration, and executes container swaps.</td>
+                  </tr>
+                  <tr>
+                    <td><code>active-filters.js</code></td>
+                    <td>JS UI</td>
+                    <td>Renders removable active filter chips from canonical URL state with dynamic label fallback resolution.</td>
+                  </tr>
+                  <tr>
+                    <td><code>filter-globals.js</code></td>
+                    <td>JS Coordination</td>
+                    <td>Manages multi-instance filter deduplication, shared AbortControllers, and third-party compatibility bridges.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             TOPIC 2: CLIENT REACTIVE ENGINE & UI LAYER
+             ================================================================== -->

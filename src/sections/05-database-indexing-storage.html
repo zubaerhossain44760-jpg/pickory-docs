@@ -1,0 +1,485 @@
+        <section class="doc-section" id="database-indexing-storage">
+
+          <!-- Document Header Block -->
+          <header class="doc-header-block">
+            <h2 class="doc-main-title">4. Database Indexing, Storage &amp; Sorting</h2>
+            <p class="doc-lead-paragraph">
+              High-volume WooCommerce stores frequently suffer catastrophic query degradation when filtering across multiple custom product attributes, price bands, stock states, and ratings. Standard WooCommerce architectures execute 4&times; to 8&times; nested relational joins against the unindexed Entity-Attribute-Value (EAV) table <code>wp_postmeta</code>. Pickory eliminates this bottleneck entirely by pre-computing all facet dimensions into two dedicated, high-performance B-tree indexed storage tables: <code>wp_ppfx_product_index</code> and <code>wp_ppfx_product_terms</code>.
+            </p>
+            <div class="doc-meta-pills">
+              <span class="ui-badge" data-variant="brand">FLAT INDEX</span>
+              <span class="ui-badge">COMPOSITE B-TREE</span>
+              <span class="ui-badge">ATOMIC UPSERT</span>
+              <span class="ui-badge">CURSOR SYNC</span>
+              <span class="ui-badge">QUERY CACHE</span>
+              <span class="ui-badge">O(1) INVALIDATION</span>
+            </div>
+          </header>
+
+          <!-- Feature Highlight Grid (UI Cards) -->
+          <div class="ui-card-grid">
+            <div class="ui-card" data-type="feature">
+              <span class="ui-badge" data-variant="brand">DENORMALIZATION</span>
+              <h3 class="ui-card-title">Flat Product Index (<code>ppfxi</code>)</h3>
+              <p class="ui-card-desc">
+                Collapses volatile numerical metrics (min/max price, on-sale flag, average star rating, stock status) into a single denormalized table with zero EAV join overhead.
+              </p>
+            </div>
+
+            <div class="ui-card" data-type="feature">
+              <span class="ui-badge" data-variant="brand">COVERING INDEX</span>
+              <h3 class="ui-card-title">Taxonomy Terms Index (<code>ppfxt</code>)</h3>
+              <p class="ui-card-desc">
+                Dedicated relational term map with 3-column covering index <code>(taxonomy, term_id, product_id)</code> enabling MySQL to resolve multi-attribute criteria directly in memory.
+              </p>
+            </div>
+
+            <div class="ui-card" data-type="feature">
+              <span class="ui-badge" data-variant="brand">CACHE VERSIONING</span>
+              <h3 class="ui-card-title">Microtime Key Invalidation</h3>
+              <p class="ui-card-desc">
+                Global query cache versioning decouples persistence from cache eviction storms. Modifying a single product bumps the global timestamp, invalidating all query keys in O(1) time.
+              </p>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               5.1 Flat Index Schema (wp_ppfx_product_index)
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-5-1">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">5.1 STORAGE SCHEMA</span>
+              <h3>Flat Index Schema (<code>wp_ppfx_product_index</code>)</h3>
+            </div>
+            <p>
+              Managed by <code>PPFX_Index_Schema::create_table()</code> in <code>includes/index/class-ppfx-index-schema.php</code>, the flat index table (aliased as <code>ppfxi</code> in compiled SQL) stores atomic product-level filtering criteria:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Column Name</th>
+                    <th>SQL Data Type</th>
+                    <th>Default</th>
+                    <th>Indexing &amp; Constraints</th>
+                    <th>Architectural Responsibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>product_id</code></td>
+                    <td><code>bigint(20) unsigned</code></td>
+                    <td><em>None</em></td>
+                    <td><code>PRIMARY KEY</code></td>
+                    <td>Matches <code>wp_posts.ID</code>. Guarantees exactly one row per parent catalog product.</td>
+                  </tr>
+                  <tr>
+                    <td><code>min_price</code></td>
+                    <td><code>decimal(10,2)</code></td>
+                    <td><code>0.00</code></td>
+                    <td><code>KEY idx_min_price</code></td>
+                    <td>Lowest purchasable variation price or simple product regular/sale price. Fixed decimal eliminates floating-point rounding errors.</td>
+                  </tr>
+                  <tr>
+                    <td><code>max_price</code></td>
+                    <td><code>decimal(10,2)</code></td>
+                    <td><code>0.00</code></td>
+                    <td><code>KEY idx_max_price</code></td>
+                    <td>Highest purchasable variation price. For simple products, <code>max_price === min_price</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>on_sale</code></td>
+                    <td><code>tinyint(1)</code></td>
+                    <td><code>0</code></td>
+                    <td><code>KEY idx_on_sale</code></td>
+                    <td>Boolean flag (<code>1</code> or <code>0</code>). Calculated dynamically across all child variations or parent discounts.</td>
+                  </tr>
+                  <tr>
+                    <td><code>avg_rating</code></td>
+                    <td><code>decimal(3,2)</code></td>
+                    <td><code>0.00</code></td>
+                    <td><code>KEY idx_avg_rating</code></td>
+                    <td>Aggregated customer review rating (e.g. <code>4.75</code>). Enables rapid minimum rating thresholds (<code>&gt;= 4.0</code>).</td>
+                  </tr>
+                  <tr>
+                    <td><code>stock_status</code></td>
+                    <td><code>varchar(20)</code></td>
+                    <td><code>'instock'</code></td>
+                    <td><code>KEY idx_stock_status</code></td>
+                    <td>Standardized WooCommerce inventory enum (<code>'instock'</code>, <code>'outofstock'</code>, <code>'onbackorder'</code>).</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              The DDL specification is executed via WordPress <code>dbDelta()</code> during plugin activation or schema version upgrades:
+            </p>
+
+            <pre><code>CREATE TABLE {$wpdb-&gt;prefix}ppfx_product_index (
+  product_id bigint(20) unsigned NOT NULL,
+  min_price decimal(10,2) NOT NULL DEFAULT 0.00,
+  max_price decimal(10,2) NOT NULL DEFAULT 0.00,
+  on_sale tinyint(1) NOT NULL DEFAULT 0,
+  avg_rating decimal(3,2) NOT NULL DEFAULT 0.00,
+  stock_status varchar(20) NOT NULL DEFAULT 'instock',
+  PRIMARY KEY  (product_id),
+  KEY idx_min_price (min_price),
+  KEY idx_max_price (max_price),
+  KEY idx_price_range (min_price, max_price),
+  KEY idx_on_sale (on_sale),
+  KEY idx_avg_rating (avg_rating),
+  KEY idx_stock_status (stock_status),
+  KEY idx_stock_product (stock_status, product_id)
+) {$collate};</code></pre>
+          </div>
+
+          <!-- ================================================================
+               5.2 Term Index Schema (wp_ppfx_product_terms)
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-5-2">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">5.2 RELATIONAL INDEX</span>
+              <h3>Term Index Schema (<code>wp_ppfx_product_terms</code>)</h3>
+            </div>
+            <p>
+              Managed by <code>PPFX_Index_Schema::create_term_table()</code>, the taxonomy-term table (aliased as <code>ppfxt</code> in compiled SQL) flattens product relationships across categories, tags, catalog visibility flags, and global product attributes (e.g. <code>pa_color</code>, <code>pa_size</code>, <code>pa_brand</code>):
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Column Name</th>
+                    <th>SQL Data Type</th>
+                    <th>Indexing &amp; Constraints</th>
+                    <th>Architectural Responsibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>id</code></td>
+                    <td><code>bigint(20) unsigned</code></td>
+                    <td><code>PRIMARY KEY AUTO_INCREMENT</code></td>
+                    <td>Unique row identifier for strict row-level pointer integrity.</td>
+                  </tr>
+                  <tr>
+                    <td><code>product_id</code></td>
+                    <td><code>bigint(20) unsigned</code></td>
+                    <td><code>KEY idx_product</code></td>
+                    <td>Foreign product ID reference. Targeted during atomic term synchronization and product deletion.</td>
+                  </tr>
+                  <tr>
+                    <td><code>taxonomy</code></td>
+                    <td><code>varchar(128)</code></td>
+                    <td>Compound Keys</td>
+                    <td>Public taxonomy identifier (e.g. <code>product_cat</code>, <code>pa_color</code>, <code>product_visibility</code>).</td>
+                  </tr>
+                  <tr>
+                    <td><code>term_id</code></td>
+                    <td><code>bigint(20) unsigned</code></td>
+                    <td>Compound Keys</td>
+                    <td>WordPress <code>wp_terms.term_id</code> integer key. B-tree indexed for instantaneous equality checks.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              The table enforces a composite unique constraint to guarantee zero duplicate term mappings per product:
+            </p>
+
+            <pre><code>CREATE TABLE {$wpdb-&gt;prefix}ppfx_product_terms (
+  id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  product_id bigint(20) unsigned NOT NULL,
+  taxonomy varchar(128) NOT NULL,
+  term_id bigint(20) unsigned NOT NULL,
+  PRIMARY KEY  (id),
+  UNIQUE KEY uniq_product_tax_term (product_id, taxonomy, term_id),
+  KEY idx_product (product_id),
+  KEY idx_taxonomy_term (taxonomy, term_id),
+  KEY idx_tax_term_product (taxonomy, term_id, product_id)
+) {$collate};</code></pre>
+          </div>
+
+          <!-- ================================================================
+               5.3 Composite Index Strategy & Column Types
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-5-3">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">5.3 INDEX ARCHITECTURE</span>
+              <h3>Composite Index Strategy &amp; Column Types</h3>
+            </div>
+            <p>
+              The physical layout of MySQL indexes dictates whether a query executes via an in-memory B-tree index scan or falls back to an expensive disk-bound temporary table and filesort operation. Pickory implements tailored composite indexes designed specifically around catalog filtering access patterns:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Index Name</th>
+                    <th>Table</th>
+                    <th>Indexed Columns</th>
+                    <th>Execution Optimization</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>idx_price_range</code></td>
+                    <td><code>ppfxi</code></td>
+                    <td><code>(min_price, max_price)</code></td>
+                    <td>Satisfies dual-bound price slider queries (<code>min_price &gt;= X AND max_price &lt;= Y</code>) in a single contiguous B-tree range scan.</td>
+                  </tr>
+                  <tr>
+                    <td><code>idx_stock_product</code></td>
+                    <td><code>ppfxi</code></td>
+                    <td><code>(stock_status, product_id)</code></td>
+                    <td>Enables instantaneous index-only filtering for in-stock catalog products without touching table data pages.</td>
+                  </tr>
+                  <tr>
+                    <td><code>idx_tax_term_product</code></td>
+                    <td><code>ppfxt</code></td>
+                    <td><code>(taxonomy, term_id, product_id)</code></td>
+                    <td><strong>Covering Index</strong>: MySQL satisfies both the <code>WHERE taxonomy = %s AND term_id IN (...)</code> clause and the <code>JOIN ppfxt.product_id = wp_posts.ID</code> straight from the index tree without row pointer dereferencing.</td>
+                  </tr>
+                  <tr>
+                    <td><code>uniq_product_tax_term</code></td>
+                    <td><code>ppfxt</code></td>
+                    <td><code>(product_id, taxonomy, term_id)</code></td>
+                    <td>Prevents multi-worker concurrency race conditions from inserting redundant attribute rows during bulk imports.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="ui-callout" data-type="guardrail" role="note">
+              <div class="ui-callout-header">
+                <span class="ui-badge" data-variant="success">[ENGINEERING RULE]</span>
+                <h4 class="ui-callout-title">Fixed-Point Decimal Precision (decimal(10,2))</h4>
+              </div>
+              <div class="ui-callout-body">
+                Floating-point data types (<code>FLOAT</code>, <code>DOUBLE</code>) introduce binary rounding imprecisions (e.g. <code>19.990000000000002</code>), causing price slider boundary queries (<code>min_price &gt;= 19.99</code>) to intermittently exclude products. All price columns in Pickory strictly enforce <code>decimal(10,2)</code> to guarantee exact monetary arithmetic.
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               5.4 Real-Time Product Sync Lifecycle
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-5-4">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">5.4 REAL-TIME SYNC</span>
+              <h3>Real-Time Product Sync Lifecycle</h3>
+            </div>
+            <p>
+              Whenever product attributes, prices, or inventory levels mutate in WooCommerce, <code>PPFX_Product_Indexer</code> (<code>includes/index/class-ppfx-product-indexer.php</code>) synchronizes both index tables in real time:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>WooCommerce Event / Hook</th>
+                    <th>Invoked Method</th>
+                    <th>Sync Execution Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>save_post_product</code><br><code>woocommerce_update_product</code></td>
+                    <td><code>sync_product($product_id)</code></td>
+                    <td>Calculates variable bounds, runs atomic <code>$wpdb-&gt;replace()</code> on <code>ppfxi</code>, synchronizes term rows in an explicit MySQL transaction, and purges price transients.</td>
+                  </tr>
+                  <tr>
+                    <td><code>woocommerce_new_product</code></td>
+                    <td><code>sync_product($product_id)</code></td>
+                    <td>Inserts new flat index record and term mappings, then bumps the shared query cache version.</td>
+                  </tr>
+                  <tr>
+                    <td><code>delete_post</code><br><code>woocommerce_delete_product</code></td>
+                    <td><code>delete_product($product_id)</code></td>
+                    <td>Deletes matching rows from both <code>ppfxi</code> and <code>ppfxt</code> by <code>product_id</code>, purges price cache, and bumps query cache version.</td>
+                  </tr>
+                  <tr>
+                    <td><code>woocommerce_product_set_stock_status</code></td>
+                    <td><code>sync_product($product_id)</code></td>
+                    <td>Instantly updates <code>stock_status</code> column when inventory depletes via order placement.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">VARIABLE BOUNDS</span>
+                <h4 class="ui-card-title">Variable Product Calculation</h4>
+                <p class="ui-card-desc">
+                  For <code>WC_Product_Variable</code> products, the indexer queries <code>$product-&gt;get_variation_prices(true)</code>, computing the exact lowest variation price, highest variation price, collective stock status, and collective sale status.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">ATOMIC TRANSACTIONS</span>
+                <h4 class="ui-card-title">Term Sync Transaction Boundary</h4>
+                <p class="ui-card-desc">
+                  Term replacement executes inside an isolated database transaction: <code>START TRANSACTION &rarr; DELETE FROM ppfxt WHERE product_id = %d &rarr; Bulk INSERT &rarr; COMMIT</code>. On failure, <code>ROLLBACK</code> prevents partial term records.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               5.5 Bulk Reindexing & CLI Locks
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-5-5">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">5.5 BATCH &amp; CLI OPS</span>
+              <h3>Bulk Reindexing &amp; CLI Locks</h3>
+            </div>
+            <p>
+              During initial installation or catalog-wide migrations, <code>PPFX_Product_Indexer::bulk_sync()</code> rebuilds both index tables from scratch using high-speed chunked batch processing:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Pipeline Phase</th>
+                    <th>Mechanism</th>
+                    <th>Architectural Protection</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Concurrency Lock</strong></td>
+                    <td><code>set_transient('ppfx_bulk_sync_lock', 1, 600)</code></td>
+                    <td>Prevents concurrent admin requests or cron jobs from running overlapping reindexes. Automatically released in a <code>try...finally</code> block.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Table Truncation</strong></td>
+                    <td><code>TRUNCATE TABLE {$table}</code></td>
+                    <td>Instantly resets auto-increment counters and purges old data without slow row-by-row deletes.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Keyset Pagination</strong></td>
+                    <td><code>WHERE ID &gt; %d ORDER BY ID ASC LIMIT 200</code></td>
+                    <td>Bypasses <code>OFFSET</code> performance decay. On a 100,000 product catalog, page 500 executes as fast as page 1.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Verification &amp; Flag</strong></td>
+                    <td><code>PPFX_Index_Schema::mark_built()</code></td>
+                    <td>Validates total indexed rows against published product counts and sets <code>ppfx_index_built = 1</code> in <code>wp_options</code>.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <pre><code>// Keyset Pagination Cursor Loop
+$last_id = 0;
+$batch   = 200;
+do {
+    $ids = $wpdb-&gt;get_col( $wpdb-&gt;prepare(
+        "SELECT ID FROM {$wpdb-&gt;posts} WHERE post_type = 'product' AND post_status = 'publish' AND ID &gt; %d ORDER BY ID ASC LIMIT %d",
+        $last_id,
+        $batch
+    ) );
+    foreach ( $ids as $id ) {
+        self::sync_product( (int) $id, false );
+    }
+    if ( ! empty( $ids ) ) {
+        $last_id = (int) end( $ids );
+    }
+} while ( count( $ids ) === $batch );</code></pre>
+          </div>
+
+          <!-- ================================================================
+               5.6 Persistent Query Cache Tier (PPFX_Query_Cache)
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-5-6">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">5.6 PERSISTENT CACHE</span>
+              <h3>Persistent Query Cache Tier (<code>PPFX_Query_Cache</code>)</h3>
+            </div>
+            <p>
+              Located in <code>includes/services/class-ppfx-query-cache.php</code>, this subsystem decouples SQL query compilation from cache persistence. To maximize Redis and Memcached hit rates, Pickory employs an <strong>ID-Only Caching Architecture</strong>:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">LIGHTWEIGHT PAYLOAD</span>
+                <h4 class="ui-card-title">ID-Only Array Storage</h4>
+                <p class="ui-card-desc">
+                  Instead of serializing heavy <code>WC_Product</code> objects or rendered HTML fragments into Redis, Pickory caches only matching post ID arrays (e.g. <code>[102, 105, 118]</code>), <code>found_posts</code>, and <code>max_num_pages</code>.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="success">DYNAMIC HYDRATION</span>
+                <h4 class="ui-card-title"><code>hydrate_query()</code> Engine</h4>
+                <p class="ui-card-desc">
+                  Reconstructs a live <code>WP_Query</code> instance using <code>'post__in' =&gt; $cached_ids</code>, <code>'orderby' =&gt; 'post__in'</code>, and restores pagination metadata. Dynamic cart rules, live currency switchers, and user-specific pricing apply seamlessly.
+                </p>
+              </div>
+            </div>
+
+            <p>
+              Cache keys are generated deterministically by normalizing and alphabetically sorting all incoming criteria:
+            </p>
+
+            <pre><code>// Deterministic Cache Key Formula
+$key = 'ppfx_query_' . PPFX_Query_Cache::get_query_cache_version() . '_' . md5( wp_json_encode( $normalized_params ) );</code></pre>
+          </div>
+
+          <!-- ================================================================
+               5.7 Cache Key Hashing & Invalidation on Save
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-5-7">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">5.7 CACHE INVALIDATION</span>
+              <h3>Cache Key Hashing &amp; Invalidation on Save</h3>
+            </div>
+            <p>
+              Standard caching plugins flush entire Redis databases or iterate through thousands of wildcard keys (e.g. <code>KEYS ppfx_query_*</code>) during product updates, causing severe CPU spikes and blocking single-threaded cache engines. Pickory solves this with <strong>O(1) Versioned Group Invalidation</strong>:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Component</th>
+                    <th>Mechanism</th>
+                    <th>Performance Characteristic</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Version Storage</strong></td>
+                    <td><code>update_option('ppfx_query_cache_version', (string) microtime(true))</code></td>
+                    <td>Stored in <code>wp_options</code> (autoloaded). Single scalar integer/float mutation.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Invalidation Cost</strong></td>
+                    <td><strong>O(1) Constant Time</strong></td>
+                    <td>Zero keyspace iterations. Previous cached keys immediately become orphaned and are evicted naturally by Redis LRU policy.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Session Bypass Guard</strong></td>
+                    <td><code>has_dynamic_session()</code></td>
+                    <td>Bypasses caching when a customer has items in their cart (<code>!WC()-&gt;cart-&gt;is_empty()</code>), is logged in, or has active session discount coupons.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Nightly Sale Cron</strong></td>
+                    <td><code>PPFX_Index_Scheduler::sync_expired_sales()</code></td>
+                    <td>Runs daily via <code>ppfx_sync_expired_sales</code> cron to gracefully update items whose scheduled sale period ended at midnight.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             TOPIC 5: REST API, FRAGMENT RENDERING & LIFECYCLE
+             ================================================================== -->

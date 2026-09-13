@@ -1,0 +1,48 @@
+        <!-- ==================================================================
+             SYSTEM OVERVIEW & GLOBAL DOCUMENTATION HEADER
+             (Placed top-level, outside of any topic)
+             ================================================================== -->
+        <header class="doc-header-block doc-overview-header" id="system-overview">
+          <h1 class="doc-main-title">Pickory Product Filter — Developer Documentation</h1>
+          <p class="doc-lead-paragraph">
+            Pickory Product Filter provides an enterprise-grade, zero-dependency client/server architecture for high-performance WooCommerce faceted filtering. Engineered to eliminate client-state drift and bypass relational <code>wp_postmeta</code> joins, the engine guarantees deterministic sub-50ms query resolution under high concurrent traffic.
+          </p>
+          <div class="doc-meta-pills">
+            <span class="ui-badge" data-variant="success"><span class="doc-pill-dot"></span>Production Ready</span>
+            <span class="ui-badge">HPOS Compatible</span>
+            <span class="ui-badge">Priority 20 Engine</span>
+            <span class="ui-badge">URL SSOT Invariant</span>
+            <span class="ui-badge">Zero Runtime Dep</span>
+          </div>
+        </header>
+
+        <!-- Feature Highlight Grid (UI Cards) -->
+        <div class="ui-card-grid doc-overview-grid">
+          <div class="ui-card" data-type="feature" id="overview-flat-index">
+            <span class="ui-badge" data-variant="brand">STORAGE</span>
+            <h3 class="ui-card-title">Flat Product Index</h3>
+            <p class="ui-card-desc">
+              Bypasses standard <code>wp_postmeta</code> joins by compiling multi-attribute metadata into a dedicated denormalized index table.
+            </p>
+          </div>
+
+          <div class="ui-card" data-type="feature" id="overview-rest-engine">
+            <span class="ui-badge" data-variant="brand">API</span>
+            <h3 class="ui-card-title">REST Query Engine</h3>
+            <p class="ui-card-desc">
+              Abortable HTTP requests via <code>AbortController</code> with debounced slider inputs and deep URL state synchronization.
+            </p>
+          </div>
+
+          <div class="ui-card" data-type="feature" id="overview-cache-tier">
+            <span class="ui-badge" data-variant="brand">CACHE</span>
+            <h3 class="ui-card-title">Object Cache Tier</h3>
+            <p class="ui-card-desc">
+              Seamless Redis/Memcached integration with automatic invalidation upon product save, trash, or inventory update events.
+            </p>
+          </div>
+        </div>
+
+        <!-- ==================================================================
+             TOPIC 1: CORE ARCHITECTURE & SYSTEM FOUNDATION
+             ================================================================== -->

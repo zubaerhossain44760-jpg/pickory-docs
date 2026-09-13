@@ -1,0 +1,439 @@
+        <section class="doc-section" id="rest-api-lifecycle">
+
+          <!-- Document Header Block -->
+          <header class="doc-header-block">
+            <h2 class="doc-main-title">5. REST API, Fragment Rendering &amp; Lifecycle</h2>
+            <p class="doc-lead-paragraph">
+              Operating over the dedicated endpoint <code>/wp-json/pickory-filter/v1/products</code>, the Pickory REST subsystem coordinates asynchronous client updates with atomic server-side HTML fragment compilation. Powered by <code>PPFX_Products_Controller</code> and <code>PPFX_Fragment_Renderer</code> with modern WordPress <code>WP_HTML_Tag_Processor</code> attribute injection, the engine renders and swaps product grids, pagination controls, result counters, and loop toolbars with zero Cumulative Layout Shift (CLS) and zero REST URL leakage.
+            </p>
+            <div class="doc-meta-pills">
+              <span class="ui-badge" data-variant="brand">WP REST API</span>
+              <span class="ui-badge">TOKEN RATE LIMIT</span>
+              <span class="ui-badge">HTML TAG PROCESSOR</span>
+              <span class="ui-badge">TARGETED DOM SWAP</span>
+              <span class="ui-badge">EVENT BUS API</span>
+              <span class="ui-badge">HPOS COMPATIBLE</span>
+            </div>
+          </header>
+
+          <!-- Feature Highlight Grid (UI Cards) -->
+          <div class="ui-card-grid">
+            <div class="ui-card" data-type="feature">
+              <span class="ui-badge" data-variant="brand">ENDPOINT ARCHITECTURE</span>
+              <h3 class="ui-card-title">Dedicated Public Route</h3>
+              <p class="ui-card-desc">
+                Exposes <code>pickory-filter/v1/products</code> via <code>WP_REST_Server::READABLE</code> with recursive argument sanitization, type casting, and schema validation.
+              </p>
+            </div>
+
+            <div class="ui-card" data-type="feature">
+              <span class="ui-badge" data-variant="brand">FRAGMENTATION</span>
+              <h3 class="ui-card-title">PPFX_Fragment_Renderer</h3>
+              <p class="ui-card-desc">
+                Renders isolated DOM replacement regions (product loop, pagination, result counters, toolbars) in a single response payload while overriding <code>$wp_query</code> in an isolated boundary.
+              </p>
+            </div>
+
+            <div class="ui-card" data-type="feature">
+              <span class="ui-badge" data-variant="brand">TAG INJECTION</span>
+              <h3 class="ui-card-title">WP_HTML_Tag_Processor</h3>
+              <p class="ui-card-desc">
+                Injects instance attributes (<code>data-ppfx-instance</code>) into wrapper tags safely using the native WordPress tag streaming engine without regex fragility.
+              </p>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               6.1 REST Endpoint & Schema (/pickory-filter/v1/products)
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-6-1">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">6.1 REST SPECIFICATION</span>
+              <h3>REST Endpoint &amp; Schema (<code>/pickory-filter/v1/products</code>)</h3>
+            </div>
+            <p>
+              Registered in <code>includes/class-ppfx-rest-api.php</code> and managed by <code>PPFX_Products_Controller</code> (<code>includes/rest/class-ppfx-products-controller.php</code>), the endpoint schema defines explicit types, sanitization callbacks, and enum boundaries for all filtering criteria:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>REST Argument</th>
+                    <th>Schema Type</th>
+                    <th>Sanitize Callback / Validation</th>
+                    <th>Default / Allowed Values</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>ppfx_page</code></td>
+                    <td><code>integer</code></td>
+                    <td><code>absint</code></td>
+                    <td>Default: <code>1</code>. Controls catalog pagination offset.</td>
+                  </tr>
+                  <tr>
+                    <td><code>per_page</code></td>
+                    <td><code>integer</code></td>
+                    <td><code>min(max(absint($v), 1), $max_per_page)</code></td>
+                    <td>Default: <code>0</code> (falls back to WooCommerce default). Filterable ceiling up to 100.</td>
+                  </tr>
+                  <tr>
+                    <td><code>instance_id</code></td>
+                    <td><code>string</code></td>
+                    <td><code>sanitize_key</code></td>
+                    <td>Unique widget instance ID. Stripped before query construction and cache hashing.</td>
+                  </tr>
+                  <tr>
+                    <td><code>toolbar_missing</code></td>
+                    <td><code>boolean</code></td>
+                    <td><code>rest_sanitize_boolean</code></td>
+                    <td>Default: <code>false</code>. Directs server to compile <code>.ppfx-loop-toolbar</code> if client page originally loaded empty.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx_category</code></td>
+                    <td><code>string</code></td>
+                    <td><code>sanitize_text_field</code></td>
+                    <td>Comma-separated category slugs for hierarchical taxonomy filtering.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx_orderby</code></td>
+                    <td><code>string</code></td>
+                    <td><code>sanitize_text_field</code> with enum whitelist</td>
+                    <td><code>menu_order</code>, <code>popularity</code>, <code>rating</code>, <code>date</code>, <code>price</code>, <code>price-desc</code>, <code>rand</code>, <code>title</code>, <code>id</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx_order</code></td>
+                    <td><code>string</code></td>
+                    <td><code>strtoupper(sanitize_text_field($v))</code></td>
+                    <td>Enum: <code>''</code>, <code>'ASC'</code>, <code>'DESC'</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx_min_price</code><br><code>ppfx_max_price</code></td>
+                    <td><code>number</code></td>
+                    <td><code>max(0.0, (float) $v)</code></td>
+                    <td>Default: <code>0.0</code>. Non-negative currency boundaries parsed as floats.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx_filter_{tax}</code></td>
+                    <td><code>string</code></td>
+                    <td><code>sanitize_text_field</code></td>
+                    <td>Dynamically registered for all active WooCommerce product attributes (e.g. <code>ppfx_filter_color</code>).</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              Before dispatching queries or computing cache keys, <code>PPFX_Utility::normalize_public_filter_params()</code> transforms public prefixed parameters into clean internal keys:
+            </p>
+
+            <pre><code>// Parameter Normalization & UI State Segregation
+$normalized_params = PPFX_Utility::normalize_public_filter_params( $request );
+// UI transport keys must never influence query logic or cache identity:
+unset( $normalized_params['toolbar_missing'], $normalized_params['instance_id'] );</code></pre>
+          </div>
+
+          <!-- ================================================================
+               6.2 Nonce Verification & Security
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-6-2">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">6.2 ACCESS CONTROL &amp; SECURITY</span>
+              <h3>Nonce Verification &amp; Security</h3>
+            </div>
+            <p>
+              Product filtering endpoints serve public catalog data that must remain fast and cacheable for unauthenticated guests, while remaining strictly protected against Denial-of-Service (DoS) scraping attacks:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Security Layer</th>
+                    <th>Implementation Mechanism</th>
+                    <th>Defensive Invariant</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Permission Callback</strong></td>
+                    <td><code>'permission_callback' =&gt; '__return_true'</code></td>
+                    <td>Permits anonymous catalog browsing. No user session cookies or CSRF nonces required for public reads.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Token Bucket Limiter</strong></td>
+                    <td><code>PPFX_Rate_Limiter::is_rate_limited('ppfx_rate', 80)</code></td>
+                    <td>Caps anonymous requests at <strong>80 requests/minute per client IP</strong> using transient buckets. Returns HTTP 429 when exceeded.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Proxy Cache Guard</strong></td>
+                    <td><code>$response-&gt;header('Cache-Control', 'no-store')</code></td>
+                    <td>Prevents intermediary reverse proxies (Cloudflare, Varnish) from caching dynamic REST fragment responses against client-specific URLs.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>SQL Injection Barrier</strong></td>
+                    <td>Strict Type Casting in <code>get_endpoint_args()</code></td>
+                    <td>All inputs are strictly cast to <code>absint</code>, <code>float</code>, or whitelisted against enum dictionaries before reaching the query builder.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               6.3 PPFX_Fragment_Renderer DOM Structure
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-6-3">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">6.3 FRAGMENT RENDERING</span>
+              <h3><code>PPFX_Fragment_Renderer</code> DOM Structure</h3>
+            </div>
+            <p>
+              Located in <code>includes/rest/class-ppfx-fragment-renderer.php</code>, this engine produces an isolated map of HTML fragments corresponding exactly to client-side DOM replacement targets:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Fragment Selector Key</th>
+                    <th>Template Helper / Output Source</th>
+                    <th>Architectural Responsibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>.woocommerce-result-count</code></td>
+                    <td>Localized text string (e.g. <code>Showing 1–12 of 36 results</code>)</td>
+                    <td>Updates catalog counter without triggering a layout reflow. Outputs <em>No products found</em> when count is 0.</td>
+                  </tr>
+                  <tr>
+                    <td><code>.ppfx-loop-toolbar</code></td>
+                    <td><code>do_action('woocommerce_before_shop_loop')</code></td>
+                    <td>Optional ordering dropdown and result count toolbar. Rendered only when requested via <code>toolbar_missing: true</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>.ppfx-products-wrapper</code></td>
+                    <td><code>woocommerce_product_loop_start()</code> &rarr; <code>wc_get_template_part('content', 'product')</code> &rarr; <code>woocommerce_product_loop_end()</code></td>
+                    <td>The core catalog product grid. Automatically wrapped in a container stamped with <code>data-ppfx-instance="$instance_id"</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>.woocommerce-pagination</code></td>
+                    <td><code>woocommerce_pagination()</code></td>
+                    <td>Standard pagination navigation. Outputs a hidden dummy nav element when results fit on a single page to maintain stable DOM hooks.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              To ensure WooCommerce template helpers execute correctly within a REST request context, the renderer executes inside an isolated <code>try ... finally</code> boundary:
+            </p>
+
+            <pre><code>// Isolated Global $wp_query Override
+global $wp_query, $post;
+$original_query = $wp_query;
+$original_post  = $post;
+
+try {
+    $wp_query = $query;
+    self::setup_loop_props( $query );
+    // Capture loop HTML fragments...
+} finally {
+    $wp_query = $original_query;
+    $post     = $original_post;
+    wc_reset_loop();
+    wp_reset_postdata();
+}</code></pre>
+          </div>
+
+          <!-- ================================================================
+               6.4 HTML Tag Processor Attribute Injection
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-6-4">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">6.4 MODERN HTML INJECTION</span>
+              <h3><code>WP_HTML_Tag_Processor</code> Attribute Injection</h3>
+            </div>
+            <p>
+              Injecting dynamic attributes into captured template markup via regular expressions (e.g. <code>preg_replace</code>) frequently corrupts HTML by mangling nested tags, quotes, or void elements. Pickory leverages WordPress 6.2+'s native streaming engine <code>WP_HTML_Tag_Processor</code>:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">PRECISION STREAMING</span>
+                <h4 class="ui-card-title">Deterministic Tag Traversal</h4>
+                <p class="ui-card-desc">
+                  Finds the outer wrapper tag via <code>$processor-&gt;next_tag(array('class_name' =&gt; 'ppfx-products-wrapper'))</code> and sets <code>data-ppfx-instance</code> with zero risk of broken markup.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="success">REST LEAKAGE GUARD</span>
+                <h4 class="ui-card-title">Referrer URL Normalization</h4>
+                <p class="ui-card-desc">
+                  Hooks <code>get_pagenum_link</code> and <code>woocommerce_product_add_to_cart_url</code> during fragment rendering to replace REST API endpoints with the actual page referrer URL.
+                </p>
+              </div>
+            </div>
+
+            <pre><code>// Safe Instance Attribute Injection via Tag Processor
+$processor = new WP_HTML_Tag_Processor( $captured_products );
+if ( $processor-&gt;next_tag( array( 'class_name' =&gt; 'ppfx-products-wrapper' ) ) ) {
+    $processor-&gt;set_attribute( 'data-ppfx-instance', $instance_id );
+    $captured_products = $processor-&gt;get_updated_html();
+}</code></pre>
+          </div>
+
+          <!-- ================================================================
+               6.5 Targeted DOM Container Swap
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-6-5">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">6.5 CLIENT DOM SWAP</span>
+              <h3>Targeted DOM Container Swap</h3>
+            </div>
+            <p>
+              When the REST response arrives on the client, <code>src/js/components/filter-form.js</code> performs targeted fragment replacement rather than an unconstrained innerHTML wipe:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Swap Sequence</th>
+                    <th>Target DOM Node</th>
+                    <th>Hydration Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>1. Resolution</strong></td>
+                    <td><code>.ppfx-products-wrapper[data-ppfx-instance="..."]</code></td>
+                    <td>Resolves target container using instance ID first, falling back to configured theme selector or standard <code>.products</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>2. Replace Wrapper</strong></td>
+                    <td><code>outerHTML</code> Swap</td>
+                    <td>Replaces existing products wrapper with incoming <code>fragments['.ppfx-products-wrapper']</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>3. Replace Nav</strong></td>
+                    <td><code>.woocommerce-pagination</code></td>
+                    <td>Swaps pagination controls. If results fit on a single page, injects hidden nav anchor so subsequent multi-page queries can remount.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>4. Update Counter</strong></td>
+                    <td><code>.woocommerce-result-count</code></td>
+                    <td>Updates text content without altering enclosing toolbar layout or filter toggles.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>5. Event Rebind</strong></td>
+                    <td><code>document.dispatchEvent()</code></td>
+                    <td>Fires <code>ppfx:filter-complete</code> and WooCommerce <code>wc_fragments_refreshed</code> to allow theme scripts to rebind tooltips and quickview modals.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               6.6 Plugin Bootstrap & Autoload
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-6-6">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">6.6 BOOTSTRAP LIFECYCLE</span>
+              <h3>Plugin Bootstrap &amp; Autoload</h3>
+            </div>
+            <p>
+              Located in the root <code>pickory-product-filter.php</code> file, the bootstrap process enforces strict dependency validation and resource efficiency:
+            </p>
+
+            <ol>
+              <li><strong>HPOS Compatibility</strong>: Declares compatibility with WooCommerce High-Performance Order Storage (HPOS) via <code>FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true)</code> before WooCommerce initializes.</li>
+              <li><strong>Version &amp; Path Constants</strong>: Defines <code>PPFX_VERSION</code>, <code>PPFX_INDEX_VERSION</code>, <code>PPFX_PLUGIN_DIR</code>, and <code>PPFX_PLUGIN_URL</code>.</li>
+              <li><strong>Lazy Class Loading</strong>: Hooks into <code>plugins_loaded</code>. If WooCommerce is absent, it halts loading immediately and displays an informative admin notice—consuming zero memory on non-eCommerce requests.</li>
+              <li><strong>Lifecycle Hooks</strong>:
+                <ul>
+                  <li><code>register_activation_hook</code>: Invokes <code>PPFX_Activator::activate()</code> to generate index tables and schedule the daily expired sales cron.</li>
+                  <li><code>register_deactivation_hook</code>: Unregisters scheduled cron events (<code>ppfx_sync_expired_sales</code>) and clears pending Action Scheduler jobs.</li>
+                </ul>
+              </li>
+            </ol>
+          </div>
+
+          <!-- ================================================================
+               6.7 Public Hooks & JS Events API
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-6-7">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">6.7 EXTENSION APIS</span>
+              <h3>Public Hooks &amp; JS Events API</h3>
+            </div>
+            <p>
+              Pickory provides comprehensive extension surfaces for third-party developers across both PHP and JavaScript runtimes:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Hook / Event Name</th>
+                    <th>Runtime</th>
+                    <th>Payload / Arguments</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>ppfx_rest_max_per_page</code></td>
+                    <td>PHP Filter</td>
+                    <td><code>int $max = 100</code></td>
+                    <td>Filters the maximum allowed products per page on the REST endpoint.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx_cache_key_context</code></td>
+                    <td>PHP Filter</td>
+                    <td><code>array $context, WP_REST_Request $request</code></td>
+                    <td>Appends custom scalar keys (e.g. B2B customer group, store region) to the cache key hash.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx_price_cache_currencies</code></td>
+                    <td>PHP Filter</td>
+                    <td><code>array $currencies</code></td>
+                    <td>Filters list of currency codes whose price range transients are purged on product save.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx:url-change</code></td>
+                    <td>JS Window Event</td>
+                    <td><code>{ detail: { params, source } }</code></td>
+                    <td>Dispatched whenever URL search parameters mutate (filter click, price slide, popstate).</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx:filter-request</code></td>
+                    <td>JS Window Event</td>
+                    <td><code>{ detail: { instanceId, params, requestId } }</code></td>
+                    <td>Dispatched immediately before an AJAX REST request is sent across the network.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx:filter-complete</code></td>
+                    <td>JS Window Event</td>
+                    <td><code>{ detail: { instanceId, response, fragments } }</code></td>
+                    <td>Dispatched after fragment replacement and DOM hydration completes.</td>
+                  </tr>
+                  <tr>
+                    <td><code>ppfx:filter-reset</code></td>
+                    <td>JS Window Event</td>
+                    <td><code>{ detail: { instanceId } }</code></td>
+                    <td>Dispatched when user clicks the "Clear All Filters" button.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             TOPIC 6: ADMIN ARCHITECTURE, SECURITY & EXTENSIBILITY
+             ================================================================== -->

@@ -1,0 +1,365 @@
+        <section class="doc-section" id="admin-security-extensibility">
+
+          <!-- Document Header Block -->
+          <header class="doc-header-block">
+            <h2 class="doc-main-title">6. Admin Architecture, Security &amp; Extensibility</h2>
+            <p class="doc-lead-paragraph">
+              The administrative and security foundation of Pickory Product Filter enforces strict runtime boundaries, cryptographic nonce validations, token bucket IP rate limiting, term meta persistence for visual color/image swatches, and enterprise guardrails against prototype pollution, CSS injection, and PHP memory exhaustion.
+            </p>
+            <div class="doc-meta-pills">
+              <span class="ui-badge" data-variant="brand">ADMIN ARCHITECTURE</span>
+              <span class="ui-badge">SWATCH TERM META</span>
+              <span class="ui-badge">TOKEN RATE LIMIT</span>
+              <span class="ui-badge">PROTOTYPE HARDENING</span>
+              <span class="ui-badge">CSS ESCAPING</span>
+              <span class="ui-badge">MEMORY GUARDRAILS</span>
+            </div>
+          </header>
+
+          <!-- Feature Highlight Grid (UI Cards) -->
+          <div class="ui-card-grid">
+            <div class="ui-card" data-type="feature">
+              <span class="ui-badge" data-variant="brand">ADMIN CONTROL</span>
+              <h3 class="ui-card-title">Settings Architecture</h3>
+              <p class="ui-card-desc">
+                Centralized settings registration managing filter modes, container selectors, debounce timings, and async Action Scheduler index rebuilds.
+              </p>
+            </div>
+
+            <div class="ui-card" data-type="feature">
+              <span class="ui-badge" data-variant="brand">SWATCH SYSTEM</span>
+              <h3 class="ui-card-title">Term Meta Swatches</h3>
+              <p class="ui-card-desc">
+                <code>PPFX_Term_Meta</code> binds Iris color pickers and media library uploaders directly to <code>pa_*</code> attribute terms with nonce security.
+              </p>
+            </div>
+
+            <div class="ui-card" data-type="feature">
+              <span class="ui-badge" data-variant="security">DoS DEFENSE</span>
+              <h3 class="ui-card-title">Token Bucket Limiter</h3>
+              <p class="ui-card-desc">
+                <code>PPFX_Rate_Limiter</code> throttles public REST traffic with Cloudflare IP parsing, proxy validation, and memory-backed rate buckets.
+              </p>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               7.1 Admin Settings Page Architecture
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-7-1">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">7.1 ADMIN CONTROL</span>
+              <h3>Admin Settings Page Architecture</h3>
+            </div>
+            <p>
+              Managed by <code>PPFX_Admin</code> (<code>includes/admin/class-ppfx-admin.php</code>) and rendered by <code>PPFX_Settings_Page</code>, the admin subsystem provides store managers with centralized control over frontend behavior and indexing operations:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Admin Action / Hook</th>
+                    <th>Execution Handler</th>
+                    <th>Security &amp; Processing Guarantee</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>admin_post_ppfx_rebuild_index</code></td>
+                    <td><code>handle_rebuild_index()</code></td>
+                    <td>Verifies <code>manage_options</code> capability and <code>ppfx_rebuild_index_nonce</code>. Dispatches asynchronous index rebuilding via <code>as_enqueue_async_action('ppfx_rebuild_index_action')</code> with fallback to <code>wp_schedule_single_event()</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>admin_post_ppfx_activate_license</code></td>
+                    <td><code>handle_activate_license()</code></td>
+                    <td>Verifies <code>ppfx_license_nonce_field</code>, validates license key against remote Lemon Squeezy API, and schedules recurring license verification cron.</td>
+                  </tr>
+                  <tr>
+                    <td><code>admin_post_ppfx_deactivate_license</code></td>
+                    <td><code>handle_deactivate_license()</code></td>
+                    <td>Revokes store registration on Lemon Squeezy and cleans up local license options and transients.</td>
+                  </tr>
+                  <tr>
+                    <td><code>admin_notices</code></td>
+                    <td><code>show_admin_notices()</code></td>
+                    <td>Renders contextual status banners (e.g. index queued, license activated, WooCommerce missing).</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              When rebuilding the product index from the admin interface, operations are strictly offloaded to background workers to prevent browser HTTP timeout errors on large catalogs:
+            </p>
+
+            <pre><code>// Asynchronous Index Rebuild Enqueueing
+if ( function_exists( 'as_enqueue_async_action' ) ) {
+    as_enqueue_async_action( 'ppfx_rebuild_index_action' );
+} elseif ( ! wp_next_scheduled( 'ppfx_rebuild_index_action' ) ) {
+    wp_schedule_single_event( time(), 'ppfx_rebuild_index_action' );
+}</code></pre>
+          </div>
+
+          <!-- ================================================================
+               7.2 Swatch Taxonomy Term Meta
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-7-2">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">7.2 SWATCH PERSISTENCE</span>
+              <h3>Swatch Taxonomy Term Meta</h3>
+            </div>
+            <p>
+              The <code>PPFX_Term_Meta</code> class (<code>includes/admin/class-ppfx-term-meta.php</code>) extends all public product attribute taxonomies (e.g. <code>pa_color</code>, <code>pa_pattern</code>) with visual swatch metadata:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Field Name</th>
+                    <th>Meta Key</th>
+                    <th>UI Component</th>
+                    <th>Sanitization &amp; Storage Type</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Swatch Color</strong></td>
+                    <td><code>ppfx_color</code></td>
+                    <td>Iris Color Picker input with hex code validation.</td>
+                    <td><code>sanitize_hex_color()</code> &rarr; stored as string (e.g. <code>#2563eb</code>) in <code>wp_termmeta</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Swatch Image</strong></td>
+                    <td><code>ppfx_image</code></td>
+                    <td>WordPress Media Library modal uploader with live thumbnail preview.</td>
+                    <td><code>absint()</code> &rarr; stored as WordPress media attachment ID in <code>wp_termmeta</code>.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              Saving swatch metadata is strictly guarded by capability checks and cryptographic nonces:
+            </p>
+
+            <pre><code>// Term Meta Persistence Security Guard
+if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ppfx_term_meta_nonce_field'] ) ), 'ppfx_term_meta_nonce' ) ) {
+    return;
+}
+if ( ! current_user_can( 'edit_term', $term_id ) ) {
+    return;
+}
+if ( isset( $_POST['ppfx_color'] ) ) {
+    update_term_meta( $term_id, 'ppfx_color', sanitize_hex_color( wp_unslash( $_POST['ppfx_color'] ) ) );
+}
+if ( isset( $_POST['ppfx_image'] ) ) {
+    update_term_meta( $term_id, 'ppfx_image', absint( wp_unslash( $_POST['ppfx_image'] ) ) );
+}</code></pre>
+          </div>
+
+          <!-- ================================================================
+               7.3 Token Bucket Rate Limiter
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-7-3">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">7.3 RATE LIMITING</span>
+              <h3>Token Bucket Rate Limiter</h3>
+            </div>
+            <p>
+              Located in <code>includes/services/class-ppfx-rate-limiter.php</code>, <code>PPFX_Rate_Limiter</code> protects the REST endpoint against scrapers and denial-of-service attempts:
+            </p>
+
+            <div class="doc-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">IP SPOOFING DEFENSE</span>
+                <h4 class="ui-card-title">Robust Client IP Detection</h4>
+                <p class="ui-card-desc">
+                  Prioritizes Cloudflare's <code>HTTP_CF_CONNECTING_IP</code>. Validates addresses with <code>FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE</code>. Generic headers (<code>X-Forwarded-For</code>) require explicit opt-in via <code>PPFX_TRUST_PROXY</code>.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="success">MEMORY EFFICIENCY</span>
+                <h4 class="ui-card-title">Atomic Object Cache Tier</h4>
+                <p class="ui-card-desc">
+                  When Redis or Memcached is active (<code>wp_using_ext_object_cache()</code>), rate counters increment atomically via <code>wp_cache_incr()</code>. Automatically bypasses database transient writes to eliminate <code>wp_options</code> bloat.
+                </p>
+              </div>
+            </div>
+
+            <pre><code>// Atomic Cache Rate Check
+$hit_count = wp_cache_incr( $transient_key, 1, 'pickory-product-filter' );
+if ( false === $hit_count ) {
+    wp_cache_set( $transient_key, 1, 'pickory-product-filter', $window_in_seconds );
+    $hit_count = 1;
+}
+return $hit_count > $max_hits; // Returns true when rate exceeded</code></pre>
+          </div>
+
+          <!-- ================================================================
+               7.4 Strict Parameter Sanitization
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-7-4">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">7.4 SANITIZATION PIPELINE</span>
+              <h3>Strict Parameter Sanitization &amp; Whitelisting</h3>
+            </div>
+            <p>
+              Every incoming request parameter undergoes strict type coercion and defensive validation across both REST endpoint ingestion and SSR query parsing:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Parameter Category</th>
+                    <th>Sanitization Routine</th>
+                    <th>Enforced Boundary</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Pagination &amp; Page Limits</strong></td>
+                    <td><code>absint($v)</code></td>
+                    <td>Non-negative integers strictly bounded between <code>1</code> and <code>$max_per_page</code> (100).</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Price Slider Bounds</strong></td>
+                    <td><code>max(0.0, (float) $v)</code></td>
+                    <td>Guaranteed non-negative float numbers, preventing negative price injection or non-numeric strings.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Catalog Sorting Order</strong></td>
+                    <td>Enum whitelist check</td>
+                    <td>Strictly whitelisted against allowed WooCommerce sort keys (<code>menu_order</code>, <code>popularity</code>, <code>rating</code>, <code>date</code>, <code>price</code>, <code>price-desc</code>). Unrecognized values fall back to catalog default.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Taxonomy &amp; Attribute Slugs</strong></td>
+                    <td><code>sanitize_text_field(wp_unslash($v))</code></td>
+                    <td>Strips tags, invalid characters, and escapes quotes before SQL query compilation.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               7.5 Prototype Pollution Defenses
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-7-5">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">7.5 CLIENT HARDENING</span>
+              <h3>Prototype Pollution Defenses</h3>
+            </div>
+            <p>
+              URL parameter parsing is a common vector for Prototype Pollution attacks in JavaScript applications. If an attacker injects query keys like <code>?__proto__[isAdmin]=true</code> or <code>?constructor[prototype][polluted]=yes</code>, naive object assignment mutates the global Object prototype.
+            </p>
+
+            <div class="ui-callout" data-type="guardrail" role="note">
+              <div class="ui-callout-header">
+                <span class="ui-badge" data-variant="success">[DEFENSIVE INVARIANT]</span>
+                <h4 class="ui-callout-title">Key Denylist in <code>src/js/utils/url.js</code></h4>
+              </div>
+              <div class="ui-callout-body">
+                Both <code>toPublicParams()</code> and <code>toInternalParams()</code> enforce an unconditional guard that discards hazardous property keys before any object mutation takes place:
+                <pre class="ui-callout-code"><code>if (key === '__proto__' || key === 'constructor' || key === 'prototype') return;</code></pre>
+              </div>
+            </div>
+
+            <p>
+              Additionally, dynamic CSS selector matching uses <code>cssEscape()</code> to sanitize attribute values before querying the DOM, neutralizing CSS injection exploits:
+            </p>
+
+            <pre><code>// Safe CSS Selector Escaping
+export const cssEscape = (value) => {
+  const stringValue = String(value);
+  if (window.CSS && typeof window.CSS.escape === 'function') {
+    return window.CSS.escape(stringValue);
+  }
+  return stringValue.replace(/[^a-zA-Z0-9_-]/g, '\\$&');
+};</code></pre>
+          </div>
+
+          <!-- ================================================================
+               7.6 Memory Thresholds & Guardrails
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-7-6">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">7.6 PERFORMANCE GUARDRAILS</span>
+              <h3>Memory Thresholds &amp; Guardrails</h3>
+            </div>
+            <p>
+              Engineers extending or deploying Pickory in large-scale enterprise environments must adhere to strict runtime boundaries:
+            </p>
+
+            <div class="ui-callout" data-type="guardrail" role="note">
+              <div class="ui-callout-header">
+                <span class="ui-badge" data-variant="success">[GUARDRAIL 1]</span>
+                <h4 class="ui-callout-title">Direct postmeta joins strictly prohibited</h4>
+              </div>
+              <div class="ui-callout-body">
+                All frontend product filtering queries must resolve exclusively against <code>wp_ppfx_product_index</code> and <code>wp_ppfx_product_terms</code>. Bypassing the flat index to execute raw <code>WP_Query</code> meta queries in catalog loops causes catastrophic table locks and CPU saturation during flash-sale spikes.
+              </div>
+            </div>
+
+            <div class="ui-callout" data-type="warning" role="alert">
+              <div class="ui-callout-header">
+                <span class="ui-badge" data-variant="warning">[GUARDRAIL 2]</span>
+                <h4 class="ui-callout-title">Batch Reindexing Memory Thresholds</h4>
+              </div>
+              <div class="ui-callout-body">
+                When executing CLI re-indexing (<code>wp pickory reindex</code>) on catalogs exceeding 50,000 SKUs, always specify keyset batch sizing (<code>--batch-size=200</code>) and sleep pauses (<code>--sleep=2</code>) to prevent Redis object cache eviction storms and PHP memory limit exhaustion.
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               7.7 Third-Party Compatibility Bridge
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-7-7">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">7.7 COMPATIBILITY</span>
+              <h3>Third-Party Compatibility Bridge</h3>
+            </div>
+            <p>
+              Pickory Product Filter is engineered to operate seamlessly alongside the broader WooCommerce ecosystem:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Integration Surface</th>
+                    <th>Compatibility Mechanism</th>
+                    <th>Architectural Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>High-Performance Order Storage (HPOS)</strong></td>
+                    <td><code>FeaturesUtil::declare_compatibility()</code></td>
+                    <td>Full native support for WooCommerce custom order tables with zero legacy postmeta dependencies.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Multi-Currency Switchers</strong></td>
+                    <td><code>ppfx_price_cache_currencies</code> &amp; Context Hashing</td>
+                    <td>Price transients and query cache hashes automatically incorporate the active currency symbol and exchange rate context.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Custom Themes &amp; Builders</strong></td>
+                    <td><code>wc_fragments_refreshed</code> &amp; Custom Events</td>
+                    <td>Fires standard WooCommerce refresh events on every DOM swap, allowing Divi, Elementor, and custom theme scripts to reinitialize quickviews, wishlists, and hover effects.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Action Scheduler</strong></td>
+                    <td>Async Queueing</td>
+                    <td>Long-running indexing tasks execute via Action Scheduler queues, preventing HTTP gateway timeout aborts.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+

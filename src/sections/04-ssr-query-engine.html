@@ -1,0 +1,315 @@
+        <section class="doc-section" id="ssr-query-engine">
+
+          <!-- Document Header Block -->
+          <header class="doc-header-block">
+            <h2 class="doc-main-title">3. SSR &amp; Query Execution Engine</h2>
+            <p class="doc-lead-paragraph">
+              The Server-Side Rendering (SSR) and Query Execution Engine intercepts WooCommerce product queries during initial catalog page load and REST retrieval. Powered by <code>PPFX_Server_Filter</code>, <code>PPFX_Product_Query_Builder</code>, and <code>PPFX_Query_Clause_Compiler</code>, the subsystem safely modifies the main <code>WP_Query</code> loop before DOM output, eliminating Cumulative Layout Shift (CLS), preventing catalog 404 routing anomalies, and executing scoped, high-performance database queries with zero <code>wp_postmeta</code> joins.
+            </p>
+            <div class="doc-meta-pills">
+              <span class="ui-badge" data-variant="brand">PRE_GET_POSTS</span>
+              <span class="ui-badge">PRIORITY 20 HOOK</span>
+              <span class="ui-badge">POSTS_CLAUSES</span>
+              <span class="ui-badge">SPL_OBJECT_HASH</span>
+              <span class="ui-badge">ZERO CLS</span>
+              <span class="ui-badge">SQL COMPILER</span>
+            </div>
+          </header>
+
+          <!-- ================================================================
+               4.1 PPFX_Server_Filter Execution Scope
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-4-1">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">4.1 HOOK LIFECYCLE</span>
+              <h3><code>PPFX_Server_Filter</code> Execution Scope</h3>
+            </div>
+            <p>
+              Located in <code>includes/class-ppfx-server-filter.php</code>, the <code>PPFX_Server_Filter</code> class hooks into the WordPress request lifecycle at strict priority checkpoints to intercept catalog queries before HTML delivery:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>WordPress / WooCommerce Hook</th>
+                    <th>Priority</th>
+                    <th>Class Method</th>
+                    <th>Architectural Responsibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>request</code></td>
+                    <td><code>1</code> (Early)</td>
+                    <td><code>normalize_shop_request_query_vars</code></td>
+                    <td>Sanitizes rewrite variables on shop requests to prevent taxonomy 404 conflicts before WP routing executes.</td>
+                  </tr>
+                  <tr>
+                    <td><code>pre_handle_404</code></td>
+                    <td><code>10</code> (Standard)</td>
+                    <td><code>prevent_filtered_shop_404</code></td>
+                    <td>Suppresses HTTP 404 header status on valid shop and taxonomy archive URLs that yield zero matching products.</td>
+                  </tr>
+                  <tr>
+                    <td><code>woocommerce_product_query</code></td>
+                    <td><code>20</code> (Post-Core)</td>
+                    <td><code>modify_main_query</code></td>
+                    <td>Intercepts WooCommerce's main catalog query after core Priority 10 orderby/visibility filters have attached.</td>
+                  </tr>
+                  <tr>
+                    <td><code>woocommerce_shortcode_products_query</code></td>
+                    <td><code>20</code> (Post-Core)</td>
+                    <td><code>modify_shortcode_query</code></td>
+                    <td>Applies active URL parameters to WooCommerce shortcode product loops (e.g. <code>[products]</code>) without overwriting base attributes.</td>
+                  </tr>
+                  <tr>
+                    <td><code>query_vars</code></td>
+                    <td><code>10</code> (Standard)</td>
+                    <td><code>register_query_vars</code></td>
+                    <td>Registers all <code>ppfx_*</code> public parameters with WordPress core so they survive query sanitization.</td>
+                  </tr>
+                  <tr>
+                    <td><code>redirect_canonical</code></td>
+                    <td><code>10</code> (Standard)</td>
+                    <td><code>prevent_canonical_redirect</code></td>
+                    <td>Halts WordPress canonical redirection from stripping custom filter parameters on catalog root URLs.</td>
+                  </tr>
+                  <tr>
+                    <td><code>woocommerce_default_catalog_orderby</code></td>
+                    <td><code>10</code> (Standard)</td>
+                    <td><code>override_default_orderby</code></td>
+                    <td>Synchronizes the catalog's default sort order with incoming <code>ppfx_orderby</code> query parameters.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               4.2 pre_get_posts & modify_main_query Interception
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-4-2">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">4.2 QUERY INTERCEPTION</span>
+              <h3><code>pre_get_posts</code> &amp; <code>modify_main_query</code> Interception</h3>
+            </div>
+            <p>
+              Modifying WordPress queries globally is hazardous. To avoid polluting secondary loops (menus, sidebars, related products) or backend admin tables, <code>modify_main_query($query)</code> enforces strict boundary guards:
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">PRIMARY LOOP GUARD</span>
+                <h4 class="ui-card-title"><code>is_main_query() &amp;&amp; !is_admin()</code></h4>
+                <p class="ui-card-desc">
+                  Immediately bails if the query is not the primary WordPress loop or is executing in an administrative context. Secondary product sliders and footer widgets remain completely untouched.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">CATALOG ARCHIVE CONTEXT</span>
+                <h4 class="ui-card-title">Archive Detection Heuristic</h4>
+                <p class="ui-card-desc">
+                  Verifies the current request matches <code>is_shop()</code>, <code>is_product_category()</code>, <code>is_product_tag()</code>, or a custom product taxonomy archive (e.g. brand, designer).
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">TAXONOMY INHERITANCE</span>
+                <h4 class="ui-card-title">Archive Context Merging</h4>
+                <p class="ui-card-desc">
+                  When filtering on <code>/product-category/shoes/</code>, the queried term is automatically extracted and merged into active parameters, ensuring filters operate strictly within the scoped category.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               4.3 Shop 404 & Redirect Guard
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-4-3">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">4.3 ROUTING DEFENSE</span>
+              <h3>Shop 404 &amp; Redirect Guard</h3>
+            </div>
+            <p>
+              Faceted filtering in WordPress introduces severe URL routing conflicts due to core's rewrite engine:
+            </p>
+
+            <div class="ui-callout" data-type="guardrail" role="note">
+              <div class="ui-callout-header">
+                <span class="ui-badge" data-variant="warning">[CORE REWRITE ANOMALY]</span>
+                <h4 class="ui-callout-title">The Taxonomy 404 Collision</h4>
+              </div>
+              <div class="ui-callout-body">
+                WordPress core registers rewrite query vars for taxonomy slugs (e.g. <code>product_tag</code>). When a filtered URL like <code>/shop/?product_tag=summer</code> is requested, WordPress attempts to parse the shop page with a taxonomy constraint. If the taxonomy constraint does not resolve to the configured shop page ID, WordPress core emits an HTTP 404 header before WooCommerce template loading begins.
+              </div>
+            </div>
+
+            <p>
+              Pickory eliminates this via <code>normalize_shop_request_query_vars($query_vars)</code>:
+            </p>
+            <ul>
+              <li>Intercepts the raw request query vars at Priority 1.</li>
+              <li>Detects if the query targets the configured shop page.</li>
+              <li>Removes conflicting taxonomy query parameters from the WordPress internal query parser, keeping <code>$_GET</code> intact for Pickory.</li>
+              <li><code>prevent_canonical_redirect()</code> inspects incoming GET parameters; if any key starts with <code>ppfx_</code>, it returns <code>false</code> to prevent WordPress from stripping parameters and redirecting to the canonical shop root.</li>
+            </ul>
+          </div>
+
+          <!-- ================================================================
+               4.4 PPFX_Product_Query_Builder Façade
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-4-4">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">4.4 QUERY FAÇADE</span>
+              <h3><code>PPFX_Product_Query_Builder</code> Façade</h3>
+            </div>
+            <p>
+              Located in <code>includes/services/class-ppfx-product-query-builder.php</code>, this service orchestrates query construction across both REST API controllers and server-side filtering:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Method</th>
+                    <th>Input Signature</th>
+                    <th>Architectural Responsibility</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>__construct</code></td>
+                    <td><code>WP_REST_Request|array|null $request</code></td>
+                    <td>Normalizes public parameters into internal clean keys using <code>PPFX_Utility::normalize_public_filter_params()</code>.</td>
+                  </tr>
+                  <tr>
+                    <td><code>apply_to_query</code></td>
+                    <td><code>WP_Query $query</code></td>
+                    <td>Compiles filter clauses, sets <code>tax_query</code> on the query instance, tags it with <code>ppfx_is_filter_query</code>, and attaches scoped SQL hooks.</td>
+                  </tr>
+                  <tr>
+                    <td><code>merge_query_args_with_params</code></td>
+                    <td><code>array $query_args, array $params</code></td>
+                    <td>Static utility that safely merges active URL filters with existing shortcode arguments without overwriting default limits.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               4.5 PPFX_Query_Clause_Compiler SQL Engine
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-4-5">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">4.5 SQL COMPILER</span>
+              <h3><code>PPFX_Query_Clause_Compiler</code> SQL Engine</h3>
+            </div>
+            <p>
+              Located in <code>includes/services/class-ppfx-query-clause-compiler.php</code>, this engine compiles multi-facet criteria into high-performance SQL targeting the flat index table:
+            </p>
+
+            <div class="doc-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Filter Dimension</th>
+                    <th>Target Table / Alias</th>
+                    <th>Compiled SQL Clause Pattern</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Price Range</strong></td>
+                    <td><code>wp_ppfx_product_index (ppfxi)</code></td>
+                    <td><code>ppfxi.min_price &gt;= %f AND ppfxi.max_price &lt;= %f</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Customer Rating</strong></td>
+                    <td><code>wp_ppfx_product_index (ppfxi)</code></td>
+                    <td><code>ppfxi.rating_average &gt;= %f</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Stock Status</strong></td>
+                    <td><code>wp_ppfx_product_index (ppfxi)</code></td>
+                    <td><code>ppfxi.stock_status = 'instock'</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Catalog Visibility</strong></td>
+                    <td><code>wp_ppfx_product_terms (ppfxt_vis)</code></td>
+                    <td><code>NOT EXISTS (SELECT 1 FROM ppfxt WHERE taxonomy = 'product_visibility' AND term_id = %d)</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Cross-Attribute AND</strong></td>
+                    <td><code>wp_ppfx_product_terms (ppfxt)</code></td>
+                    <td><code>HAVING COUNT(DISTINCT ppfxt.taxonomy) = %d</code> across multiple attribute groups.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               4.6 Scoped posts_clauses Hooks & spl_object_hash Lifecycle
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-4-6">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">4.6 SCOPED HOOK LIFECYCLE</span>
+              <h3>Scoped <code>posts_clauses</code> Hooks &amp; <code>spl_object_hash</code> Lifecycle</h3>
+            </div>
+            <p>
+              Standard WordPress SQL filters (<code>posts_clauses</code>, <code>posts_join</code>, <code>posts_where</code>) are global singletons. Once added via <code>add_filter()</code>, they execute on every subsequent query unless explicitly removed.
+            </p>
+            <p>
+              <code>PPFX_Query_Hook_Scope</code> solves this with an isolated object-hash lifecycle:
+            </p>
+            <ol>
+              <li>When <code>attach($query)</code> is invoked, it records the unique memory identity of the target query via <code>spl_object_hash($query)</code>.</li>
+              <li>In the attached SQL callback, it inspects the passing query:
+                <pre><code>if ( spl_object_hash( $wp_query ) !== $this-&gt;expected_hash || ! $wp_query-&gt;get( 'ppfx_is_filter_query' ) ) {
+    return $clauses;
+}</code></pre>
+              </li>
+              <li>Hooks a cleanup listener on <code>the_posts</code> or <code>posts_results</code> that automatically detaches the exact callbacks as soon as the target query finishes executing.</li>
+              <li>Guarantees zero leakage into secondary loop queries, navigation menus, or admin queries.</li>
+            </ol>
+          </div>
+
+          <!-- ================================================================
+               4.7 Client-Server SSR Hash Parity
+               ================================================================ -->
+          <div class="doc-subtopic" id="subtopic-4-7">
+            <div class="doc-subtopic-header">
+              <span class="ui-badge" data-variant="brand">4.7 PERFORMANCE FIDELITY</span>
+              <h3>Client-Server SSR Hash Parity</h3>
+            </div>
+            <p>
+              When a user loads a filtered URL (e.g. from a shared link or bookmark), the server renders the complete filtered catalog via SSR. Without state parity coordination, frontend JavaScript initializes, notices the active URL parameters, and immediately fires a redundant AJAX fetch—wasting bandwidth and causing layout flicker.
+            </p>
+
+            <div class="ui-card-grid">
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="brand">SERVER FINGERPRINT</span>
+                <h4 class="ui-card-title"><code>ppfxFilterData.ssrHash</code></h4>
+                <p class="ui-card-desc">
+                  During SSR rendering, <code>PPFX_Server_Filter</code> normalizes the active parameters, sorts their keys alphabetically, and computes an MD5 checksum injected into the localized script global.
+                </p>
+              </div>
+
+              <div class="ui-card" data-type="feature">
+                <span class="ui-badge" data-variant="success">CLIENT VERIFICATION</span>
+                <h4 class="ui-card-title">Zero Redundant Fetch</h4>
+                <p class="ui-card-desc">
+                  On client boot, <code>src/js/utils/hash.js</code> computes the identical MD5 checksum of the current URL parameters. If <code>clientHash === serverHash</code>, the initial AJAX request is suppressed and DOM hydration completes instantly.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             TOPIC 4: DATABASE INDEXING, STORAGE & SORTING
+             ================================================================== -->
