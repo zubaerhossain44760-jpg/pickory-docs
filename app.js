@@ -229,14 +229,6 @@
    * associated with each primary section in the Main Navigation.
    */
   const SECTION_CONTEXT_TOPICS = {
-    'system-overview': {
-      title: 'System Overview & Highlights',
-      topics: [
-        { id: 'overview-flat-index', label: 'Flat Product Index' },
-        { id: 'overview-rest-engine', label: 'REST Query Engine' },
-        { id: 'overview-cache-tier', label: 'Object Cache Tier' }
-      ]
-    },
     'core-architecture': {
       title: 'Core Architecture & System Foundation',
       topics: [

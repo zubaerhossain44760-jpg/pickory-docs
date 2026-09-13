@@ -24,12 +24,6 @@
       <nav class="doc-nav-tree" aria-label="Documentation Navigation">
         <ul class="doc-nav-list">
           <li class="doc-nav-item is-active">
-            <a href="#system-overview" class="doc-nav-link">
-              <span>Overview</span>
-              <span class="ui-badge" data-variant="success">START</span>
-            </a>
-          </li>
-          <li class="doc-nav-item">
             <a href="#core-architecture" class="doc-nav-link">
               <span>1. Core Architecture &amp; System Foundation</span>
               <span class="ui-badge" data-variant="brand">CORE</span>
@@ -497,7 +491,7 @@
 
           <!-- Document Header Block -->
           <header class="doc-header-block">
-            <h1 class="doc-main-title">2. Client Reactive Engine &amp; UI Layer</h1>
+            <h2 class="doc-main-title">2. Client Reactive Engine &amp; UI Layer</h2>
             <p class="doc-lead-paragraph">
               Pickory Product Filter treats the browser URL address bar as the absolute, immutable Single Source of Truth (SSOT). All user interactions—from dual-thumb price drags to taxonomy swatch toggles—are serialized into canonical parameters, routed through a centralized write gate, and broadcast across a decoupled event bus. This architecture guarantees zero client-state drift between multiple desktop and mobile widgets while ensuring 100% bookmarkable, shareable catalog views.
             </p>
@@ -1681,7 +1675,7 @@
 
           <!-- Document Header Block -->
           <header class="doc-header-block">
-            <h1 class="doc-main-title">3. SSR &amp; Query Execution Engine</h1>
+            <h2 class="doc-main-title">3. SSR &amp; Query Execution Engine</h2>
             <p class="doc-lead-paragraph">
               The Server-Side Rendering (SSR) and Query Execution Engine intercepts WooCommerce product queries during initial catalog page load and REST retrieval. Powered by <code>PPFX_Server_Filter</code>, <code>PPFX_Product_Query_Builder</code>, and <code>PPFX_Query_Clause_Compiler</code>, the subsystem safely modifies the main <code>WP_Query</code> loop before DOM output, eliminating Cumulative Layout Shift (CLS), preventing catalog 404 routing anomalies, and executing scoped, high-performance database queries with zero <code>wp_postmeta</code> joins.
             </p>
@@ -1996,7 +1990,7 @@
 
           <!-- Document Header Block -->
           <header class="doc-header-block">
-            <h1 class="doc-main-title">4. Database Indexing, Storage &amp; Sorting</h1>
+            <h2 class="doc-main-title">4. Database Indexing, Storage &amp; Sorting</h2>
             <p class="doc-lead-paragraph">
               High-volume WooCommerce stores frequently suffer catastrophic query degradation when filtering across multiple custom product attributes, price bands, stock states, and ratings. Standard WooCommerce architectures execute 4&times; to 8&times; nested relational joins against the unindexed Entity-Attribute-Value (EAV) table <code>wp_postmeta</code>. Pickory eliminates this bottleneck entirely by pre-computing all facet dimensions into two dedicated, high-performance B-tree indexed storage tables: <code>wp_ppfx_product_index</code> and <code>wp_ppfx_product_terms</code>.
             </p>
@@ -2481,7 +2475,7 @@ $key = 'ppfx_query_' . PPFX_Query_Cache::get_query_cache_version() . '_' . md5( 
 
           <!-- Document Header Block -->
           <header class="doc-header-block">
-            <h1 class="doc-main-title">5. REST API, Fragment Rendering &amp; Lifecycle</h1>
+            <h2 class="doc-main-title">5. REST API, Fragment Rendering &amp; Lifecycle</h2>
             <p class="doc-lead-paragraph">
               Operating over the dedicated endpoint <code>/wp-json/pickory-filter/v1/products</code>, the Pickory REST subsystem coordinates asynchronous client updates with atomic server-side HTML fragment compilation. Powered by <code>PPFX_Products_Controller</code> and <code>PPFX_Fragment_Renderer</code> with modern WordPress <code>WP_HTML_Tag_Processor</code> attribute injection, the engine renders and swaps product grids, pagination controls, result counters, and loop toolbars with zero Cumulative Layout Shift (CLS) and zero REST URL leakage.
             </p>
@@ -2920,7 +2914,7 @@ if ( $processor-&gt;next_tag( array( 'class_name' =&gt; 'ppfx-products-wrapper' 
 
           <!-- Document Header Block -->
           <header class="doc-header-block">
-            <h1 class="doc-main-title">6. Admin Architecture, Security &amp; Extensibility</h1>
+            <h2 class="doc-main-title">6. Admin Architecture, Security &amp; Extensibility</h2>
             <p class="doc-lead-paragraph">
               The administrative and security foundation of Pickory Product Filter enforces strict runtime boundaries, cryptographic nonce validations, token bucket IP rate limiting, term meta persistence for visual color/image swatches, and enterprise guardrails against prototype pollution, CSS injection, and PHP memory exhaustion.
             </p>
