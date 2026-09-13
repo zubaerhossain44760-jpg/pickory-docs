@@ -46,25 +46,7 @@
   background-color: var(--card-bg);
   border: 1px solid var(--card-border);
   border-left: 3px solid var(--color-success);
-  box-shadow: none;
-}
-
-.ui-card[data-type="inspector"].is-pulsing {
-  animation: inspectorPulse 350ms ease;
-}
-
-@keyframes inspectorPulse {
-  0% {
-    box-shadow: 0 0 0 0 var(--color-success-glow);
-  }
-
-  50% {
-    box-shadow: 0 0 16px 2px var(--color-success-glow);
-  }
-
-  100% {
-    box-shadow: 0 0 0 0 transparent;
-  }
+  box-shadow: 0 0 10px 2px var(--color-success-glow);
 }
 
 .ui-card-header {

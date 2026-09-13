@@ -98,11 +98,6 @@
       if (microPath) microPath.textContent = nodeData.filePath;
       if (microRole) microRole.textContent = nodeData.role;
       if (microInvariant) microInvariant.textContent = nodeData.invariant;
-
-      // 3. Subtle microcard pulse feedback
-      microCard.classList.remove('is-pulsing');
-      void microCard.offsetWidth; // Force CSS reflow
-      microCard.classList.add('is-pulsing');
     }
 
     // Event delegation on the SVG flowchart container

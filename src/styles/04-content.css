@@ -5,7 +5,7 @@
   min-width: 0;
   background-color: var(--bg-canvas-dark);
   background-image:
-    radial-gradient(ellipse 110% 58% at 50% -5%, rgba(20, 105, 250, 0.58) 0%, rgba(12, 70, 215, 0.35) 26%, rgba(6, 38, 140, 0.14) 55%, transparent 86%),
+    radial-gradient(ellipse 110% 58% at 50% -5%, rgba(20, 105, 250, 0.58) 0%, rgba(12, 70, 215, 0.35) 26%, rgba(6, 38, 140, 0.14) 55%, transparent 80%),
     radial-gradient(ellipse 85% 42% at 50% 28%, var(--effect-brand-glow-small) 0%, transparent 70%);
   background-repeat: no-repeat;
   overflow-y: auto;
