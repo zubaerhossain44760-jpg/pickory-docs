@@ -20,14 +20,15 @@
   /* ----------------------------------------------------------------------------
      1.1 PRIMITIVE TOKENS (Raw Color Values - Platform Agnostic)
      ---------------------------------------------------------------------------- */
-  
+
   /* Primitive Blue Scale */
   --blue-50: #eef2ff;
   --blue-100: #e0e7ff;
   --blue-200: #c7d2fe;
   --blue-300: #a5b4fc;
   --blue-400: #818cf8;
-  --blue-500: #3867f5;  /* Current brand color base */
+  --blue-500: #3867f5;
+  /* Current brand color base */
   --blue-600: #2563eb;
   --blue-700: #1d4ed8;
   --blue-800: #1e40af;
@@ -82,7 +83,7 @@
   /* ----------------------------------------------------------------------------
      1.2 SEMANTIC TOKENS (Intent-Based Aliases - Point to Primitives)
      ---------------------------------------------------------------------------- */
-  
+
   /* Brand Colors */
   --color-brand: var(--blue-500);
   --color-brand-hover: var(--blue-600);
@@ -104,24 +105,33 @@
   --color-info-alpha: rgba(6, 182, 212, 0.12);
 
   /* Surface & Background Semantics */
-  --color-canvas: #19191c;  /* Custom dark canvas, mapped from gray-900 with slight tint */
-  --color-surface: #252528; /* Custom dark surface, mapped from gray-800 with slight tint */
-  --color-surface-hover: #2c2c30; /* Custom hover state */
-  --color-surface-subtle: #18181b; /* Custom subtle surface */
+  --color-canvas: #19191c;
+  /* Custom dark canvas, mapped from gray-900 with slight tint */
+  --color-surface: #252528;
+  /* Custom dark surface, mapped from gray-800 with slight tint */
+  --color-surface-hover: #2c2c30;
+  /* Custom hover state */
+  --color-surface-subtle: #18181b;
+  /* Custom subtle surface */
 
   /* Structural Border Semantics */
-  --color-border: #303033; /* Custom border, mapped from gray-700 with slight tint */
-  --color-border-subtle: #27272a; /* Custom subtle border */
-  --color-border-hover: #424248; /* Custom hover border */
+  --color-border: #303033;
+  /* Custom border, mapped from gray-700 with slight tint */
+  --color-border-subtle: #27272a;
+  /* Custom subtle border */
+  --color-border-hover: #424248;
+  /* Custom hover border */
 
   /* Typography Semantics */
-  --color-text: #f4f4f4; /* Custom text color */
-  --color-text-muted: #b5b5b5; /* Custom muted text */
+  --color-text: #f4f4f4;
+  /* Custom text color */
+  --color-text-muted: #b5b5b5;
+  /* Custom muted text */
 
   /* ----------------------------------------------------------------------------
      1.3 COMPONENT TOKENS (Component-Specific - Point to Semantic Tokens)
      ---------------------------------------------------------------------------- */
-  
+
   /* Button Component Tokens */
   --button-primary-bg: var(--color-brand);
   --button-primary-bg-hover: var(--color-brand-hover);
@@ -493,6 +503,7 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   padding-bottom: var(--space-8);
   position: relative;
+  scroll-margin-top: var(--space-8);
 }
 
 

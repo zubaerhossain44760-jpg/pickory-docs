@@ -24,6 +24,12 @@
       <nav class="doc-nav-tree" aria-label="Documentation Navigation">
         <ul class="doc-nav-list">
           <li class="doc-nav-item is-active">
+            <a href="#system-overview" class="doc-nav-link">
+              <span>Overview</span>
+              <span class="ui-badge" data-variant="success">START</span>
+            </a>
+          </li>
+          <li class="doc-nav-item">
             <a href="#core-architecture" class="doc-nav-link">
               <span>1. Core Architecture &amp; System Foundation</span>
               <span class="ui-badge" data-variant="brand">CORE</span>
@@ -71,51 +77,69 @@
 
 
         <!-- ==================================================================
+             SYSTEM OVERVIEW & GLOBAL DOCUMENTATION HEADER
+             (Placed top-level, outside of any topic)
+             ================================================================== -->
+        <header class="doc-header-block doc-overview-header" id="system-overview">
+          <h1 class="doc-main-title">Pickory Product Filter — Developer Documentation</h1>
+          <p class="doc-lead-paragraph">
+            Pickory Product Filter provides an enterprise-grade, zero-dependency client/server architecture for high-performance WooCommerce faceted filtering. Engineered to eliminate client-state drift and bypass relational <code>wp_postmeta</code> joins, the engine guarantees deterministic sub-50ms query resolution under high concurrent traffic.
+          </p>
+          <div class="doc-meta-pills">
+            <span class="ui-badge" data-variant="success"><span class="doc-pill-dot"></span>Production Ready</span>
+            <span class="ui-badge">HPOS Compatible</span>
+            <span class="ui-badge">Priority 20 Engine</span>
+            <span class="ui-badge">URL SSOT Invariant</span>
+            <span class="ui-badge">Zero Runtime Dep</span>
+          </div>
+        </header>
+
+        <!-- Feature Highlight Grid (UI Cards) -->
+        <div class="ui-card-grid doc-overview-grid">
+          <div class="ui-card" data-type="feature" id="overview-flat-index">
+            <span class="ui-badge" data-variant="brand">STORAGE</span>
+            <h3 class="ui-card-title">Flat Product Index</h3>
+            <p class="ui-card-desc">
+              Bypasses standard <code>wp_postmeta</code> joins by compiling multi-attribute metadata into a dedicated denormalized index table.
+            </p>
+          </div>
+
+          <div class="ui-card" data-type="feature" id="overview-rest-engine">
+            <span class="ui-badge" data-variant="brand">API</span>
+            <h3 class="ui-card-title">REST Query Engine</h3>
+            <p class="ui-card-desc">
+              Abortable HTTP requests via <code>AbortController</code> with debounced slider inputs and deep URL state synchronization.
+            </p>
+          </div>
+
+          <div class="ui-card" data-type="feature" id="overview-cache-tier">
+            <span class="ui-badge" data-variant="brand">CACHE</span>
+            <h3 class="ui-card-title">Object Cache Tier</h3>
+            <p class="ui-card-desc">
+              Seamless Redis/Memcached integration with automatic invalidation upon product save, trash, or inventory update events.
+            </p>
+          </div>
+        </div>
+
+        <!-- ==================================================================
              TOPIC 1: CORE ARCHITECTURE & SYSTEM FOUNDATION
              ================================================================== -->
         <section class="doc-section" id="core-architecture">
 
-          <!-- Document Header Block -->
+          <!-- Section Header Block -->
           <header class="doc-header-block">
-            <h1 class="doc-main-title">1. Core Architecture &amp; System Foundation</h1>
+            <h2 class="doc-main-title">1. Core Architecture &amp; System Foundation</h2>
             <p class="doc-lead-paragraph">
-              Pickory Product Filter provides an enterprise-grade, zero-dependency client/server architecture for high-performance WooCommerce faceted filtering. Engineered to eliminate client-state drift and bypass relational <code>wp_postmeta</code> joins, the engine guarantees deterministic sub-50ms query resolution under high concurrent traffic.
+              The core architecture governs the plugin lifecycle, PSR-compliant directory layout, execution boundaries, and namespacing standards across WordPress and WooCommerce environments.
             </p>
             <div class="doc-meta-pills">
-              <span class="ui-badge" data-variant="success"><span class="doc-pill-dot"></span>Production Ready</span>
-              <span class="ui-badge">HPOS Compatible</span>
-              <span class="ui-badge">Priority 20 Engine</span>
-              <span class="ui-badge">URL SSOT Invariant</span>
-              <span class="ui-badge">Zero Runtime Dep</span>
+              <span class="ui-badge" data-variant="brand">CORE ARCHITECTURE</span>
+              <span class="ui-badge">PSR-4 Layout</span>
+              <span class="ui-badge">Singleton Lifecycles</span>
+              <span class="ui-badge">ppfx_ Namespace</span>
+              <span class="ui-badge">Priority 20 Hooks</span>
             </div>
           </header>
-
-          <!-- Feature Highlight Grid (UI Cards) -->
-          <div class="ui-card-grid">
-            <div class="ui-card" data-type="feature" id="overview-flat-index">
-              <span class="ui-badge" data-variant="brand">STORAGE</span>
-              <h3 class="ui-card-title">Flat Product Index</h3>
-              <p class="ui-card-desc">
-                Bypasses standard <code>wp_postmeta</code> joins by compiling multi-attribute metadata into a dedicated denormalized index table.
-              </p>
-            </div>
-
-            <div class="ui-card" data-type="feature" id="overview-rest-engine">
-              <span class="ui-badge" data-variant="brand">API</span>
-              <h3 class="ui-card-title">REST Query Engine</h3>
-              <p class="ui-card-desc">
-                Abortable HTTP requests via <code>AbortController</code> with debounced slider inputs and deep URL state synchronization.
-              </p>
-            </div>
-
-            <div class="ui-card" data-type="feature" id="overview-cache-tier">
-              <span class="ui-badge" data-variant="brand">CACHE</span>
-              <h3 class="ui-card-title">Object Cache Tier</h3>
-              <p class="ui-card-desc">
-                Seamless Redis/Memcached integration with automatic invalidation upon product save, trash, or inventory update events.
-              </p>
-            </div>
-          </div>
 
           <!-- ================================================================
                1.1 Plugin Anatomy & Directory Contract
@@ -3265,26 +3289,17 @@ export const cssEscape = (value) => {
          ====================================================================== -->
     <aside class="doc-sidebar-right" aria-label="Contextual Topics and Navigation">
 
-      <div class="doc-toc-section-title" id="dynamic-toc-section">Core Architecture &amp; System Foundation</div>
+      <div class="doc-toc-section-title" id="dynamic-toc-section">System Overview &amp; Highlights</div>
 
       <ul class="doc-toc-list" id="dynamic-toc-list">
-        <li class="doc-toc-item is-active" data-target-id="subtopic-1-1">
-          <a href="#subtopic-1-1" class="doc-toc-link">1.1 Plugin Anatomy &amp; Directory Contract</a>
+        <li class="doc-toc-item is-active" data-target-id="overview-flat-index">
+          <a href="#overview-flat-index" class="doc-toc-link">Flat Product Index</a>
         </li>
-        <li class="doc-toc-item" data-target-id="subtopic-1-2">
-          <a href="#subtopic-1-2" class="doc-toc-link">1.2 Dual-Path Execution Model</a>
+        <li class="doc-toc-item" data-target-id="overview-rest-engine">
+          <a href="#overview-rest-engine" class="doc-toc-link">REST Query Engine</a>
         </li>
-        <li class="doc-toc-item" data-target-id="subtopic-1-3">
-          <a href="#subtopic-1-3" class="doc-toc-link">1.3 ppfx_ Namespace Convention</a>
-        </li>
-        <li class="doc-toc-item" data-target-id="subtopic-1-4">
-          <a href="#subtopic-1-4" class="doc-toc-link">1.4 WooCommerce Integration Surface</a>
-        </li>
-        <li class="doc-toc-item" data-target-id="subtopic-1-5">
-          <a href="#subtopic-1-5" class="doc-toc-link">1.5 Data Flow: Browser &rarr; REST &rarr; DOM</a>
-        </li>
-        <li class="doc-toc-item" data-target-id="subtopic-1-6">
-          <a href="#subtopic-1-6" class="doc-toc-link">1.6 Class Responsibility Map</a>
+        <li class="doc-toc-item" data-target-id="overview-cache-tier">
+          <a href="#overview-cache-tier" class="doc-toc-link">Object Cache Tier</a>
         </li>
       </ul>
 
