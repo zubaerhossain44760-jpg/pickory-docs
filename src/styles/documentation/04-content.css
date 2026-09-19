@@ -1,320 +1,334 @@
 /* ============================================================================
    6. COLUMN 2: CENTER CANVAS & SEMANTIC BASE LAYER
+   Architecture: Semantic Element Hierarchy inside <main class="doc-content-wrapper">
+   Integration: Strictly consumes DTCG Tokens (01-tokens.css)
    ============================================================================ */
+/* Column 2: Center Documentation Canvas with Restored Vivid Ambient Glow */
 .doc-center-canvas {
   min-width: 0;
-  background-color: var(--bg-canvas-dark);
+  background-color: var(--surface-canvas, #09090b);
   background-image:
-    radial-gradient(ellipse 110% 58% at 50% -5%, rgba(20, 105, 250, 0.58) 0%, rgba(12, 70, 215, 0.35) 26%, rgba(6, 38, 140, 0.14) 55%, transparent 80%),
-    radial-gradient(ellipse 85% 42% at 50% 28%, var(--effect-brand-glow-small) 0%, transparent 70%);
+    radial-gradient(ellipse 110% 58% at 50% -5%,
+      rgba(20, 105, 250, 0.60) 0%,
+      rgba(12, 70, 215, 0.38) 26%,
+      rgba(6, 38, 140, 0.16) 55%,
+      transparent 80%),
+    radial-gradient(ellipse 85% 45% at 50% 28%,
+      color-mix(in srgb, var(--color-brand, #3b82f6) 18%, transparent) 0%,
+      transparent 70%);
   background-repeat: no-repeat;
-  overflow-y: auto;
-  scrollbar-width: auto;
-  scrollbar-color: var(--color-border-hover) var(--color-surface-subtle);
+  position: relative;
 }
 
-/* Webkit scrollbar for center canvas */
-.doc-center-canvas::-webkit-scrollbar {
-  width: 10px;
-}
-
-.doc-center-canvas::-webkit-scrollbar-track {
-  background: var(--color-surface-subtle);
-  border-radius: var(--radius-sm);
-}
-
-.doc-center-canvas::-webkit-scrollbar-thumb {
-  background: var(--color-border-hover);
-  border-radius: var(--radius-sm);
-  border: 2px solid var(--color-surface-subtle);
-}
-
-.doc-center-canvas::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
-}
-
-/* Reading Progress Indicator */
+/* Reading Progress Indicator (Fixed to Viewport, Zero Layout Shifts) */
 .doc-center-canvas::before {
-  content: '';
+  content: "";
   position: fixed;
-  top: 0;
-  left: 0;
+  inset-block-start: 0;
+  inset-inline-start: 0;
   width: 100%;
   height: 3px;
-  background: linear-gradient(90deg, var(--color-brand), var(--color-success));
-  transform-origin: left;
-  transform: scaleX(0);
+  background: linear-gradient(90deg,
+      var(--color-brand, #3b82f6) 0%,
+      var(--color-success, #10b981) 100%);
+  transform-origin: left center;
+  transform: scaleX(var(--reading-progress, 0));
   z-index: 1000;
   pointer-events: none;
-  transition: transform 0.1s ease-out;
+  transition: transform var(--transition-fast, 120ms ease-out);
 }
 
-.doc-center-canvas.reading-progress::before {
-  transform: scaleX(var(--reading-progress, 0));
-}
-
+/* Main Content Boundaries (Optimal Measure for Reading Ergonomics: 75ch max) */
 .doc-content-wrapper {
-  max-width: var(--content-w);
-  margin-left: auto;
-  margin-right: auto;
-  padding: var(--space-10) var(--space-8) var(--space-16);
+  width: 100%;
+  max-width: var(--content-w, 1040px);
+  margin-inline: auto;
+  padding: var(--space-8, 2rem) var(--space-6, 1.5rem) var(--space-16, 4rem);
 }
 
-/* Module Divider & Sub-Section Transitions */
-.doc-module-divider {
-  margin: var(--space-8) 0 var(--space-6);
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--color-border-subtle);
+@media (min-width: 768px) {
+  .doc-content-wrapper {
+    padding: var(--space-10, 2.5rem) var(--space-8, 2rem) var(--space-20, 5rem);
+  }
 }
 
-.doc-module-divider-title {
-  font-size: var(--font-xl);
-  font-weight: 700;
-  color: var(--color-text);
-  margin: var(--space-2) 0 var(--space-3);
-}
-
-.doc-module-divider-desc {
-  margin-bottom: var(--space-4);
-}
-
-.ui-callout-code {
-  margin-top: var(--space-2);
-}
-
-/* Header Area */
+/* ----------------------------------------------------------------------------
+   6.1 DOCUMENTATION HEADER ZONE
+   ---------------------------------------------------------------------------- */
 .doc-header-block {
-  margin-bottom: var(--space-8);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding-bottom: var(--space-8);
-  position: relative;
-  scroll-margin-top: var(--space-8);
+  margin-block-end: var(--space-10, 2.5rem);
+  border-block-end: 1px solid var(--border-subtle);
+  padding-block-end: var(--space-8, 2rem);
+  scroll-margin-top: var(--space-8, 2rem);
 }
 
+.doc-header-badges {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+  margin-block-end: var(--space-3, 0.75rem);
+  flex-wrap: wrap;
+}
 
-.doc-main-title,
-.doc-content-wrapper .doc-main-title,
-.doc-content-wrapper h1.doc-main-title,
-.doc-content-wrapper h2.doc-main-title {
-  font-size: var(--font-3xl);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.18;
-  color: var(--text-white);
-  text-shadow: 0 0 25px rgba(24, 115, 255, 0.4), 0 2px 4px rgba(0, 0, 0, 0.6);
-  margin-bottom: var(--space-3);
+.doc-main-title {
+  font-size: clamp(2rem, 3vw + 1rem, var(--font-4xl, 2.5rem));
+  font-weight: var(--weight-extrabold, 800);
+  letter-spacing: -0.035em;
+  line-height: var(--leading-tight, 1.15);
+  color: var(--text-primary, #fafafa);
+  margin-block-end: var(--space-3, 0.75rem);
   display: block;
 }
 
 .doc-lead-paragraph {
-  font-size: 1.05rem;
-  line-height: 1.7;
-  color: var(--text-lead);
-  max-width: 820px;
-  margin-bottom: var(--space-4);
+  font-size: var(--font-lg, 1.125rem);
+  line-height: var(--leading-relaxed, 1.625);
+  color: var(--text-secondary, #d4d4d8);
+  max-width: 72ch;
+  margin-block-end: var(--space-5, 1.25rem);
 }
 
 .doc-meta-pills {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-2, 0.5rem);
 }
 
 .doc-pill-dot {
   width: 6px;
   height: 6px;
   border-radius: var(--radius-full);
-  background-color: var(--color-success);
+  background-color: var(--color-success, #10b981);
+  display: inline-block;
+  flex-shrink: 0;
 }
 
-/* Sections & Pure Semantic Content Base Layer */
+/* ----------------------------------------------------------------------------
+   6.2 MODULE DIVIDERS & SECTION TRANSITIONS
+   ---------------------------------------------------------------------------- */
+.doc-module-divider {
+  margin-block: var(--space-10, 2.5rem) var(--space-6, 1.5rem);
+  padding-block-start: var(--space-6, 1.5rem);
+  border-block-start: 1px solid var(--border-subtle);
+}
+
+.doc-module-divider-title {
+  font-size: var(--font-xl, 1.25rem);
+  font-weight: var(--weight-bold, 700);
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin: var(--space-2, 0.5rem) 0 var(--space-3, 0.75rem);
+}
+
+.doc-module-divider-desc {
+  margin-block-end: var(--space-4, 1rem);
+  color: var(--text-muted);
+  font-size: var(--font-sm, 0.8125rem);
+}
+
 .doc-section {
-  margin-bottom: var(--space-12);
-  scroll-margin-top: var(--space-8);
+  margin-block-end: var(--space-12, 3rem);
+  scroll-margin-top: calc(var(--header-h, 64px) + var(--space-4, 1rem));
 }
 
-/* Content Headings */
+/* ----------------------------------------------------------------------------
+   6.3 PURE SEMANTIC CONTENT BASE LAYER (Inside <main>)
+   ---------------------------------------------------------------------------- */
+
+/* Fluid, Distinct Typographic Scale */
 .doc-content-wrapper h2:not(.doc-main-title) {
-  font-size: var(--font-xl);
-  font-weight: 700;
-  letter-spacing: -0.015em;
-  color: var(--color-text);
-  margin-bottom: var(--space-3);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  font-size: var(--font-2xl, 1.5rem);
+  font-weight: var(--weight-bold, 700);
+  letter-spacing: -0.02em;
+  line-height: var(--leading-snug, 1.375);
+  color: var(--text-primary);
+  margin-block: var(--space-8, 2rem) var(--space-3, 0.75rem);
+  scroll-margin-top: calc(var(--header-h, 64px) + var(--space-4, 1rem));
+  position: relative;
 }
 
 .doc-content-wrapper h3 {
-  font-size: var(--font-lg);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--color-text);
-  margin: var(--space-6) 0 var(--space-2);
+  font-size: var(--font-lg, 1.125rem);
+  font-weight: var(--weight-semibold, 600);
+  letter-spacing: -0.015em;
+  line-height: var(--leading-snug, 1.375);
+  color: var(--text-primary);
+  margin-block: var(--space-2, 0.5rem);
+  scroll-margin-top: calc(var(--header-h, 64px) + var(--space-4, 1rem));
 }
 
 .doc-content-wrapper h4 {
-  font-size: var(--font-base);
-  font-weight: 600;
-  color: var(--color-text);
-  margin: var(--space-4) 0 var(--space-2);
+  font-size: var(--font-base, 0.875rem);
+  font-weight: var(--weight-semibold, 600);
+  color: var(--text-secondary);
+  margin-block: var(--space-4, 1rem) var(--space-2, 0.5rem);
 }
 
-/* Content Paragraphs */
+/* Paragraphs & Text Run Ergonomics */
 .doc-content-wrapper p {
-  font-size: var(--font-base);
-  line-height: 1.7;
-  color: var(--color-text-muted);
-  margin-bottom: var(--space-4);
+  font-size: var(--font-base, 0.875rem);
+  line-height: var(--leading-relaxed, 1.625);
+  color: var(--text-secondary, #d4d4d8);
+  margin-block-end: var(--space-4, 1rem);
+  max-width: 75ch;
 }
 
 .doc-content-wrapper p strong {
-  color: var(--color-text);
-  font-weight: 600;
+  color: var(--text-primary, #fafafa);
+  font-weight: var(--weight-semibold, 600);
 }
 
-/* Content Links */
-.doc-content-wrapper a {
+/* Inline Links (Accessible & WCAG 1.4.1 Compliant) */
+.doc-content-wrapper a:not(.btn):not(.ui-badge) {
+  color: var(--color-brand, #3b82f6);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--color-brand) 30%, transparent);
+  transition:
+    color var(--transition-fast),
+    text-decoration-color var(--transition-fast);
+}
+
+.doc-content-wrapper a:not(.btn):not(.ui-badge):hover {
+  color: var(--color-brand-hover, #60a5fa);
+  text-decoration-color: var(--color-brand-hover, #60a5fa);
+}
+
+/* Section Anchor Link (Keyboard Accessible & Baseline Aligned) */
+.section-anchor {
+  display: inline-flex;
+  align-items: center;
+  margin-inline-start: var(--space-2, 0.5rem);
+  color: var(--text-muted);
+  text-decoration: none !important;
+  opacity: 0;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
+  font-weight: var(--weight-regular, 400);
+  vertical-align: baseline;
+}
+
+.doc-content-wrapper h2:hover .section-anchor,
+.doc-content-wrapper h3:hover .section-anchor {
+  opacity: 1;
+}
+
+.section-anchor:hover {
   color: var(--color-brand);
-  text-decoration: none;
-  transition: color var(--transition);
 }
 
-.doc-content-wrapper a:hover {
-  color: var(--color-text);
+.section-anchor:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
 }
 
-/* Content Inline Code */
-.doc-content-wrapper code {
+/* ----------------------------------------------------------------------------
+   6.4 INLINE CODE & RAW PREFORMATTED CODE
+   ---------------------------------------------------------------------------- */
+.doc-content-wrapper code:not(pre code) {
   font-family: var(--font-mono);
-  font-size: 0.85em;
-  color: var(--text-code);
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  padding: 1px 5px;
-  border-radius: var(--radius-sm);
+  font-size: 0.875em;
+  color: #b183ffc0;
+  background-color: var(--surface-card, #18181b);
+  border: 1px solid var(--border-subtle);
+  padding: 0.125rem var(--space-1-5, 0.375rem);
+  border-radius: var(--radius-xs, 3px);
   word-break: break-word;
 }
 
-/* Content Preformatted Code Blocks */
+/* Raw Preformatted Code Fallback (When not using .ui-code-window) */
 .doc-content-wrapper pre {
-  background-color: var(--color-surface-subtle);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
-  margin: var(--space-4) 0 var(--space-6);
+  background-color: var(--code-window-bg, #09090b);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md, 8px);
+  padding: var(--space-4, 1rem);
+  margin-block: var(--space-4, 1rem) var(--space-6, 1.5rem);
   overflow-x: auto;
+  overscroll-behavior-x: contain;
   font-family: var(--font-mono);
-  font-size: var(--font-xs);
-  line-height: 1.55;
-  color: var(--text-code-window);
-  scrollbar-width: auto;
-  scrollbar-color: var(--color-border-hover) var(--color-surface-subtle);
-}
-
-/* Webkit scrollbar for code blocks */
-.doc-content-wrapper pre::-webkit-scrollbar {
-  height: 10px;
-}
-
-.doc-content-wrapper pre::-webkit-scrollbar-track {
-  background: var(--color-surface-subtle);
-  border-radius: var(--radius-sm);
-}
-
-.doc-content-wrapper pre::-webkit-scrollbar-thumb {
-  background: var(--color-border-hover);
-  border-radius: var(--radius-sm);
-  border: 2px solid var(--color-surface-subtle);
-}
-
-.doc-content-wrapper pre::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
+  font-size: var(--font-xs, 0.75rem);
+  line-height: var(--leading-relaxed, 1.625);
+  color: var(--code-text, #e4e4e7);
+  box-shadow: var(--shadow-sm);
 }
 
 .doc-content-wrapper pre code {
-  background-color: transparent;
+  background: transparent;
   border: none;
   padding: 0;
   color: inherit;
   font-size: inherit;
 }
 
-/* Content Lists */
+/* ----------------------------------------------------------------------------
+   6.5 LISTS & DATA TABLES
+   ---------------------------------------------------------------------------- */
 .doc-content-wrapper ul,
 .doc-content-wrapper ol {
-  padding-left: var(--space-6);
-  margin-bottom: var(--space-4);
-  color: var(--color-text-muted);
+  padding-inline-start: var(--space-6, 1.5rem);
+  margin-block-end: var(--space-4, 1rem);
+  color: var(--text-secondary);
 }
 
 .doc-content-wrapper li {
-  font-size: var(--font-base);
-  line-height: 1.7;
-  margin-bottom: var(--space-1);
+  font-size: var(--font-base, 0.875rem);
+  line-height: var(--leading-relaxed, 1.625);
+  margin-block-end: var(--space-1-5, 0.375rem);
 }
 
 .doc-content-wrapper li::marker {
   color: var(--color-brand);
 }
 
-/* Content Tables */
+/* Tables */
 .doc-table-container {
   width: 100%;
-  margin: var(--space-4) 0 var(--space-6);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  margin-block: var(--space-5, 1.25rem) var(--space-8, 2rem);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md, 8px);
   overflow-x: auto;
-  background-color: var(--color-surface);
+  overscroll-behavior-x: contain;
+  background-color: var(--surface-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.doc-table-container:focus-visible {
+  outline: 2px solid var(--border-focus);
 }
 
 .doc-content-wrapper table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: var(--font-xs);
+  font-size: var(--font-xs, 0.75rem);
+  min-width: 580px;
 }
 
 .doc-content-wrapper th {
-  background-color: var(--color-surface-subtle);
-  color: var(--color-text-muted);
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  background-color: var(--surface-canvas);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-weight: var(--weight-semibold, 600);
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  font-size: var(--font-xs);
-  padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-2xs, 0.6875rem);
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  border-block-end: 1px solid var(--border-default);
 }
 
 .doc-content-wrapper td {
-  padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--color-border-subtle);
-  color: var(--color-text-muted);
-  vertical-align: top;
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  border-block-end: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  vertical-align: middle;
 }
 
-.doc-content-wrapper tbody tr:nth-child(even) td {
-  background-color: var(--color-surface-subtle);
-}
-
-.doc-content-wrapper tbody tr:nth-child(odd) td {
-  background-color: var(--color-surface);
+.doc-content-wrapper tbody tr:last-child td {
+  border-block-end: none;
 }
 
 .doc-content-wrapper tbody tr:hover td {
-  background-color: var(--color-surface-hover);
-}
-
-/* Section Anchor Link */
-.section-anchor {
-  color: var(--color-text-muted);
-  text-decoration: none;
-  opacity: 0;
-  transition: opacity var(--transition);
-  font-weight: 400;
-}
-
-.doc-section:hover .section-anchor {
-  opacity: 0.6;
+  background-color: var(--surface-hover);
 }

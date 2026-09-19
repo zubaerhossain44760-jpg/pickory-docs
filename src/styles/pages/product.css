@@ -1,0 +1,503 @@
+/* ============================================================================
+   COMMERCIAL SAAS SHOWCASE STYLES: FILTER & THEME SHARED ENGINE
+   Files: product-filter.html / theme-showcase.html
+   Architecture: Resilient Dual-Mapped BEM, Mobile-First, WCAG 2.2 AA Compliant
+   ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   0. ISOLATION, RESET & CRITICAL ACCESSIBILITY UTILITIES
+   ---------------------------------------------------------------------------- */
+.pf-page-container,
+.pf-page-container * {
+  box-sizing: border-box;
+}
+
+/* ----------------------------------------------------------------------------
+   1. MAIN WRAPPER & HERO SECTION (Mobile-First)
+   ---------------------------------------------------------------------------- */
+.pf-page-container {
+  width: 100%;
+  max-width: var(--container-xl, 1300px);
+  margin-inline: auto;
+  padding: 0 var(--space-4, 1rem) var(--space-12, 3rem);
+  color: var(--color-text, #cbd5e1);
+  font-family: var(--font-sans, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+}
+
+@media (min-width: 768px) {
+  .pf-page-container {
+    padding-inline: var(--space-6, 1.5rem);
+    padding-bottom: var(--space-16, 4rem);
+  }
+}
+
+.pf-hero-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-10, 2.5rem) var(--space-2, 0.5rem) var(--space-6, 1.5rem);
+}
+
+@media (min-width: 768px) {
+  .pf-hero-center {
+    padding: var(--space-16, 4rem) var(--space-4, 1rem) var(--space-10, 2.5rem);
+  }
+}
+
+.pf-hero-headline {
+  font-size: clamp(2rem, 4vw + 0.5rem, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--text-white, #ffffff);
+  margin: 0;
+}
+
+.pf-hero-subheadline {
+  font-size: clamp(1.1rem, 1.5vw + 0.5rem, 1.45rem);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--color-text-subtle, var(--gray-200, #e2e8f0));
+  max-width: 65ch;
+  margin: var(--space-4, 1rem) 0 var(--space-8, 2rem);
+}
+
+.pf-hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4, 1rem);
+  flex-wrap: wrap;
+}
+
+.pf-hero-microcopy {
+  font-size: var(--font-xs, 0.75rem);
+  color: var(--color-text-muted, var(--gray-400, #94a3b8));
+  margin-top: var(--space-4, 1rem);
+  text-align: center;
+}
+
+
+
+/* ----------------------------------------------------------------------------
+   3. SHOWCASE FRAME & OS WINDOW MOCKUP ENGINE (Universal Dual-Mapped)
+   ---------------------------------------------------------------------------- */
+.pf-showcase-wrapper {
+  background: var(--gradient-showcase, linear-gradient(281deg, #ff008b 0%, #0081fd 100%));
+  border-radius: var(--radius-2xl, 24px);
+  padding: var(--space-5, 1.25rem) var(--space-3, 0.75rem) 0;
+  margin-block: var(--space-6, 1.5rem) var(--space-16, 4rem);
+  container-type: inline-size;
+  container-name: showcase;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .pf-showcase-wrapper {
+    padding: var(--space-8, 2rem) var(--space-8, 2rem) 0;
+  }
+}
+
+.pf-showcase-title {
+  font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  margin: 0 0 var(--space-6, 1.5rem);
+  letter-spacing: -0.02em;
+}
+
+/* Unified Mockup Window Container */
+.pf-mockup-window,
+.pf-app-window,
+.pf-window {
+  background-color: var(--bg-canvas-dark, #0b1329);
+  border: 1px solid var(--border-subtle-alpha, rgba(255, 255, 255, 0.12));
+  border-bottom: none;
+  border-radius: var(--radius-lg, 12px) var(--radius-lg, 12px) 0 0;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+}
+
+/* Window Header Bar */
+.pf-mockup-window__header,
+.pf-app-titlebar,
+.pf-window-header {
+  background-color: var(--bg-card-dark, #0f172a);
+  border-bottom: 1px solid var(--border-subtle-alpha, rgba(255, 255, 255, 0.08));
+  padding: 0.65rem var(--space-4, 1rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2, 0.5rem);
+}
+
+/* Dot Controls */
+.pf-mockup-window__controls,
+.pf-app-controls,
+.pf-window-controls {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.pf-mockup-window__dot,
+.pf-app-dot,
+.pf-window-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.pf-mockup-window__dot--danger,
+.pf-app-dot-red,
+.pf-dot-close {
+  background-color: #ff5f56;
+}
+
+.pf-mockup-window__dot--warning,
+.pf-app-dot-yellow,
+.pf-dot-minimize {
+  background-color: #ffbd2e;
+}
+
+.pf-mockup-window__dot--success,
+.pf-app-dot-green,
+.pf-dot-expand {
+  background-color: #27c93f;
+}
+
+/* Mockup Titles & Badges */
+.pf-mockup-window__title,
+.pf-app-project-tag,
+.pf-window-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--font-2xs, 11px);
+  color: var(--gray-400, #94a3b8);
+}
+
+.pf-mockup-window__badge,
+.pf-app-badge-pill,
+.pf-window-badge {
+  background-color: var(--badge-bg-brand, rgba(59, 130, 246, 0.2));
+  color: var(--badge-fg-brand, #93c5fd);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm, 4px);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* Image Screenshot Containment (Fixes 1787px blowout) */
+.pf-app-preview-wrap {
+  position: relative;
+  width: 100%;
+  background-color: var(--bg-canvas-dark, #0b1329);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pf-app-preview-wrap picture {
+  display: contents;
+}
+
+.pf-app-preview-img {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+/* ----------------------------------------------------------------------------
+   4. INTERACTIVE WALKTHROUGH SECTION
+   ---------------------------------------------------------------------------- */
+.pf-feature-walkthrough {
+  margin: var(--space-8, 2rem) 0 var(--space-16, 4rem);
+}
+
+.pf-walkthrough-panel {
+  background-color: var(--color-canvas, #0b1329);
+  border: 1px solid var(--border-subtle-alpha, rgba(255, 255, 255, 0.08));
+  border-radius: var(--radius-2xl, 24px);
+  padding: var(--space-4, 1rem);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6, 1.5rem);
+  align-items: center;
+}
+
+@media (min-width: 992px) {
+  .pf-walkthrough-panel {
+    grid-template-columns: 380px 1fr;
+    padding: var(--space-8, 2rem);
+    gap: var(--space-8, 2rem);
+  }
+}
+
+.pf-walkthrough-nav {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.pf-walkthrough-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 0.5rem);
+}
+
+/* Walkthrough Interactive Tab Buttons */
+.pf-walkthrough-item {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  padding: 0.75rem var(--space-4, 1rem);
+  border-radius: var(--radius-lg, 12px);
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  font-family: inherit;
+}
+
+.pf-walkthrough-item:hover:not(.is-active) {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.pf-walkthrough-item:focus-visible {
+  outline: 2px solid var(--color-focus-ring, #38bdf8);
+  outline-offset: 2px;
+}
+
+.pf-walkthrough-item.is-active {
+  background-color: var(--brand-surface-active, #1e293b);
+  border-color: var(--brand-border-active, rgba(59, 130, 246, 0.4));
+  padding: var(--space-4, 1rem);
+}
+
+.pf-walkthrough-title {
+  display: block;
+  font-size: var(--font-base, 1rem);
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.4;
+}
+
+.pf-walkthrough-item.is-active .pf-walkthrough-title {
+  color: #38bdf8;
+}
+
+.pf-walkthrough-desc {
+  display: none;
+  font-size: var(--font-xs, 0.8125rem);
+  line-height: 1.55;
+  color: var(--gray-300, #cbd5e1);
+  margin: 0;
+}
+
+.pf-walkthrough-item.is-active .pf-walkthrough-desc {
+  display: block;
+}
+
+.pf-walkthrough-action {
+  margin-top: var(--space-6, 1.5rem);
+  padding-left: var(--space-2, 0.5rem);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 0.75rem);
+  flex-wrap: wrap;
+}
+
+/* Stage Canvas & Responsive Video Containment */
+.pf-stage-canvas {
+  background: linear-gradient(135deg, #ff5662 0%, #935be3 50%, #f349ad 100%);
+  border-radius: var(--radius-xl, 20px);
+  padding: var(--space-3, 0.75rem);
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .pf-stage-canvas {
+    padding: var(--space-6, 1.5rem);
+  }
+}
+
+.pf-mockup-window__screen,
+.pf-window-screen {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: var(--bg-canvas-dark, #020617);
+}
+
+.pf-window-player {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* ----------------------------------------------------------------------------
+   5. COMPARISON TABLE (Filter Product Page Component)
+   ---------------------------------------------------------------------------- */
+.pf-comparison-section {
+  margin: var(--space-12, 3rem) 0 var(--space-16, 4rem);
+}
+
+.pf-comparison-header {
+  text-align: center;
+  margin-bottom: var(--space-8, 2rem);
+}
+
+.pf-comparison-title {
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin-bottom: var(--space-2, 0.5rem);
+}
+
+.pf-comparison-desc {
+  font-size: var(--font-base, 1rem);
+  color: var(--gray-300, #cbd5e1);
+  max-width: 65ch;
+  margin-inline: auto;
+  line-height: 1.5;
+}
+
+.pf-comparison-table-wrapper {
+  background-color: var(--color-canvas, #0b1329);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-xl, 20px);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pf-comparison-table-wrapper:focus-visible {
+  outline: 2px solid #38bdf8;
+}
+
+.pf-comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  min-width: 640px;
+}
+
+.pf-col-feature {
+  width: 50%;
+  padding: var(--space-5, 1.25rem) var(--space-6, 1.5rem);
+}
+
+.pf-col-plan {
+  width: 25%;
+  padding: var(--space-5, 1.25rem);
+  vertical-align: top;
+  text-align: center;
+}
+
+.pf-col-plan--free,
+.pf-col-free {
+  background-color: rgba(34, 211, 238, 0.04);
+  border-inline: 1px solid rgba(34, 211, 238, 0.18);
+}
+
+.pf-col-plan--pro,
+.pf-col-pro {
+  background-color: rgba(251, 191, 36, 0.04);
+  border-inline: 1px solid rgba(251, 191, 36, 0.22);
+}
+
+.pf-plan-card-header {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.pf-plan-name {
+  font-size: var(--font-lg, 1.125rem);
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.pf-plan-price {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.pf-plan-price__period,
+.pf-plan-price span {
+  font-size: var(--font-xs, 0.75rem);
+  font-weight: 400;
+  color: var(--gray-400, #94a3b8);
+}
+
+.pf-feature-row {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pf-feature-title {
+  padding: var(--space-4, 1rem) var(--space-6, 1.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-weight: normal;
+  text-align: left;
+}
+
+.pf-feature-title__name {
+  display: block;
+  font-size: var(--font-lg, 1.125rem);
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.pf-feature-title__hint {
+  display: block;
+  font-size: var(--font-xs, 0.75rem);
+  color: var(--gray-400, #94a3b8);
+}
+
+.pf-feature-val {
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
+  vertical-align: middle;
+  text-align: center;
+}
+
+.pf-status-text {
+  font-size: var(--font-xs, 0.75rem);
+  font-weight: 600;
+  color: var(--gray-400, #94a3b8);
+  font-family: var(--font-mono, monospace);
+}
+
+.pf-status-text--highlight {
+  color: var(--color-success, #48ffcb);
+}
+
+.pf-tic-icon {
+  color: #fbbf24;
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.pf-cross-icon {
+  color: #22d3ee;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1;
+}

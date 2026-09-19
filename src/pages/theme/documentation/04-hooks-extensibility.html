@@ -16,37 +16,39 @@
               Key WordPress action hooks fired throughout the lifecycle of the Pickory Theme layout:
             </p>
 
-            <table class="doc-data-table" style="width: 100%; margin-bottom: var(--space-6);">
-              <thead>
-                <tr>
-                  <th>Hook Name</th>
-                  <th>Parameters</th>
-                  <th>Execution Point / Purpose</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><code>pickory_theme_before_header</code></td>
-                  <td>None</td>
-                  <td>Fires immediately after <code>&lt;body&gt;</code> opening tag (suitable for analytics/announcement bars).</td>
-                </tr>
-                <tr>
-                  <td><code>pickory_theme_archive_before_loop</code></td>
-                  <td><code>$query</code></td>
-                  <td>Fires before the WooCommerce product grid renders on shop &amp; taxonomy archives.</td>
-                </tr>
-                <tr>
-                  <td><code>pickory_theme_product_card_badges</code></td>
-                  <td><code>$product_id</code></td>
-                  <td>Allows custom badge injection (e.g., 'NEW', 'SALE', 'OUT OF STOCK') on the product card.</td>
-                </tr>
-                <tr>
-                  <td><code>pickory_theme_after_footer</code></td>
-                  <td>None</td>
-                  <td>Fires immediately before the closing <code>&lt;/body&gt;</code> tag.</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="doc-table-container">
+              <table class="doc-data-table">
+                <thead>
+                  <tr>
+                    <th>Hook Name</th>
+                    <th>Parameters</th>
+                    <th>Execution Point / Purpose</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>pickory_theme_before_header</code></td>
+                    <td>None</td>
+                    <td>Fires immediately after <code>&lt;body&gt;</code> opening tag (suitable for analytics/announcement bars).</td>
+                  </tr>
+                  <tr>
+                    <td><code>pickory_theme_archive_before_loop</code></td>
+                    <td><code>$query</code></td>
+                    <td>Fires before the WooCommerce product grid renders on shop &amp; taxonomy archives.</td>
+                  </tr>
+                  <tr>
+                    <td><code>pickory_theme_product_card_badges</code></td>
+                    <td><code>$product_id</code></td>
+                    <td>Allows custom badge injection (e.g., 'NEW', 'SALE', 'OUT OF STOCK') on the product card.</td>
+                  </tr>
+                  <tr>
+                    <td><code>pickory_theme_after_footer</code></td>
+                    <td>None</td>
+                    <td>Fires immediately before the closing <code>&lt;/body&gt;</code> tag.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <div class="doc-content-block">

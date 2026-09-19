@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pickory — Official Website | High-Performance WooCommerce Solutions</title>
+  <meta name="description" content="Pickory builds high-performance WooCommerce solutions, faceted product filter engines, and modern developer tooling.">
+  <link rel="canonical" href="https://pickory.com/">
+  
+  <!-- Schema.org Structured Data (Organization & WebSite) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://pickory.com/#organization",
+        "name": "Pickory",
+        "url": "https://pickory.com/",
+        "description": "Official Pickory company portal providing high-performance WooCommerce plugins, themes, and developer tooling."
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://pickory.com/#website",
+        "url": "https://pickory.com/",
+        "name": "Pickory",
+        "publisher": {
+          "@id": "https://pickory.com/#organization"
+        }
+      }
+    ]
+  }
+  </script>
+
+  <link rel="preload" href="fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/InterVariable-Italic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Skip Navigation Link for Accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- ======================================================================
+       SHARED DOCUMENTATION CANVAS (3-Column Layout: Sidebar + Canvas + TOC)
+       ====================================================================== -->
+  <div class="doc-canvas pickory-docs-canvas" id="pickory-docs-root">
+
+    <!-- ======================================================================
+         PICKORY THEME DOCUMENTATION NAVIGATION (Left Sidebar)
+         ====================================================================== -->
+    <aside class="doc-sidebar-left" aria-label="Pickory Theme Navigation">
+      <nav class="doc-nav-tree" aria-label="Theme Documentation Navigation">
+        <ul class="doc-nav-list">
+          <li class="doc-nav-item is-active">
+            <a href="#theme-overview" class="doc-nav-link">
+              <span><em>Theme</em></span>
+              <span class="ui-badge" data-variant="success">START</span>
+            </a>
+          </li>
+          <li class="doc-nav-item">
+            <a href="#theme-architecture" class="doc-nav-link">
+              <span>1. Anatomy &amp; Hierarchy</span>
+              <span class="ui-badge" data-variant="brand">THEME</span>
+            </a>
+          </li>
+          <li class="doc-nav-item">
+            <a href="#theme-styling-tokens" class="doc-nav-link">
+              <span>2. Design Tokens &amp; Grid</span>
+              <span class="ui-badge">DESIGN</span>
+            </a>
+          </li>
+          <li class="doc-nav-item">
+            <a href="#theme-hooks-extensibility" class="doc-nav-link">
+              <span>3. Hooks &amp; Customizer</span>
+              <span class="ui-badge">API/PHP</span>
+            </a>
+          </li>
+          <li class="doc-nav-item doc-nav-item--divider">
+            <a href="theme-changelog.html" class="doc-nav-link">
+              <span>Changelog &amp; Releases</span>
+              <span class="ui-badge" data-variant="success">v1.1</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- ======================================================================
+         COLUMN 2: CENTER CANVAS & SEMANTIC CONTENT
+         ====================================================================== -->
+    <main class="doc-center-canvas" id="main-content" tabindex="-1">
+      <div class="doc-content-wrapper">
+
+        <!-- ==================================================================
+             PICKORY THEME: ARCHITECTURE OVERVIEW & HEADER
+             ================================================================== -->
+        <header class="doc-header-block doc-overview-header" id="theme-overview">
+  <div class="doc-header-badges">
+    <a href="/" class="ui-badge">&larr; Home</a>
+    <span class="ui-badge" data-variant="brand">PICKORY THEME</span>
+    <span class="ui-badge" data-variant="success">v1.1.0</span>
+  </div>
+          <h1 class="doc-main-title">Pickory Theme — <span class="doc-main-title-sub">Architecture &amp; Developer Reference</span></h1>
+          <p class="doc-lead-paragraph">
+            Pickory Theme is a modern, high-performance WooCommerce storefront theme engineered for high conversion rates and sub-second paint times. Built strictly around CSS Custom Properties, semantic HTML5, and native browser APIs, it eradicates bloated client frameworks while providing a seamless foundation for the Pickory Product Filter engine.
+          </p>
+          <div class="doc-meta-pills">
+            <span class="ui-badge" data-variant="success"><span class="doc-pill-dot"></span>Production Ready</span>
+            <span class="ui-badge">Zero jQuery Dependency</span>
+            <span class="ui-badge">Native CSS Grid Layouts</span>
+            <span class="ui-badge">W3C Design Token Compliant</span>
+            <span class="ui-badge">Lighthouse 100/100</span>
+          </div>
+        </header>
+
+        <!-- Feature Highlight Grid (UI Cards) -->
+        <div class="ui-card-grid doc-overview-grid">
+          <div class="ui-card" data-type="feature" id="theme-perf-feature">
+            <span class="ui-badge" data-variant="brand">PERFORMANCE</span>
+            <h3 class="ui-card-title">Lean Asset Pipeline</h3>
+            <p class="ui-card-desc">
+              Total CSS payload under 28 KB gzipped with zero utility bloat. Eliminates layout shifts (CLS &lt; 0.01) with native CSS aspect-ratio containment.
+            </p>
+          </div>
+
+          <div class="ui-card" data-type="feature" id="theme-woo-feature">
+            <span class="ui-badge" data-variant="brand">WOOCOMMERCE</span>
+            <h3 class="ui-card-title">Decoupled Templates</h3>
+            <p class="ui-card-desc">
+              Non-destructive WooCommerce overrides using standard action hooks (<code>woocommerce_before_shop_loop</code>, etc.) preventing template deprecation headaches.
+            </p>
+          </div>
+
+          <div class="ui-card" data-type="feature" id="theme-tokens-feature">
+            <span class="ui-badge" data-variant="brand">DESIGN SYSTEM</span>
+            <h3 class="ui-card-title">W3C Design Tokens</h3>
+            <p class="ui-card-desc">
+              Fully customized via pure CSS variables. Instant runtime theme adjustments and dark/light switching without CSS preprocessors.
+            </p>
+          </div>
+        </div>
+
+        <!-- ==================================================================
+             TOPIC 1: THEME ARCHITECTURE & TEMPLATE HIERARCHY
+             ================================================================== -->
+        <section class="doc-section" id="theme-architecture" aria-labelledby="heading-theme-architecture">
+          <div class="doc-section-header">
+            <span class="ui-badge" data-variant="brand">SECTION 1</span>
+            <h2 id="heading-theme-architecture" class="doc-section-title">Theme Anatomy &amp; Template Hierarchy</h2>
+            <p class="doc-section-desc">
+              Directory structure, file responsibilities, and non-destructive WordPress/WooCommerce template resolution.
+            </p>
+          </div>
+
+          <div class="doc-content-block">
+            <h3 class="doc-subsection-title" id="theme-subtopic-1-1">1.1 Directory Contract</h3>
+            <p class="doc-paragraph">
+              Pickory Theme adheres to an enterprise theme layout isolating presentation templates, assets, and PHP business logic into strict namespaces:
+            </p>
+
+            <div class="code-window">
+              <div class="code-window-header">
+                <div class="code-window-controls">
+                  <span class="code-window-dot code-window-dot--red"></span>
+                  <span class="code-window-dot code-window-dot--yellow"></span>
+                  <span class="code-window-dot code-window-dot--green"></span>
+                </div>
+                <span class="code-window-title">Directory Anatomy — pickory-theme/</span>
+              </div>
+              <pre class="code-block"><code class="language-bash">pickory-theme/
+├── assets/
+│   ├── css/
+│   │   ├── tokens.css             # Primitive and semantic CSS custom properties
+│   │   ├── layout.css             # CSS Grid canvas &amp; header/footer wrappers
+│   │   ├── woocommerce.css        # Product card, cart drawer, checkout styling
+│   │   └── theme.css              # Assembled production stylesheet
+│   └── js/
+│       ├── navigation.js          # Native accessible mobile drawer &amp; flyout menus
+│       └── mini-cart.js           # Lightweight reactive side-cart dispatcher
+├── inc/
+│   ├── class-theme-setup.php      # Theme supports (title-tag, post-thumbnails, HTML5)
+│   ├── class-woocommerce.php      # Action hooks, customizer defaults, HPOS flags
+│   ├── class-customizer.php       # Live preview theme settings &amp; color tokens
+│   └── template-tags.php          # Reusable semantic markup helpers
+├── template-parts/
+│   ├── header/                    # Main bar, announcement banner, search bar
+│   ├── footer/                    # Multi-column footer &amp; copyright strip
+│   └── product/                   # Grid item card, badge chips, rating stars
+├── woocommerce/                   # Strict, selective WooCommerce template overrides
+│   ├── archive-product.php        # Shop &amp; category grid with Pickory Filter mount
+│   └── single-product.php         # Gallery &amp; buy box container
+├── functions.php                  # Theme bootstrap &amp; autoloader
+└── style.css                      # WordPress theme metadata header</code></pre>
+            </div>
+          </div>
+
+          <div class="doc-content-block">
+            <h3 class="doc-subsection-title" id="theme-subtopic-1-2">1.2 WooCommerce Overrides vs. Action Hooks</h3>
+            <p class="doc-paragraph">
+              Rather than copying dozens of fragile WooCommerce PHP template files into the theme (which break on every major WooCommerce release), Pickory Theme utilizes an <strong>Action-Hook-First strategy</strong>. Core loops are modified by manipulating action queues:
+            </p>
+
+            <div class="code-window">
+              <div class="code-window-header">
+                <span class="code-window-title">inc/class-woocommerce.php — Action Queue Normalization</span>
+              </div>
+              <pre class="code-block"><code class="language-php">&lt;?php
+declare(strict_types=1);
+
+namespace Pickory\Theme;
+
+final class WooCommerce_Engine {
+
+    public static function init(): void {
+        // Strip legacy WooCommerce wrappers
+        remove_action('woocommerce_before_main_content', 'woocommerce_output_content_wrapper', 10);
+        remove_action('woocommerce_after_main_content', 'woocommerce_output_content_wrapper_end', 10);
+
+        // Mount semantic Pickory canvas
+        add_action('woocommerce_before_main_content', [__CLASS__, 'render_canvas_open'], 10);
+        add_action('woocommerce_after_main_content', [__CLASS__, 'render_canvas_close'], 10);
+
+        // Inject Pickory Product Filter sidebar hook safely
+        add_action('woocommerce_before_shop_loop', [__CLASS__, 'inject_active_filter_chips'], 15);
+    }
+
+    public static function render_canvas_open(): void {
+        echo '&lt;main id="pickory-shop-canvas" class="pickory-shop-grid" role="main"&gt;';
+    }
+
+    public static function render_canvas_close(): void {
+        echo '&lt;/main&gt;';
+    }
+}</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             TOPIC 2: DESIGN TOKENS & RESPONSIVE GRID
+             ================================================================== -->
+        <section class="doc-section" id="theme-styling-tokens" aria-labelledby="heading-theme-tokens">
+          <div class="doc-section-header">
+            <span class="ui-badge" data-variant="brand">SECTION 2</span>
+            <h2 id="heading-theme-tokens" class="doc-section-title">Design Token Architecture &amp; CSS Grid</h2>
+            <p class="doc-section-desc">
+              Custom property design token taxonomy, responsive typography scales, and CSS layout containment.
+            </p>
+          </div>
+
+          <div class="doc-content-block">
+            <h3 class="doc-subsection-title" id="theme-subtopic-2-1">2.1 Token Taxonomy</h3>
+            <p class="doc-paragraph">
+              Pickory Theme exposes a clean set of global CSS custom properties defined on <code>:root</code>. These allow deep white-label customization without modifying theme PHP templates or stylesheet files directly:
+            </p>
+
+            <div class="doc-table-container">
+              <table class="doc-data-table">
+                <thead>
+                  <tr>
+                    <th>Token Variable</th>
+                    <th>Default Value</th>
+                    <th>Role / Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>--theme-color-brand</code></td>
+                    <td><code>#3867f5</code></td>
+                    <td>Primary accent, CTA buttons, and focus outlines.</td>
+                  </tr>
+                  <tr>
+                    <td><code>--theme-color-canvas</code></td>
+                    <td><code>#19191c</code></td>
+                    <td>Root document canvas background color.</td>
+                  </tr>
+                  <tr>
+                    <td><code>--theme-color-surface</code></td>
+                    <td><code>#252528</code></td>
+                    <td>Elevated container surface (cards, modals, dropdowns).</td>
+                  </tr>
+                  <tr>
+                    <td><code>--theme-radius-card</code></td>
+                    <td><code>10px</code></td>
+                    <td>Border radius for product cards and facet widgets.</td>
+                  </tr>
+                  <tr>
+                    <td><code>--theme-shop-columns</code></td>
+                    <td><code>repeat(auto-fill, minmax(260px, 1fr))</code></td>
+                    <td>Dynamic responsive product archive grid definition.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="doc-content-block">
+            <h3 class="doc-subsection-title" id="theme-subtopic-2-2">2.2 CSS Containment &amp; CLS Protection</h3>
+            <p class="doc-paragraph">
+              To guarantee high Google PageSpeed scores, product cards implement CSS containment (<code>contain: layout style;</code>) and explicit image aspect-ratio placeholders. This prevents cumulative layout shifts when product images lazy-load:
+            </p>
+
+            <div class="code-window">
+              <div class="code-window-header">
+                <span class="code-window-title">assets/css/woocommerce.css — Containment & Aspect-Ratio</span>
+              </div>
+              <pre class="code-block"><code class="language-css">.pickory-product-card {
+  contain: layout style;
+  display: flex;
+  flex-direction: column;
+  background: var(--theme-color-surface);
+  border: 1px solid var(--theme-color-border);
+  border-radius: var(--theme-radius-card);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.pickory-product-image-wrap {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  overflow: hidden;
+  background: var(--theme-color-canvas);
+}
+
+.pickory-product-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             TOPIC 3: EXTENSIBILITY HOOKS & CUSTOMIZER
+             ================================================================== -->
+        <section class="doc-section" id="theme-hooks-extensibility" aria-labelledby="heading-theme-hooks">
+          <div class="doc-section-header">
+            <span class="ui-badge" data-variant="brand">SECTION 3</span>
+            <h2 id="heading-theme-hooks" class="doc-section-title">Hooks, Filters &amp; Customizer API</h2>
+            <p class="doc-section-desc">
+              Developer extension surfaces for injecting markup, altering query loops, and customizing token values.
+            </p>
+          </div>
+
+          <div class="doc-content-block">
+            <h3 class="doc-subsection-title" id="theme-subtopic-3-1">3.1 Action Hook Reference</h3>
+            <p class="doc-paragraph">
+              Key WordPress action hooks fired throughout the lifecycle of the Pickory Theme layout:
+            </p>
+
+            <div class="doc-table-container">
+              <table class="doc-data-table">
+                <thead>
+                  <tr>
+                    <th>Hook Name</th>
+                    <th>Parameters</th>
+                    <th>Execution Point / Purpose</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>pickory_theme_before_header</code></td>
+                    <td>None</td>
+                    <td>Fires immediately after <code>&lt;body&gt;</code> opening tag (suitable for analytics/announcement bars).</td>
+                  </tr>
+                  <tr>
+                    <td><code>pickory_theme_archive_before_loop</code></td>
+                    <td><code>$query</code></td>
+                    <td>Fires before the WooCommerce product grid renders on shop &amp; taxonomy archives.</td>
+                  </tr>
+                  <tr>
+                    <td><code>pickory_theme_product_card_badges</code></td>
+                    <td><code>$product_id</code></td>
+                    <td>Allows custom badge injection (e.g., 'NEW', 'SALE', 'OUT OF STOCK') on the product card.</td>
+                  </tr>
+                  <tr>
+                    <td><code>pickory_theme_after_footer</code></td>
+                    <td>None</td>
+                    <td>Fires immediately before the closing <code>&lt;/body&gt;</code> tag.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="doc-content-block">
+            <h3 class="doc-subsection-title" id="theme-subtopic-3-2">3.2 Hooking the Pickory Product Filter</h3>
+            <p class="doc-paragraph">
+              When Pickory Product Filter is active, Pickory Theme automatically wires up the reactive filter container without requiring shortcodes or widgets. Developers can customize this placement using the <code>pickory_theme_filter_container_id</code> filter:
+            </p>
+
+            <div class="code-window">
+              <div class="code-window-header">
+                <span class="code-window-title">functions.php — Custom Filter Placement</span>
+              </div>
+              <pre class="code-block"><code class="language-php">&lt;?php
+// Customize the DOM mount target for the reactive filter sidebar
+add_filter('pickory_theme_filter_container_id', function(string $default_id): string {
+    return 'custom-sticky-filter-drawer';
+});</code></pre>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+<!-- ======================================================================
+     COLUMN 3: RIGHT CONTEXTUAL TOPICS SIDEBAR (Sticky, Fixed Width ~220px)
+     Theme Documentation Navigation
+     ====================================================================== -->
+<aside class="doc-sidebar-right" aria-label="Contextual Topics and Navigation">
+
+  <div class="doc-toc-section-title" id="dynamic-toc-section">Theme Architecture &amp; Topics</div>
+
+  <ul class="doc-toc-list" id="dynamic-toc-list">
+    <li class="doc-toc-item is-active" data-target-id="theme-overview">
+      <a href="#theme-overview" class="doc-toc-link">Theme Overview</a>
+    </li>
+    <li class="doc-toc-item" data-target-id="theme-architecture">
+      <a href="#theme-architecture" class="doc-toc-link">1. Anatomy &amp; Hierarchy</a>
+    </li>
+    <li class="doc-toc-item" data-target-id="theme-styling-tokens">
+      <a href="#theme-styling-tokens" class="doc-toc-link">2. Design Tokens &amp; Grid</a>
+    </li>
+    <li class="doc-toc-item" data-target-id="theme-hooks-extensibility">
+      <a href="#theme-hooks-extensibility" class="doc-toc-link">3. Hooks &amp; Customizer</a>
+    </li>
+  </ul>
+
+  <!-- External Quick Links -->
+  <div class="doc-toc-footer">
+    <a href="/theme" class="doc-toc-ext-link">
+      <span>Theme Showcase</span>
+      <svg class="doc-toc-ext-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M4.22 11.78a.75.75 0 0 1 0-1.06L9.44 5.5H5.75a.75.75 0 0 1 0-1.5h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V6.56l-5.22 5.22a.75.75 0 0 1-1.06 0Z" clip-rule="evenodd"/>
+      </svg>
+    </a>
+    <a href="theme-changelog.html" class="doc-toc-ext-link">
+      <span>Changelog (v1.1.0)</span>
+      <svg class="doc-toc-ext-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M4.22 11.78a.75.75 0 0 1 0-1.06L9.44 5.5H5.75a.75.75 0 0 1 0-1.5h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V6.56l-5.22 5.22a.75.75 0 0 1-1.06 0Z" clip-rule="evenodd"/>
+      </svg>
+    </a>
+  </div>
+
+</aside>
+
+  </div>
+  <!-- /pickory-docs-canvas -->
+
+  <!-- Vanilla JavaScript Interactive Documentation Runtime -->
+  <script src="app.js" defer></script>
+</body>
+</html>

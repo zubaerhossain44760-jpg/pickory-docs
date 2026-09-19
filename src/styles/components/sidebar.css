@@ -1,0 +1,259 @@
+/* ============================================================================
+   SECTIONS 5 & 8: DUAL SIDEBAR ARCHITECTURE (LEFT NAV + RIGHT TOC)
+   Architecture: CSS Logical Properties (RTL-Ready), DTCG Token Mapped, Sticky
+   ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   5. COLUMN 1: LEFT NAVIGATION SIDEBAR
+   ---------------------------------------------------------------------------- */
+.doc-sidebar-left {
+  width: var(--sidebar-w, 280px);
+  min-width: var(--sidebar-w, 280px);
+  height: 100vh;
+  height: 100dvh;
+  position: sticky;
+  inset-block-start: 0;
+  background-color: var(--surface-canvas, #09090b);
+  border-inline-end: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 20;
+}
+
+/* Offset Compensation When Global Header Is Present */
+body:has(.doc-top-header) .doc-sidebar-left,
+body:has(.doc-top-header) .doc-sidebar-right {
+  height: calc(100vh - var(--header-h, 64px));
+  height: calc(100dvh - var(--header-h, 64px));
+  inset-block-start: var(--header-h, 64px);
+}
+
+/* Scrollable Navigation Tree */
+.doc-nav-tree {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  /* Prevents background page scroll chaining */
+  padding: var(--space-8, 2rem) var(--space-3, 0.75rem) var(--space-6, 1.5rem);
+}
+
+.doc-nav-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  padding-inline-start: 0;
+  margin: 0;
+}
+
+.doc-nav-item {
+  position: relative;
+  list-style: none;
+  margin: 0;
+}
+
+/* Category Dividers */
+.doc-nav-item--divider {
+  margin-block-start: var(--space-3, 0.75rem);
+  padding-block-start: var(--space-2, 0.5rem);
+  border-block-start: 1px solid var(--border-subtle);
+}
+
+/* Navigation Item Link */
+.doc-nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.75rem;
+  font-size: var(--font-base, 0.875rem);
+  font-weight: var(--weight-medium, 500);
+  color: var(--text-secondary, #d4d4d8);
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-inline-start: 3px solid transparent;
+  border-radius: var(--radius-md, 8px);
+  line-height: var(--leading-snug, 1.375);
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.doc-nav-link:hover {
+  color: var(--text-primary, #fafafa);
+  background-color: var(--surface-hover);
+  border-color: var(--border-subtle);
+  border-inline-start-color: var(--color-brand);
+}
+
+/* Active Navigation State */
+.doc-nav-item.is-active .doc-nav-link,
+.doc-nav-link[aria-current="true"] {
+  color: var(--neutral-0, #ffffff);
+  font-weight: var(--weight-semibold, 600);
+  border-color: var(--border-subtle);
+  border-inline-start-color: var(--color-brand);
+  background-color: var(--color-brand-alpha);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ----------------------------------------------------------------------------
+   8. COLUMN 3: RIGHT TOC SIDEBAR
+   ---------------------------------------------------------------------------- */
+.doc-sidebar-right {
+  width: var(--toc-w, 240px);
+  min-width: var(--toc-w, 240px);
+  height: 100vh;
+  height: 100dvh;
+  position: sticky;
+  inset-block-start: 0;
+  background-color: var(--surface-canvas, #09090b);
+  border-inline-start: 1px solid var(--border-subtle);
+  padding: var(--space-6, 1.5rem) var(--space-3, 0.75rem) var(--space-6, 1.5rem);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  /* Prevents background page scroll chaining */
+  z-index: 20;
+}
+
+.doc-toc-section-title {
+  font-family: var(--font-mono);
+  font-size: var(--font-2xs, 0.6875rem);
+  font-weight: var(--weight-semibold, 600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-block-end: var(--space-3, 0.75rem);
+  padding-inline-start: var(--space-2, 0.5rem);
+  line-height: var(--leading-tight);
+}
+
+/* Vertical Timeline Spine */
+.doc-toc-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-inline-start: 2px solid var(--border-subtle);
+  padding-inline-start: 0;
+  margin: 0;
+}
+
+.doc-toc-item {
+  position: relative;
+  list-style: none;
+  margin: 0;
+}
+
+/* TOC Anchor Link */
+.doc-toc-link {
+  display: block;
+  font-size: var(--font-sm, 0.8125rem);
+  font-weight: var(--weight-medium, 500);
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 0.45rem 0.75rem;
+  margin-inline-start: -2px;
+  /* Overlaps 2px vertical spine */
+  border: 1px solid transparent;
+  border-inline-start: 2px solid transparent;
+  border-radius: 0 var(--radius-sm, 6px) var(--radius-sm, 6px) 0;
+  line-height: var(--leading-normal);
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.doc-toc-link:hover {
+  color: var(--text-primary);
+  background-color: var(--surface-hover);
+  border-color: var(--border-subtle);
+  border-inline-start-color: var(--border-strong);
+}
+
+/* Active TOC Subtopic State */
+.doc-toc-item.is-active .doc-toc-link,
+.doc-toc-link[aria-current="location"] {
+  color: var(--color-brand);
+  font-weight: var(--weight-semibold, 600);
+  border-color: color-mix(in srgb, var(--color-brand) 25%, transparent);
+  border-inline-start-color: var(--color-brand);
+  background-color: var(--color-brand-alpha);
+}
+
+/* External Link Footer */
+.doc-toc-footer {
+  margin-block-start: auto;
+  padding-block-start: var(--space-6, 1.5rem);
+  border-block-start: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 0.5rem);
+}
+
+.doc-toc-ext-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+  font-size: var(--font-xs, 0.75rem);
+  color: var(--text-muted);
+  text-decoration: none;
+  border-radius: var(--radius-xs);
+  padding: var(--space-1, 0.25rem) var(--space-1-5, 0.375rem);
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.doc-toc-ext-link:hover {
+  color: var(--color-brand);
+  background-color: var(--surface-hover);
+}
+
+.doc-toc-ext-link:focus-visible {
+  outline: 2px solid var(--border-focus);
+}
+
+.doc-toc-ext-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+/* ----------------------------------------------------------------------------
+   RESPONSIVE SIDEBAR COLLAPSE & ADAPTATION
+   ---------------------------------------------------------------------------- */
+
+/* Tablets & Small Laptops: Hide TOC to Give Central Article Full Width */
+@media screen and (max-width: 1200px) {
+  .doc-sidebar-right {
+    display: none !important;
+  }
+}
+
+/* Mobile Handhelds: Left Nav Converts to Inline Accordion Header */
+@media screen and (max-width: 768px) {
+
+  .doc-sidebar-left,
+  body:has(.doc-top-header) .doc-sidebar-left {
+    width: 100%;
+    min-width: 100%;
+    height: auto;
+    position: static;
+    inset-block-start: auto;
+    border-inline-end: none;
+    border-block-end: 1px solid var(--border-subtle);
+  }
+
+  .doc-nav-tree {
+    max-height: 280px;
+    padding: var(--space-4, 1rem);
+  }
+
+  /* Keep TOC hidden consistently on mobile (no post-article clutter) */
+  .doc-sidebar-right,
+  body:has(.doc-top-header) .doc-sidebar-right {
+    display: none !important;
+  }
+}

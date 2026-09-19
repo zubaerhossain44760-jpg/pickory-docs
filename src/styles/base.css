@@ -1,0 +1,210 @@
+/* ============================================================================
+   2. ACCESSIBILITY BASE & FOCUS MANAGEMENT
+   ============================================================================ */
+
+/* Accessible Skip Navigation (GPU-accelerated, zero-layout-shift) */
+.skip-link {
+  position: fixed;
+  inset-block-start: var(--space-3, 0.75rem);
+  inset-inline-start: var(--space-4, 1rem);
+  z-index: 9999;
+  transform: translateY(calc(-100% - var(--space-6, 1.5rem)));
+  transition: transform var(--transition-fast, 120ms cubic-bezier(0.16, 1, 0.3, 1));
+
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+  background-color: var(--color-brand, #3b82f6);
+  color: var(--neutral-0, #ffffff);
+  font-family: var(--font-sans);
+  font-size: var(--font-sm, 0.8125rem);
+  font-weight: var(--weight-semibold, 600);
+  text-decoration: none;
+  border-radius: var(--radius-md, 8px);
+  box-shadow: var(--shadow-lg, 0 12px 24px -4px rgba(0, 0, 0, 0.6));
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--neutral-0, #ffffff);
+  outline-offset: 2px;
+}
+
+/* Universal Focus Outline (WCAG 2.4.7 & 2.4.11 Compliant) */
+:focus-visible {
+  outline: 2px solid var(--border-focus, #60a5fa);
+  outline-offset: 2px;
+}
+
+/* Interior Negative-Offset for Dense Interactive Items (Prevents Container Clipping) */
+.doc-nav-link:focus-visible,
+.doc-toc-link:focus-visible,
+.code-tab-btn:focus-visible,
+.copy-btn:focus-visible,
+.flow-node:focus-visible {
+  outline: 2px solid var(--border-focus, #60a5fa);
+  outline-offset: -2px;
+  border-radius: var(--radius-sm, 6px);
+}
+
+/* Screen-Reader / Visually Hidden Accessible Utility */
+.sr-only,
+.support-hp-wrap {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* ============================================================================
+   4. SYSTEM RESET & DOCUMENTATION CANVAS LAYOUT
+   ============================================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Fluid root sizing: Preserves operating system and browser text scaling preferences */
+html {
+  font-size: 100%;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  tab-size: 4;
+  overflow-x: clip; /* prevent horizontal scroll from drawer slide animation */
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--surface-canvas, #09090b);
+  color: var(--text-primary, #fafafa);
+  font-family: var(--font-sans);
+  font-size: var(--font-base, 0.875rem);
+  line-height: var(--leading-normal, 1.5);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+/* Three-Column Documentation Grid */
+.pickory-docs-canvas {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: var(--sidebar-w, 280px) minmax(0, 1fr) var(--toc-w, 240px);
+  background-color: var(--surface-canvas, #09090b);
+  position: relative;
+  overflow-x: clip;
+}
+
+/* Desktop Independent Sticky Scroll Architecture */
+.doc-sidebar-left {
+  position: sticky;
+  inset-block-start: 0;
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-inline-end: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  background-color: var(--surface-canvas, #09090b);
+  padding: var(--space-6, 1.5rem) var(--space-4, 1rem);
+}
+
+.doc-center-canvas {
+  width: 100%;
+  min-width: 0; /* Prevents pre/code tag grid blowout */
+  display: flex;
+  justify-content: center;
+}
+
+.doc-content-wrapper {
+  width: 100%;
+  max-width: var(--content-w, 1040px);
+  padding: var(--space-8, 2rem) var(--space-10, 2.5rem) var(--space-16, 4rem);
+}
+
+.doc-sidebar-right {
+  position: sticky;
+  inset-block-start: 0;
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-inline-start: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  background-color: var(--surface-canvas, #09090b);
+  padding: var(--space-8, 2rem) var(--space-4, 1rem);
+}
+
+/* ============================================================================
+   9. RESPONSIVE BREAKPOINTS (Fluid Degradation)
+   ============================================================================ */
+
+/* Intermediate Laptops & Tablets: Collapse TOC, Expand Main Content */
+@media screen and (max-width: 1200px) {
+  .pickory-docs-canvas {
+    grid-template-columns: var(--sidebar-w, 280px) minmax(0, 1fr);
+  }
+
+  .doc-sidebar-right {
+    display: none;
+  }
+
+  .doc-content-wrapper {
+    padding: var(--space-6, 1.5rem) var(--space-6, 1.5rem) var(--space-12, 3rem);
+  }
+}
+
+/* Tablet Portrait & Handheld: Switch from Grid to Stacked Flow */
+@media screen and (max-width: 768px) {
+  .pickory-docs-canvas {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+  }
+
+  /* Left Sidebar converts to collapsible mobile header zone */
+  .doc-sidebar-left {
+    position: static;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    overflow-y: visible;
+    border-inline-end: none;
+    border-block-end: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+    padding: var(--space-4, 1rem);
+  }
+
+  .doc-nav-tree {
+    max-height: 280px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-block: var(--space-2, 0.5rem);
+  }
+
+  .doc-content-wrapper {
+    padding: var(--space-6, 1.5rem) var(--space-4, 1rem) var(--space-10, 2.5rem);
+  }
+
+  /* Keep TOC hidden on mobile to prioritize main content flow */
+  .doc-sidebar-right {
+    display: none;
+  }
+
+  .ui-card-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4, 1rem);
+  }
+
+  .doc-main-title {
+    font-size: clamp(1.75rem, 4vw + 1rem, var(--font-2xl, 1.5rem));
+    line-height: var(--leading-tight, 1.2);
+  }
+}

@@ -1,0 +1,572 @@
+/* ============================================================================
+   7. SINGLE-CLASS MODULAR UI TYPES
+   Architecture: Single-Class + Data-Attribute Selectors (No Compound Classes)
+   Integration: Strictly maps to DTCG Three-Tier Tokens (styles.css)
+   ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   7.1 UI Type: .ui-card
+   ---------------------------------------------------------------------------- */
+.ui-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-4, 1rem);
+  margin-block-end: var(--space-10, 2.5rem);
+}
+
+.ui-card {
+  background-color: var(--card-bg, var(--surface-card));
+  border: 1px solid var(--card-border, var(--border-default));
+  border-radius: var(--radius-md, 8px);
+  padding: var(--space-4, 1rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 0.75rem);
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.4));
+  transition:
+    border-color var(--transition-normal, 200ms cubic-bezier(0.16, 1, 0.3, 1)),
+    box-shadow var(--transition-normal, 200ms cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+/* Feature Card Variant */
+.ui-card[data-type="feature"] {
+  border-color: color-mix(in srgb, var(--color-brand) 25%, transparent);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.35),
+    0 0 18px -4px var(--color-brand-alpha);
+}
+
+.ui-card[data-type="feature"]:hover {
+  border-color: color-mix(in srgb, var(--color-brand) 55%, transparent);
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.45),
+    0 0 24px -2px var(--color-brand-glow);
+}
+
+.ui-card-title {
+  font-size: var(--font-base, 0.875rem);
+  font-weight: var(--weight-semibold, 600);
+  line-height: var(--leading-snug, 1.375);
+  color: var(--text-primary, #fafafa);
+  margin: 0;
+}
+
+.ui-card-desc {
+  font-size: var(--font-xs, 0.75rem);
+  line-height: var(--leading-normal, 1.5);
+  color: var(--text-muted, #71717a);
+  margin: 0;
+}
+
+.ui-list {
+  padding-inline-start: var(--space-5, 1.25rem);
+  margin: 0;
+  color: var(--text-secondary, #d4d4d8);
+  line-height: var(--leading-relaxed, 1.625);
+  font-size: var(--font-sm, 0.8125rem);
+}
+
+/* Inspector Card Variant (Telemetry & File Structure Auditing) */
+.ui-card[data-type="inspector"] {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-inline-start: 3px solid var(--color-success);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 16px -4px var(--color-success-alpha);
+}
+
+.ui-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2, 0.5rem);
+}
+
+.ui-card-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+  font-size: var(--font-xs, 0.75rem);
+}
+
+.ui-card-label {
+  font-size: var(--font-2xs, 0.6875rem);
+  font-weight: var(--weight-semibold, 600);
+  color: var(--text-muted, #71717a);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ui-card-filepath {
+  font-family: var(--font-mono);
+  font-size: var(--font-xs, 0.75rem);
+  color: var(--cyan-300, #67e8f9);
+  background-color: var(--surface-canvas);
+  padding: 0.125rem var(--space-2, 0.5rem);
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-subtle);
+  word-break: break-all;
+}
+
+.ui-card-role {
+  color: var(--color-brand);
+  font-weight: var(--weight-medium, 500);
+}
+
+.ui-card-box {
+  background-color: var(--surface-canvas);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm, 6px);
+  padding: var(--space-3, 0.75rem);
+  font-size: var(--font-xs, 0.75rem);
+  line-height: var(--leading-normal, 1.5);
+  color: var(--text-muted, #71717a);
+}
+
+.ui-card-box strong {
+  color: var(--text-primary, #fafafa);
+  display: block;
+  margin-block-end: var(--space-1, 0.25rem);
+}
+
+/* ----------------------------------------------------------------------------
+   7.2 UI Type: .ui-callout (Strictly <div> Based, Single-Class Engine)
+   ---------------------------------------------------------------------------- */
+.ui-callout {
+  margin-block: var(--space-5, 1.25rem);
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  border-radius: var(--radius-md, 8px);
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-inline-start-width: 4px;
+}
+
+/* Semantic Intent Variants */
+.ui-callout[data-type="guardrail"],
+.ui-callout[data-type="success"] {
+  border-inline-start-color: var(--color-success);
+  background-color: color-mix(in srgb, var(--color-success) 4%, var(--surface-card));
+}
+
+.ui-callout[data-type="warning"] {
+  border-inline-start-color: var(--color-warning);
+  background-color: color-mix(in srgb, var(--color-warning) 4%, var(--surface-card));
+}
+
+.ui-callout[data-type="security"],
+.ui-callout[data-type="danger"] {
+  border-inline-start-color: var(--color-danger);
+  background-color: color-mix(in srgb, var(--color-danger) 4%, var(--surface-card));
+}
+
+.ui-callout[data-type="info"] {
+  border-inline-start-color: var(--color-info);
+  background-color: color-mix(in srgb, var(--color-info) 4%, var(--surface-card));
+}
+
+.ui-callout[data-type="brand"] {
+  border-inline-start-color: var(--color-brand);
+  background-color: color-mix(in srgb, var(--color-brand) 4%, var(--surface-card));
+}
+
+.ui-callout-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+  margin-block-end: var(--space-1, 0.25rem);
+}
+
+.ui-callout-title {
+  font-size: var(--font-xs, 0.75rem);
+  font-weight: var(--weight-semibold, 600);
+  color: var(--text-primary, #fafafa);
+}
+
+.ui-callout-body {
+  font-size: var(--font-xs, 0.75rem);
+  line-height: var(--leading-relaxed, 1.625);
+  color: var(--text-secondary, #d4d4d8);
+}
+
+.ui-callout-body code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  color: var(--cyan-300, #67e8f9);
+  background-color: var(--surface-canvas);
+  border: 1px solid var(--border-subtle);
+  padding: 0.05rem var(--space-1, 0.25rem);
+  border-radius: var(--radius-xs, 3px);
+}
+
+/* ----------------------------------------------------------------------------
+   7.3 UI Type: .ui-badge
+   ---------------------------------------------------------------------------- */
+.ui-badge {
+  font-family: var(--font-mono);
+  font-size: var(--font-2xs, 0.6875rem);
+  font-weight: var(--weight-medium, 500);
+  padding: 0.125rem var(--space-2, 0.5rem);
+  border-radius: var(--radius-sm, 6px);
+  background-color: var(--surface-canvas);
+  border: 1px solid var(--border-default);
+  color: var(--text-muted, #71717a);
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  gap: var(--space-1, 0.25rem);
+  text-decoration: none;
+  line-height: var(--leading-none, 1);
+  white-space: nowrap;
+}
+
+a.ui-badge {
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast, 120ms cubic-bezier(0.16, 1, 0.3, 1)),
+    color var(--transition-fast, 120ms cubic-bezier(0.16, 1, 0.3, 1)),
+    background-color var(--transition-fast, 120ms cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+a.ui-badge:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+  background-color: var(--surface-overlay);
+}
+
+.ui-badge[data-variant="success"] {
+  color: var(--badge-success-fg);
+  background-color: var(--badge-success-bg);
+  border-color: color-mix(in srgb, var(--color-success) 35%, transparent);
+}
+
+.ui-badge[data-variant="brand"] {
+  color: var(--badge-brand-fg);
+  background-color: var(--badge-brand-bg);
+  border-color: color-mix(in srgb, var(--color-brand) 35%, transparent);
+}
+
+.ui-badge[data-variant="warning"] {
+  color: var(--badge-warning-fg);
+  background-color: var(--badge-warning-bg);
+  border-color: color-mix(in srgb, var(--color-warning) 35%, transparent);
+}
+
+.ui-badge[data-variant="danger"],
+.ui-badge[data-variant="security"] {
+  color: var(--badge-danger-fg);
+  background-color: var(--badge-danger-bg);
+  border-color: color-mix(in srgb, var(--color-danger) 35%, transparent);
+}
+
+.ui-badge[data-variant="info"],
+.ui-badge[data-variant="cyan"] {
+  color: var(--badge-info-fg);
+  background-color: var(--badge-info-bg);
+  border-color: color-mix(in srgb, var(--color-info) 35%, transparent);
+}
+
+/* ----------------------------------------------------------------------------
+   7.4 UI Type: .ui-code-window (Multi-Tab Enterprise Code Window)
+   ---------------------------------------------------------------------------- */
+.ui-code-window,
+.code-window {
+  margin-block: var(--space-6, 1.5rem) var(--space-8, 2rem);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg, 12px);
+  background-color: var(--code-window-bg);
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px var(--border-subtle),
+    var(--shadow-xl);
+}
+
+.code-window-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--code-window-header-bg);
+  border-block-end: 1px solid var(--border-subtle);
+  padding-inline: var(--space-3, 0.75rem);
+  min-height: 42px;
+  gap: var(--space-3, 0.75rem);
+}
+
+.code-window-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.code-window-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.code-window-dot--red,
+.code-window-dot:nth-child(1) {
+  background-color: var(--mac-dot-close);
+}
+
+.code-window-dot--yellow,
+.code-window-dot:nth-child(2) {
+  background-color: var(--mac-dot-minimize);
+}
+
+.code-window-dot--green,
+.code-window-dot:nth-child(3) {
+  background-color: var(--mac-dot-expand);
+}
+
+/* Tab Triggers & Grouping */
+.code-tab-group {
+  display: flex;
+  align-items: stretch;
+  height: 42px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.code-tab-group::-webkit-scrollbar {
+  display: none;
+}
+
+.code-tab-btn {
+  background: transparent;
+  border: none;
+  border-block-end: 2px solid transparent;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--font-xs, 0.75rem);
+  padding: 0 var(--space-3, 0.75rem);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5, 0.375rem);
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.code-tab-btn:hover {
+  color: var(--text-primary);
+}
+
+.code-tab-btn.is-active,
+.code-tab-btn[aria-selected="true"] {
+  color: var(--text-primary);
+  border-block-end-color: var(--color-brand);
+}
+
+.code-window-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 0.75rem);
+}
+
+.code-window-filename {
+  font-family: var(--font-mono);
+  font-size: var(--font-xs, 0.75rem);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Copy Trigger Utility */
+.copy-btn {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  border-radius: var(--radius-sm, 6px);
+  padding: 0.25rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: var(--font-2xs, 0.6875rem);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all var(--transition-fast);
+}
+
+.copy-btn:hover {
+  background-color: var(--surface-hover);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.code-tab-pane {
+  display: none;
+  margin: 0;
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: var(--font-xs, 0.75rem);
+  line-height: var(--leading-relaxed, 1.625);
+  color: var(--code-text);
+  background-color: var(--code-window-bg);
+}
+
+.code-tab-pane.is-active,
+.code-tab-pane:not([hidden]) {
+  display: block;
+}
+
+/* Syntax Token Engine */
+.token-keyword {
+  color: var(--syntax-keyword);
+  font-weight: var(--weight-medium);
+}
+
+.token-function {
+  color: var(--syntax-function);
+}
+
+.token-string {
+  color: var(--syntax-string);
+}
+
+.token-comment {
+  color: var(--syntax-comment);
+  font-style: italic;
+}
+
+.token-type {
+  color: var(--syntax-type);
+}
+
+.token-variable {
+  color: var(--syntax-variable);
+}
+
+/* ----------------------------------------------------------------------------
+   7.5 UI Type: .ui-flowchart (SVG Reactive State Machine)
+   ---------------------------------------------------------------------------- */
+.ui-flowchart {
+  margin-block: var(--space-5, 1.25rem) var(--space-8, 2rem);
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--space-5, 1.25rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 1rem);
+  box-shadow: var(--shadow-md);
+}
+
+.flowchart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-block-end: 1px solid var(--border-subtle);
+  padding-block-end: var(--space-3, 0.75rem);
+}
+
+.flowchart-heading {
+  font-size: var(--font-base, 0.875rem);
+  font-weight: var(--weight-semibold, 600);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+  margin: 0;
+}
+
+.flowchart-hint {
+  font-size: var(--font-2xs, 0.6875rem);
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+.flowchart-canvas {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--neutral-600) transparent;
+  padding: var(--space-2, 0.5rem) 0;
+  border-radius: var(--radius-sm);
+}
+
+.flowchart-svg {
+  width: 100%;
+  min-width: 760px;
+  height: auto;
+  display: block;
+}
+
+/* SVG Interactive Nodes */
+.flow-node {
+  cursor: pointer;
+  outline: none;
+}
+
+.flow-node rect {
+  fill: var(--surface-canvas);
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+  rx: 8;
+  ry: 8;
+  transition:
+    stroke var(--transition-fast),
+    fill var(--transition-fast);
+}
+
+.flow-node:hover rect {
+  fill: var(--surface-hover);
+  stroke: var(--border-focus);
+}
+
+.flow-node:focus-visible rect {
+  stroke: var(--border-focus);
+  stroke-width: 2.5;
+}
+
+.flow-node.is-active rect,
+.flow-node[aria-current="true"] rect {
+  fill: color-mix(in srgb, var(--color-success) 12%, var(--surface-canvas));
+  stroke: var(--color-success);
+  stroke-width: 2;
+}
+
+.flow-node text.node-step {
+  font-family: var(--font-mono);
+  font-size: var(--font-2xs, 11px);
+  letter-spacing: 0.06em;
+  fill: var(--text-muted);
+  text-transform: uppercase;
+  transition: fill var(--transition-fast);
+  user-select: none;
+}
+
+.flow-node.is-active text.node-step,
+.flow-node[aria-current="true"] text.node-step {
+  fill: var(--color-success);
+  font-weight: var(--weight-semibold);
+}
+
+.flow-node text.node-title {
+  font-family: var(--font-sans);
+  font-size: var(--font-xs, 12px);
+  font-weight: var(--weight-medium);
+  fill: var(--text-primary);
+  transition: fill var(--transition-fast);
+  user-select: none;
+}
+
+.flow-node.is-active text.node-title,
+.flow-node[aria-current="true"] text.node-title {
+  font-weight: var(--weight-bold);
+  fill: var(--neutral-0, #ffffff);
+}
+
+.flow-connector {
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+}
+
+.flow-arrowhead {
+  fill: var(--border-strong);
+}

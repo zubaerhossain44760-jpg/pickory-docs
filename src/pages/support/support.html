@@ -1,153 +1,286 @@
-    <!-- ======================================================================
-         FORUM & SUPPORT PAGE (Clean Centered Layout - No Sidebar)
-         ====================================================================== -->
-    <main class="forum-container" id="main-content" tabindex="-1">
-      
-      <!-- Forum Page Header -->
-      <header class="forum-header">
-        <div class="forum-badge-row">
-          <span class="ui-badge" data-variant="brand">DEVELOPER FORUM</span>
-          <span class="ui-badge" data-variant="success"><span class="doc-pill-dot"></span>COMMUNITY HUB</span>
-        </div>
-        <h1 class="forum-title">Pickory Support &amp; Forum</h1>
-        <p class="forum-lead">
-          Connect with the community, explore solutions, report bugs, and discuss architectural extensions for the Pickory ecosystem.
-        </p>
+<!-- ======================================================================
+     PICKORY SUPPORT & CLIENT DESK (Official Company Portal)
+     Architecture: WCAG 2.2 AA Compliant, Strict CSP Compatible, Validated ARIA
+     ====================================================================== -->
+<main class="forum-container" id="main-content" tabindex="-1">
 
-        <!-- Search & New Topic Actions -->
-        <div class="forum-action-bar">
-          <div class="forum-search-box">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-            </svg>
-            <input type="text" class="forum-search-input" placeholder="Search forum topics, discussions, or error codes..." aria-label="Search forum topics">
-          </div>
-          <button type="button" class="forum-btn-primary">
-            <span>+ New Discussion</span>
+  <!-- 1. Support Page Header -->
+  <header class="forum-header">
+    <div class="forum-badge-row">
+      <span class="ui-badge" data-variant="brand">Official Support</span>
+      <span class="ui-badge" data-variant="success">
+        <span class="doc-pill-dot" aria-hidden="true"></span>Engineering Desk
+      </span>
+    </div>
+
+    <h1 class="forum-title">Pickory Support &amp; Help Center</h1>
+    <p class="forum-lead">
+      Technical assistance, architectural inquiries, bug diagnostics, and official licensing support for Pickory
+      WooCommerce solutions.
+    </p>
+
+    <!-- Direct Action Bar -->
+    <div class="support-action-bar">
+      <a href="product-filter-docs.html" class="btn btn--outline btn--sm">
+        Browse Plugin Documentation &rarr;
+      </a>
+      <a href="theme-docs.html" class="btn btn--outline btn--sm">
+        Browse Theme Documentation &rarr;
+      </a>
+    </div>
+  </header>
+
+  <!-- 2. Category Channels -->
+  <section class="forum-categories" aria-labelledby="channels-heading">
+    <div class="support-section-header">
+      <h2 id="channels-heading" class="forum-section-heading">Submit Inquiry by Category</h2>
+      <p class="support-section-sub">Select an inquiry type below to open a ticket directly with our engineering team.
+      </p>
+    </div>
+
+    <div class="forum-grid">
+      <!-- Category 1 -->
+      <button type="button" class="ui-card js-category-card" data-type="feature" data-category="Getting Started"
+        aria-labelledby="cat-title-1" aria-describedby="cat-desc-1">
+        <div class="ui-card-header">
+          <span class="forum-card-icon" aria-hidden="true">🚀</span>
+          <span class="ui-badge" data-variant="brand">Setup &amp; Onboarding</span>
+        </div>
+        <span class="ui-card-title" id="cat-title-1" role="heading" aria-level="3">Getting Started</span>
+        <span class="ui-card-desc" id="cat-desc-1">Installation assistance, system requirements, initial setup
+          workflows, and onboarding diagnostics.</span>
+        <span class="btn btn--outline btn--sm forum-card-btn" aria-hidden="true">Select &rarr;</span>
+      </button>
+
+      <!-- Category 2 -->
+      <button type="button" class="ui-card js-category-card" data-type="feature" data-category="Account &amp; Billing"
+        aria-labelledby="cat-title-2" aria-describedby="cat-desc-2">
+        <div class="ui-card-header">
+          <span class="forum-card-icon" aria-hidden="true">💳</span>
+          <span class="ui-badge" data-variant="info">Account Desk</span>
+        </div>
+        <span class="ui-card-title" id="cat-title-2" role="heading" aria-level="3">Account &amp; Billing</span>
+        <span class="ui-card-desc" id="cat-desc-2">Subscription management, invoices, payment troubleshooting, license
+          upgrades, and transfer requests.</span>
+        <span class="btn btn--outline btn--sm forum-card-btn" aria-hidden="true">Select &rarr;</span>
+      </button>
+
+      <!-- Category 3 -->
+      <button type="button" class="ui-card js-category-card" data-type="feature"
+        data-category="Licensing &amp; Activations" aria-labelledby="cat-title-3" aria-describedby="cat-desc-3">
+        <div class="ui-card-header">
+          <span class="forum-card-icon" aria-hidden="true">🔑</span>
+          <span class="ui-badge" data-variant="brand">License Keys</span>
+        </div>
+        <span class="ui-card-title" id="cat-title-3" role="heading" aria-level="3">Licensing &amp; Keys</span>
+        <span class="ui-card-desc" id="cat-desc-3">Domain activation issues, key resets, multisite deployments, and
+          agency seat provisioning.</span>
+        <span class="btn btn--outline btn--sm forum-card-btn" aria-hidden="true">Select &rarr;</span>
+      </button>
+
+      <!-- Category 4 -->
+      <button type="button" class="ui-card js-category-card" data-type="feature" data-category="Bugs &amp; Diagnostics"
+        aria-labelledby="cat-title-4" aria-describedby="cat-desc-4">
+        <div class="ui-card-header">
+          <span class="forum-card-icon" aria-hidden="true">🐛</span>
+          <span class="ui-badge" data-variant="warning">Technical Report</span>
+        </div>
+        <span class="ui-card-title" id="cat-title-4" role="heading" aria-level="3">Bugs &amp; Diagnostics</span>
+        <span class="ui-card-desc" id="cat-desc-4">Error logs, uncaught exceptions, compatibility conflicts, query
+          bottlenecks, and environment diagnostics.</span>
+        <span class="btn btn--outline btn--sm forum-card-btn" aria-hidden="true">Select &rarr;</span>
+      </button>
+
+      <!-- Category 5 -->
+      <button type="button" class="ui-card js-category-card" data-type="feature" data-category="Integrations &amp; APIs"
+        aria-labelledby="cat-title-5" aria-describedby="cat-desc-5">
+        <div class="ui-card-header">
+          <span class="forum-card-icon" aria-hidden="true">⚡</span>
+          <span class="ui-badge" data-variant="brand">Developer Desk</span>
+        </div>
+        <span class="ui-card-title" id="cat-title-5" role="heading" aria-level="3">Integrations &amp; APIs</span>
+        <span class="ui-card-desc" id="cat-desc-5">Custom hooks, REST endpoints, faceted query hooks, database schema
+          extensions, and custom development.</span>
+        <span class="btn btn--outline btn--sm forum-card-btn" aria-hidden="true">Select &rarr;</span>
+      </button>
+
+      <!-- Category 6 -->
+      <button type="button" class="ui-card js-category-card" data-type="feature" data-category="Feature Suggestions"
+        aria-labelledby="cat-title-6" aria-describedby="cat-desc-6">
+        <div class="ui-card-header">
+          <span class="forum-card-icon" aria-hidden="true">💡</span>
+          <span class="ui-badge" data-variant="success">Roadmap &amp; Ideas</span>
+        </div>
+        <span class="ui-card-title" id="cat-title-6" role="heading" aria-level="3">Feature Suggestions</span>
+        <span class="ui-card-desc" id="cat-desc-6">Propose new capabilities, workflow enhancements, design feedback, and
+          architectural suggestions.</span>
+        <span class="btn btn--outline btn--sm forum-card-btn" aria-hidden="true">Select &rarr;</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- 3. Frequently Asked Questions -->
+  <section class="faq-section" aria-labelledby="faq-heading">
+    <div class="support-section-header">
+      <h2 id="faq-heading" class="forum-section-heading">Frequently Asked Questions</h2>
+    </div>
+
+    <div class="faq-accordion-list">
+      <details class="ui-card faq-accordion-item" open>
+        <summary class="faq-accordion-summary">
+          <span class="faq-question">Is Pickory Product Filter fully compatible with WooCommerce HPOS?</span>
+          <span class="faq-toggle-icon" aria-hidden="true">+</span>
+        </summary>
+        <div class="faq-accordion-body">
+          <p>Yes, completely. Pickory Product Filter has native support for WooCommerce High-Performance Order Storage
+            (HPOS) and custom order tables (<code>wp_wc_orders</code>). It does not depend on legacy postmeta tables,
+            ensuring complete compatibility with WooCommerce 9.0+ and modern database architectures.</p>
+        </div>
+      </details>
+
+      <details class="ui-card faq-accordion-item">
+        <summary class="faq-accordion-summary">
+          <span class="faq-question">How does Pickory handle large catalogs with 50,000+ SKUs?</span>
+          <span class="faq-toggle-icon" aria-hidden="true">+</span>
+        </summary>
+        <div class="faq-accordion-body">
+          <p>Pickory uses an indexed flat-table query architecture with grouped taxonomy counts. Rather than executing
+            separate queries per term, attribute counts are resolved in a single consolidated query (reducing database
+            overhead by up to 40% on large catalogs). Additionally, client-side state caching ensures sub-50ms
+            instantaneous filter responses.</p>
+        </div>
+      </details>
+
+      <details class="ui-card faq-accordion-item">
+        <summary class="faq-accordion-summary">
+          <span class="faq-question">How can I customize styling and design tokens without editing core files?</span>
+          <span class="faq-toggle-icon" aria-hidden="true">+</span>
+        </summary>
+        <div class="faq-accordion-body">
+          <p>Pickory exposes standardized W3C CSS custom properties (tokens such as <code>--color-brand</code>,
+            <code>--radius-md</code>, and typography scales). You can override any token safely in your child theme’s
+            <code>style.css</code> or the WordPress Customizer. Your styling customizations persist seamlessly across
+            all future updates.
+          </p>
+        </div>
+      </details>
+
+      <details class="ui-card faq-accordion-item">
+        <summary class="faq-accordion-summary">
+          <span class="faq-question">What details should I provide when submitting a technical diagnostic report?</span>
+          <span class="faq-toggle-icon" aria-hidden="true">+</span>
+        </summary>
+        <div class="faq-accordion-body">
+          <p>For swift investigation, please include your PHP version (PHP 8.0+ is recommended), WordPress &amp;
+            WooCommerce versions, any active object caching plugins (e.g., Redis or Memcached), and relevant excerpts
+            from your WordPress debug log (<code>wp-content/debug.log</code>).</p>
+        </div>
+      </details>
+
+      <details class="ui-card faq-accordion-item">
+        <summary class="faq-accordion-summary">
+          <span class="faq-question">Can I use Pickory Product Filter with custom post meta and ACF fields?</span>
+          <span class="faq-toggle-icon" aria-hidden="true">+</span>
+        </summary>
+        <div class="faq-accordion-body">
+          <p>Yes. Pickory provides comprehensive hook filters (such as <code>filterkit_pre_query</code> and indexing
+            hooks) that allow developers to index custom post meta, Advanced Custom Fields (ACF), and custom
+            hierarchical taxonomies directly into faceted filter controls.</p>
+        </div>
+      </details>
+
+      <details class="ui-card faq-accordion-item">
+        <summary class="faq-accordion-summary">
+          <span class="faq-question">How are updates delivered and licenses activated?</span>
+          <span class="faq-toggle-icon" aria-hidden="true">+</span>
+        </summary>
+        <div class="faq-accordion-body">
+          <p>Updates are delivered directly through the standard WordPress dashboard via the Pickory update API. Once
+            your license key is entered in the Pickory Settings panel, one-click updates and security patches are
+            automatically available.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- 4. Ticket Submission Modal -->
+  <div class="support-modal-backdrop" id="ticket-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"
+    hidden>
+    <div class="ui-card support-modal-window">
+      <div class="ui-card-header support-modal-header">
+        <button type="button" class="support-modal-close" id="modal-close-btn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <!-- Live Notification Region for Errors/Feedback -->
+      <div class="support-form-status" id="form-status-msg" role="alert" aria-live="assertive" hidden></div>
+
+      <h3 class="support-modal-title" id="modal-title">Support Request</h3>
+      <p class="ui-card-desc support-modal-desc">
+        Our core engineering team responds to all technical and licensing inquiries within 24 business hours.
+      </p>
+
+      <form id="support-ticket-form" class="support-form"
+        action="https://script.google.com/macros/s/AKfycbyGPaHX_SHEeVTXKSQydlFNZClcab311dmkWCIuqAJG_P5MjXxu2x-XFyiEFj7co0d3Gw/exec"
+        method="POST">
+
+        <!-- Programmatic Category State (Fixes browser validation exception) -->
+        <input type="hidden" id="ticket-category" name="category" value="Getting Started">
+
+        <!-- Anti-Spam Bot Shield (Safe from a11y linter warnings) -->
+        <div class="support-hp-wrap" aria-hidden="true">
+          <label for="company_verify_check">Leave this field blank</label>
+          <input type="text" id="company_verify_check" name="company_verify_check" tabindex="-1"
+            autocomplete="new-password">
+        </div>
+
+        <!-- Name / Website Name -->
+        <div class="support-form-group">
+          <label for="ticket-name" class="support-form-label">Name / Website Name</label>
+          <input type="text" id="ticket-name" name="name" class="support-form-input"
+            placeholder="John Doe / Example.com" autocomplete="name">
+        </div>
+
+        <!-- Email Input -->
+        <div class="support-form-group">
+          <label for="ticket-email" class="support-form-label">
+            Work Email <span class="required" aria-hidden="true">*</span>
+          </label>
+          <input type="email" id="ticket-email" name="email" class="support-form-input"
+            placeholder="developer@yourcompany.com" autocomplete="email" required>
+        </div>
+
+        <!-- Issue Description -->
+        <div class="support-form-group">
+          <label for="ticket-description" class="support-form-label">
+            Describe the Issue or Inquiry <span class="required" aria-hidden="true">*</span>
+          </label>
+          <textarea id="ticket-description" name="description" class="support-form-input support-form-textarea" rows="5"
+            placeholder="Provide details, error codes, steps to reproduce, or questions..." maxlength="2500"
+            required></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="support-form-actions">
+          <button type="submit" class="btn btn--white btn--md">
+            Submit Ticket
           </button>
         </div>
-      </header>
+      </form>
+    </div>
+  </div>
 
-      <!-- Forum Category Channels -->
-      <section class="forum-categories" aria-label="Forum Categories">
-        <h2 class="forum-section-heading">Browse Categories</h2>
-        
-        <div class="forum-grid">
-          <div class="forum-card">
-            <div class="forum-card-icon">⚡</div>
-            <div class="forum-card-content">
-              <div class="forum-card-header">
-                <h3 class="forum-card-title">Pickory Product Filter</h3>
-                <span class="ui-badge" data-variant="brand">142 topics</span>
-              </div>
-              <p class="forum-card-desc">Faceted indexing queries, WooCommerce HPOS compatibility, REST API filters, and custom taxonomies.</p>
-            </div>
-          </div>
-
-          <div class="forum-card">
-            <div class="forum-card-icon">🎨</div>
-            <div class="forum-card-content">
-              <div class="forum-card-header">
-                <h3 class="forum-card-title">Pickory Theme</h3>
-                <span class="ui-badge" data-variant="success">86 topics</span>
-              </div>
-              <p class="forum-card-desc">Template hierarchy, W3C CSS token customization, container queries, and child theme engineering.</p>
-            </div>
-          </div>
-
-          <div class="forum-card">
-            <div class="forum-card-icon">🐛</div>
-            <div class="forum-card-content">
-              <div class="forum-card-header">
-                <h3 class="forum-card-title">Bugs &amp; Diagnostics</h3>
-                <span class="ui-badge">53 topics</span>
-              </div>
-              <p class="forum-card-desc">Error logs, reproducible test cases, transient cache issues, and environment diagnostics.</p>
-            </div>
-          </div>
-
-          <div class="forum-card">
-            <div class="forum-card-icon">💡</div>
-            <div class="forum-card-content">
-              <div class="forum-card-header">
-                <h3 class="forum-card-title">Feature Requests &amp; Ideas</h3>
-                <span class="ui-badge">69 topics</span>
-              </div>
-              <p class="forum-card-desc">Community proposals, architectural feedback, and roadmap discussion for upcoming releases.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Recent Discussions List -->
-      <section class="forum-discussions" aria-label="Recent Discussions">
-        <div class="forum-discussions-header">
-          <h2 class="forum-section-heading">Recent Discussions</h2>
-          <div class="forum-filter-tags">
-            <button type="button" class="forum-tag-btn is-active">All</button>
-            <button type="button" class="forum-tag-btn">Unresolved</button>
-            <button type="button" class="forum-tag-btn">Solved</button>
-          </div>
-        </div>
-
-        <div class="forum-thread-list">
-          <div class="forum-thread-item">
-            <div class="forum-thread-main">
-              <span class="ui-badge" data-variant="brand">PRODUCT FILTER</span>
-              <h4 class="forum-thread-title">
-                <a href="#thread-1">Handling custom attribute slugs with hyphenated keys in flat index</a>
-              </h4>
-              <p class="forum-thread-meta">Started by <strong>dev_alex</strong> &bull; 2 hours ago</p>
-            </div>
-            <div class="forum-thread-stats">
-              <span class="forum-stat-count">14 replies</span>
-              <span class="ui-badge" data-variant="success">Solved</span>
-            </div>
-          </div>
-
-          <div class="forum-thread-item">
-            <div class="forum-thread-main">
-              <span class="ui-badge" data-variant="success">THEME</span>
-              <h4 class="forum-thread-title">
-                <a href="#thread-2">Overriding CSS custom properties dynamically inside child theme blocks</a>
-              </h4>
-              <p class="forum-thread-meta">Started by <strong>sarah_ui</strong> &bull; 5 hours ago</p>
-            </div>
-            <div class="forum-thread-stats">
-              <span class="forum-stat-count">8 replies</span>
-            </div>
-          </div>
-
-          <div class="forum-thread-item">
-            <div class="forum-thread-main">
-              <span class="ui-badge">DIAGNOSTICS</span>
-              <h4 class="forum-thread-title">
-                <a href="#thread-3">REST query timeout during batch reindexing with 80k WooCommerce SKUs</a>
-              </h4>
-              <p class="forum-thread-meta">Started by <strong>mark_ops</strong> &bull; 1 day ago</p>
-            </div>
-            <div class="forum-thread-stats">
-              <span class="forum-stat-count">23 replies</span>
-              <span class="ui-badge" data-variant="success">Solved</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Community Channels Banner -->
-      <section class="forum-channels-banner">
-        <div class="forum-channel-col">
-          <h3>Need Real-Time Help?</h3>
-          <p>Join the Pickory Discord server for live chat with core contributors and community engineers.</p>
-        </div>
-        <div class="forum-channel-links">
-          <a href="https://discord.com" class="ui-badge" data-variant="brand" target="_blank" rel="noopener noreferrer">
-            Join Discord Community &rarr;
-          </a>
-          <a href="https://github.com" class="ui-badge" target="_blank" rel="noopener noreferrer">
-            GitHub Discussions &rarr;
-          </a>
-        </div>
-      </section>
-
-    </main>
+  <!-- 5. Floating Toast Notification -->
+  <div class="support-toast" id="support-toast" role="status" aria-live="polite" hidden>
+    <div class="support-toast-icon" aria-hidden="true">&#10003;</div>
+    <div class="support-toast-content">
+      <div class="support-toast-title">Ticket Submitted Successfully</div>
+      <div class="support-toast-desc">
+        Your inquiry has been logged. Our engineering desk will review and follow up at <strong
+          id="toast-user-email">your email</strong> shortly.
+      </div>
+    </div>
+    <button type="button" class="support-toast-close" id="toast-close-btn"
+      aria-label="Dismiss notification">&times;</button>
+    <div class="support-toast-progress" aria-hidden="true"></div>
+  </div>
+</main>

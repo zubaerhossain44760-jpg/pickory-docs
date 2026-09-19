@@ -1,0 +1,209 @@
+/* ============================================================================
+   SHARED UI COMPONENT: BUTTONS (BEM Architecture)
+   File: src/styles/components/button.css
+   Architecture: DTCG Token Mapped, WCAG 2.2 AA / AAA Compliant, GPU-Smooth
+   ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   1. BLOCK: .btn (Normalized Element Base)
+   ---------------------------------------------------------------------------- */
+.btn {
+  /* Normalization & Reset */
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid transparent;
+  background-color: transparent;
+  font-family: var(--font-sans);
+  font-size: var(--font-base, 0.875rem);
+  font-weight: var(--weight-semibold, 600);
+  line-height: var(--leading-tight, 1.2);
+  text-decoration: none;
+  text-align: center;
+
+  /* Layout & Geometry */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 0.5rem);
+  padding: 0.625rem 1.375rem;
+  /* 10px 22px */
+  border-radius: var(--radius-full, 9999px);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  max-width: 100%;
+  position: relative;
+  isolation: isolate;
+
+  /* High-Performance GPU Transitions */
+  transition:
+    color var(--transition-fast, 120ms ease),
+    background-color var(--transition-fast, 120ms ease),
+    border-color var(--transition-fast, 120ms ease),
+    box-shadow var(--transition-fast, 120ms ease),
+    filter var(--transition-fast, 120ms ease),
+    transform var(--transition-fast, 120ms ease);
+}
+
+/* Tactile Click/Press Feedback */
+.btn:active:not([disabled]):not([aria-disabled="true"]) {
+  transform: scale(0.98);
+}
+
+/* Icon Alignment & Sizing Guard */
+.btn svg,
+.btn-icon {
+  width: 1.125em;
+  height: 1.125em;
+  flex-shrink: 0;
+}
+
+/* Disabled State Machine */
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Loading / Async Busy State */
+.btn[aria-busy="true"] {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+  cursor: wait;
+}
+
+.btn[aria-busy="true"]::after {
+  content: "";
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: var(--radius-full);
+  animation: btn-spin 0.6s linear infinite;
+}
+
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   2. SIZE MODIFIERS
+   ---------------------------------------------------------------------------- */
+
+/* Large (Hero CTA & Modal Action Triggers) */
+.btn--lg {
+  padding: 0.8rem 2rem;
+  /* 13px 32px */
+  font-size: var(--font-md, 1rem);
+  /* Proportional 16px type */
+  font-weight: var(--weight-bold, 700);
+}
+
+/* Small (Table Actions, Headers, Card Buttons) */
+.btn--sm {
+  padding: 0.375rem 0.875rem;
+  /* 6px 14px */
+  font-size: var(--font-xs, 0.75rem);
+  font-weight: var(--weight-medium, 500);
+}
+
+/* Full-Width Block Utility */
+.btn--block {
+  width: 100%;
+  display: flex;
+}
+
+/* ----------------------------------------------------------------------------
+   3. THE 4 UNIFIED BRAND BUTTON STYLES
+   ---------------------------------------------------------------------------- */
+
+/* 1. White Solid Button (Primary Light Action) */
+.btn--white {
+  background-color: var(--neutral-0, #ffffff);
+  color: var(--neutral-950, #09090b);
+  border-color: var(--neutral-0, #ffffff);
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.btn--white:hover {
+  background-color: var(--neutral-100, #f4f4f5);
+  border-color: var(--neutral-100, #f4f4f5);
+  color: var(--neutral-1000, #000000);
+}
+
+.btn--white[aria-busy="true"]::after {
+  border-color: var(--neutral-950, #09090b);
+  border-inline-end-color: transparent;
+}
+
+/* 2. Dark Subtle Outline Button (Secondary / Ghost Action) */
+.btn--outline {
+  background-color: transparent;
+  color: var(--text-primary, #fafafa);
+  border-color: var(--border-default, rgba(255, 255, 255, 0.14));
+}
+
+.btn--outline:hover {
+  background-color: var(--surface-hover, rgba(255, 255, 255, 0.08));
+  border-color: var(--border-strong, rgba(255, 255, 255, 0.24));
+  color: var(--neutral-0, #ffffff);
+}
+
+/* 3. Cyan Outline Button (Old Free Plan CTA) */
+.btn--cyan {
+  background-color: var(--badge-info-bg, rgba(6, 182, 212, 0.12));
+  border-color: color-mix(in srgb, var(--color-info) 40%, transparent);
+  color: var(--cyan-300, #67e8f9);
+}
+
+.btn--cyan:hover {
+  background-color: color-mix(in srgb, var(--color-info) 22%, transparent);
+  border-color: var(--color-info-hover, #22d3ee);
+  color: var(--neutral-0, #ffffff);
+  box-shadow: 0 4px 16px var(--color-info-alpha);
+}
+
+/* 3.1. Premium Silver Glass Button (New Free Plan CTA) */
+.btn--free-tier {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--neutral-200, #e2e8f0);
+  box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+}
+
+.btn--free-tier:hover {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  box-shadow: 0 15px 25px -10px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+/* 4. Premium Gradient Button (Pro Plan Conversion CTA) */
+.btn--gradient {
+  background: linear-gradient(15deg, #880088, #aa2068, #cc3f47, #de6f3d, #f09f33, #de6f3d, #cc3f47, #aa2068, #880088) no-repeat;
+  background-size: 300%;
+  background-position: left center;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  text-shadow: 2px 2px 3px rgba(136, 0, 136, 0.5);
+  box-shadow: 0 30px 10px -20px rgba(0,0,0,0.2);
+  transition: background 0.3s ease, background-size 0.3s ease, background-position 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn--gradient:hover {
+  background-size: 320%;
+  background-position: right center;
+  color: #fff;
+  box-shadow: 0 30px 15px -15px rgba(0,0,0,0.3);
+}

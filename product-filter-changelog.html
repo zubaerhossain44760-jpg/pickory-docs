@@ -3,10 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pickory Product Filter — Changelog & Releases</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <title>Pickory — Official Website | High-Performance WooCommerce Solutions</title>
+  <meta name="description" content="Pickory builds high-performance WooCommerce solutions, faceted product filter engines, and modern developer tooling.">
+  <link rel="canonical" href="https://pickory.com/">
+  
+  <!-- Schema.org Structured Data (Organization & WebSite) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://pickory.com/#organization",
+        "name": "Pickory",
+        "url": "https://pickory.com/",
+        "description": "Official Pickory company portal providing high-performance WooCommerce plugins, themes, and developer tooling."
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://pickory.com/#website",
+        "url": "https://pickory.com/",
+        "name": "Pickory",
+        "publisher": {
+          "@id": "https://pickory.com/#organization"
+        }
+      }
+    ]
+  }
+  </script>
+
+  <link rel="preload" href="fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/InterVariable-Italic.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -14,121 +41,162 @@
   <!-- Skip Navigation Link for Accessibility -->
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
-  <!-- ======================================================================
-       TOP GLOBAL NAVIGATION HEADER (Clean Site-Wide Navigation)
+<!-- ======================================================================
+       TOP GLOBAL NAVIGATION HEADER (Commercial Tech Company Header)
        ====================================================================== -->
-  <header class="doc-top-header" aria-label="Global Site Navigation">
-    <div class="doc-header-left">
-      <a href="index.html" class="doc-header-brand" aria-label="Pickory Documentation Home">
-        <span class="doc-header-logo" aria-hidden="true">P</span>
-        <span class="doc-header-title">Pickory <span class="doc-header-title-sub">Docs</span></span>
-      </a>
-    </div>
-
-    <nav class="doc-header-nav" aria-label="Primary Documentation Tabs">
-      <a href="index.html" class="doc-header-link" data-page="index.html">
-        <span>Home</span>
-      </a>
-      <a href="product-filter.html" class="doc-header-link" data-page="product-filter.html">
-        <span>Pickory Product Filter</span>
-      </a>
-      <a href="theme.html" class="doc-header-link" data-page="theme.html">
-        <span>Pickory Theme</span>
-      </a>
-      <a href="support.html" class="doc-header-link" data-page="support.html">
-        <span>Support &amp; Help</span>
-      </a>
-    </nav>
-
-    <div class="doc-header-right">
-      <div class="doc-header-actions">
-        <button type="button" class="doc-header-search-btn" id="header-search-trigger" aria-label="Search documentation">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-          </svg>
-          <span>Search...</span>
-          <kbd class="doc-header-kbd">⌘K</kbd>
-        </button>
-
-        <span class="ui-badge" data-variant="brand" style="font-size: 10px; padding: 2px 8px;">v1.2.0</span>
-
-        <a href="https://github.com" class="doc-header-icon-btn" target="_blank" rel="noopener noreferrer" aria-label="GitHub Repository">
-          <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
-          </svg>
-        </a>
-      </div>
-    </div>
-  </header>
-
-  <main class="site-home-canvas" id="main-content">
-    <div class="site-home-wrapper">
-
-        <header class="doc-header-block doc-overview-header" id="filter-changelog-overview">
-          <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-2);">
-            <a href="product-filter.html" class="ui-badge" style="text-decoration: none;">&larr; Filter Docs</a>
-            <span class="ui-badge" data-variant="brand">PRODUCT FILTER</span>
-            <span class="ui-badge" data-variant="success">v1.2.0</span>
-          </div>
-          <h1 class="doc-main-title">Pickory Product Filter — <span class="doc-main-title-sub">Changelog &amp; Releases</span></h1>
-          <p class="doc-lead-paragraph">
-            Release logs, schema migrations, and version updates for Pickory Product Filter.
-          </p>
-        </header>
-
-        <section class="doc-section" id="filter-v1-2-0">
-          <div class="doc-section-header">
-            <span class="ui-badge" data-variant="success">v1.2.0</span>
-            <h2 class="doc-section-title">Version 1.2.0 — Flat Index Performance Boost</h2>
-          </div>
-          <div class="doc-content-block">
-            <div class="ui-card">
-              <ul style="color: var(--color-text); line-height: 1.8; font-size: var(--font-sm); padding-left: var(--space-4);">
-                <li>Added composite indexing strategy on <code>wp_ppfxi</code> table.</li>
-                <li>SSR &amp; Client hash parity enforcement for shop archives.</li>
-                <li>Debounce semantics optimized for dual-thumb slider widgets.</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <section class="doc-section" id="filter-v1-1-0">
-          <div class="doc-section-header">
-            <span class="ui-badge">v1.1.0</span>
-            <h2 class="doc-section-title">Version 1.1.0 — AbortController Request Mutex</h2>
-          </div>
-          <div class="doc-content-block">
-            <div class="ui-card">
-              <ul style="color: var(--color-text); line-height: 1.8; font-size: var(--font-sm); padding-left: var(--space-4);">
-                <li>Automatic in-flight query cancellation using <code>AbortController</code>.</li>
-                <li>Swatch taxonomy term meta support for visual filters.</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <section class="doc-section" id="filter-v1-0-0">
-          <div class="doc-section-header">
-            <span class="ui-badge">v1.0.0</span>
-            <h2 class="doc-section-title">Version 1.0.0 — Initial Release</h2>
-          </div>
-          <div class="doc-content-block">
-            <div class="ui-card">
-              <ul style="color: var(--color-text); line-height: 1.8; font-size: var(--font-sm); padding-left: var(--space-4);">
-                <li>Initial public enterprise release with HPOS compatibility.</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-    </div>
-  </main>
-
+<header class="doc-top-header" aria-label="Main Navigation">
+  <div class="doc-header-left">
+    <a href="/" class="doc-header-brand" aria-label="Pickory Home">
+      <span class="doc-header-wordmark">Pickory</span>
+    </a>
   </div>
 
-  <!-- Shared Universal Runtime -->
-  <script src="scripts/common.js" defer></script>
-    <!-- Dedicated Page Runtime -->
-  <script src="scripts/pages/home.js" defer></script>
+  <nav class="doc-header-nav" aria-label="Primary Navigation">
+    <a href="/product-filter" class="doc-header-link" data-page="product-filter">
+      <span>Product Filter</span>
+    </a>
+    <a href="/theme" class="doc-header-link" data-page="theme">
+      <span>Theme</span>
+    </a>
+    <a href="/support" class="doc-header-link" data-page="support">
+      <span>Contact and Support</span>
+    </a>
+  </nav>
+
+  <div class="doc-header-right">
+    <div class="doc-header-actions">
+      <a href="https://github.com" class="doc-header-icon-btn" target="_blank" rel="noopener noreferrer"
+        aria-label="GitHub">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <path
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
+        </svg>
+      </a>
+
+      <a href="https://profiles.wordpress.org/zubaerhossain/" class="doc-header-icon-btn" target="_blank"
+        rel="noopener noreferrer" aria-label="WordPress">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M21.469 6.825c.84 1.537 1.318 3.3 1.318 5.175 0 3.979-2.156 7.456-5.363 9.325l3.295-9.527c.615-1.54.82-2.771.82-3.864 0-.405-.026-.78-.07-1.109m-7.981.105c.647-.03 1.232-.105 1.232-.105.582-.075.514-.93-.067-.899 0 0-1.755.135-2.88.135-1.064 0-2.85-.15-2.85-.15-.585-.03-.661.855-.075.885 0 0 .54.061 1.125.09l1.68 4.605-2.37 7.08L5.354 6.9c.648-.03 1.233-.105 1.233-.105.582-.075.514-.93-.067-.899 0 0-1.755.135-2.88.135-.202 0-.44-.005-.692-.015C4.97 4.374 8.315 2.25 12.15 2.25c2.838 0 5.413 1.08 7.356 2.85-.047-.003-.09-.01-.138-.01-1.063 0-1.815.924-1.815 1.917 0 .89.513 1.643 1.057 2.533.411.719.89 1.643.89 2.977 0 .921-.354 1.994-.821 3.479l-1.075 3.585-3.9-11.61zm-3.817 13.116 3.915-11.385 4.005 10.965c.026.063.057.123.09.18-1.275.456-2.64.705-4.062.705-1.37 0-2.685-.24-3.948-.465m-7.049-4.695c-.657-1.46-.994-3.048-.994-4.725 0-.39.03-.765.075-1.125l5.7 15.6C4.209 17.22 2.622 14.35 2.622 11.351zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z" />
+        </svg>
+      </a>
+      <a href="https://youtube.com" class="doc-header-icon-btn" target="_blank" rel="noopener noreferrer"
+        aria-label="YouTube">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path
+            d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z">
+          </path>
+          <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+        </svg>
+      </a>
+      <a href="https://facebook.com" class="doc-header-icon-btn" target="_blank" rel="noopener noreferrer"
+        aria-label="Facebook">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+        </svg>
+      </a>
+
+      <button type="button" class="doc-header-hamburger" popovertarget="header-mobile-menu"
+        aria-label="Open mobile navigation menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="4" y1="6" x2="20" y2="6"></line>
+          <line x1="4" y1="12" x2="20" y2="12"></line>
+          <line x1="4" y1="18" x2="20" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+</header>
+
+<!-- Mobile Navigation Drawer (Popover API) — must be outside <header> to avoid sticky stacking context clipping -->
+<div id="header-mobile-menu" popover="auto" class="doc-mobile-popover">
+  <div class="doc-mobile-popover-header">
+    <span class="doc-mobile-nav-label">Navigation</span>
+    <button type="button" class="doc-mobile-popover-close" popovertarget="header-mobile-menu" popovertargetaction="hide"
+      aria-label="Close navigation menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+
+  <nav class="doc-mobile-nav" aria-label="Mobile Navigation">
+    <a href="/product-filter" class="doc-header-link" data-page="product-filter">
+      <span>Product Filter</span>
+    </a>
+    <a href="/theme" class="doc-header-link" data-page="theme">
+      <span>Theme</span>
+    </a>
+    <a href="/support" class="doc-header-link" data-page="support">
+      <span>Support &amp; Community</span>
+    </a>
+  </nav>
+
+  <div class="doc-mobile-actions">
+    <a href="https://profiles.wordpress.org/zubaerhossain/" class="doc-header-link doc-mobile-github" target="_blank"
+      rel="noopener noreferrer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M21.469 6.825c.84 1.537 1.318 3.3 1.318 5.175 0 3.979-2.156 7.456-5.363 9.325l3.295-9.527c.615-1.54.82-2.771.82-3.864 0-.405-.026-.78-.07-1.109m-7.981.105c.647-.03 1.232-.105 1.232-.105.582-.075.514-.93-.067-.899 0 0-1.755.135-2.88.135-1.064 0-2.85-.15-2.85-.15-.585-.03-.661.855-.075.885 0 0 .54.061 1.125.09l1.68 4.605-2.37 7.08L5.354 6.9c.648-.03 1.233-.105 1.233-.105.582-.075.514-.93-.067-.899 0 0-1.755.135-2.88.135-.202 0-.44-.005-.692-.015C4.97 4.374 8.315 2.25 12.15 2.25c2.838 0 5.413 1.08 7.356 2.85-.047-.003-.09-.01-.138-.01-1.063 0-1.815.924-1.815 1.917 0 .89.513 1.643 1.057 2.533.411.719.89 1.643.89 2.977 0 .921-.354 1.994-.821 3.479l-1.075 3.585-3.9-11.61zm-3.817 13.116 3.915-11.385 4.005 10.965c.026.063.057.123.09.18-1.275.456-2.64.705-4.062.705-1.37 0-2.685-.24-3.948-.465m-7.049-4.695c-.657-1.46-.994-3.048-.994-4.725 0-.39.03-.765.075-1.125l5.7 15.6C4.209 17.22 2.622 14.35 2.622 11.351zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z" />
+      </svg>
+      <span>WordPress</span>
+    </a>
+    <a href="https://youtube.com" class="doc-header-link doc-mobile-github" target="_blank" rel="noopener noreferrer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path
+          d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z">
+        </path>
+        <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+      </svg>
+      <span>YouTube</span>
+    </a>
+    <a href="https://facebook.com" class="doc-header-link doc-mobile-github" target="_blank" rel="noopener noreferrer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+      </svg>
+      <span>Facebook</span>
+    </a>
+    <a href="https://github.com" class="doc-header-link doc-mobile-github" target="_blank" rel="noopener noreferrer">
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
+      </svg>
+      <span>GitHub</span>
+    </a>
+  </div>
+</div>
+
+<main class="pf-page-container pf-changelog-container" id="main-content" tabindex="-1"
+  data-changelog="product-filter">
+  <header class="doc-header-block doc-overview-header" id="filter-changelog-overview">
+    <h1 class="doc-main-title">Pickory Product Filter — <span class="doc-main-title-sub">Changelog &amp; Releases</span></h1>
+    <p class="doc-lead-paragraph">
+      Every update we ship, newest first. Updates are delivered automatically to licensed installs through the WordPress dashboard.
+    </p>
+  </header>
+
+  <!-- Filter chips -->
+  <div class="changelog-filters" id="changelog-filters">
+    <span class="changelog-filter-label">Filter</span>
+    <!-- chips injected by JS -->
+  </div>
+
+  <!-- Release timeline (rendered by JS) -->
+  <ol class="changelog-timeline" id="changelog-releases" aria-label="Release history"></ol>
+  <p class="changelog-empty" id="changelog-empty" hidden>No changes match this filter.</p>
+</main>
+
+  <!-- Vanilla JavaScript Pages Interactive Runtime -->
+  <script src="pages.js" defer></script>
 </body>
 </html>

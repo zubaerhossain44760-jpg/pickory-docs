@@ -1,78 +1,317 @@
 /* ============================================================================
    PAGE STYLES: CHANGELOG
    File: src/styles/pages/changelog.css
-   Scope: Release Logs, Migration Guides, Version Histories
+   Architecture: Logical Properties (RTL-Ready), DTCG Token Mapped, WCAG 2.2 AA
    ============================================================================ */
 
-/* Changelog Timeline Container */
-.changelog-timeline {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-8);
-  position: relative;
-  margin: var(--space-6) 0 var(--space-12);
+/* ----------------------------------------------------------------------------
+   1. MAIN CONTAINER
+   ---------------------------------------------------------------------------- */
+.pf-changelog-container {
+  width: 100%;
+  max-width: var(--container-sm, 860px);
+  margin-inline: auto;
+  padding-inline: var(--space-4, 1rem);
+  padding-block: var(--space-8, 2rem) var(--space-16, 4rem);
+  min-height: calc(100dvh - 140px);
 }
 
-/* Release Version Entry */
-.changelog-release-entry {
-  background-color: var(--bg-card-dark);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-6);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  transition: border-color var(--transition);
+@media (min-width: 768px) {
+  .pf-changelog-container {
+    padding-inline: var(--space-6, 1.5rem);
+  }
 }
 
-.changelog-release-entry:hover {
-  border-color: var(--color-border-hover);
-}
-
-.changelog-header-row {
+/* ----------------------------------------------------------------------------
+   2. FILTER CHIPS BAR
+   ---------------------------------------------------------------------------- */
+.changelog-filters {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
   flex-wrap: wrap;
-  gap: var(--space-2);
-  border-bottom: 1px solid var(--color-border-subtle);
-  padding-bottom: var(--space-3);
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+  margin-block-start: var(--space-6, 1.5rem);
+  padding-block-end: var(--space-4, 1rem);
+  border-block-end: 1px solid var(--border-subtle);
 }
 
-.changelog-version-title {
-  font-size: var(--font-base);
-  font-weight: 700;
-  color: var(--color-text);
+.changelog-filter-label {
+  font-family: var(--font-mono);
+  font-size: var(--font-2xs, 0.6875rem);
+  font-weight: var(--weight-semibold, 600);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-inline-end: var(--space-1, 0.25rem);
+}
+
+/* Interactive Filter Chips */
+.changelog-chip {
+  cursor: pointer;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  background-color: var(--surface-card);
+  color: var(--text-secondary);
+  padding: 0.35rem 0.75rem;
+  font-size: var(--font-xs, 0.75rem);
+  font-family: var(--font-mono);
+  font-weight: var(--weight-medium, 500);
+  line-height: var(--leading-none, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5, 0.375rem);
+  user-select: none;
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.changelog-chip:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+  background-color: var(--surface-overlay);
+}
+
+/* Active Semantic Chip States */
+.changelog-chip.is-active[data-kind="added"] {
+  background-color: var(--badge-success-bg);
+  color: var(--badge-success-fg);
+  border-color: color-mix(in srgb, var(--color-success) 45%, transparent);
+}
+
+.changelog-chip.is-active[data-kind="improved"] {
+  background-color: var(--badge-brand-bg);
+  color: var(--badge-brand-fg);
+  border-color: color-mix(in srgb, var(--color-brand) 45%, transparent);
+}
+
+.changelog-chip.is-active[data-kind="fixed"] {
+  background-color: var(--badge-warning-bg);
+  color: var(--badge-warning-fg);
+  border-color: color-mix(in srgb, var(--color-warning) 45%, transparent);
+}
+
+.changelog-chip.is-active[data-kind="removed"] {
+  background-color: var(--badge-danger-bg);
+  color: var(--badge-danger-fg);
+  border-color: color-mix(in srgb, var(--color-danger) 45%, transparent);
+}
+
+/* Reset / Clear Button */
+.changelog-clear-btn {
+  cursor: pointer;
+  margin-inline-start: var(--space-2, 0.5rem);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-xs, 3px);
+  padding: var(--space-1, 0.25rem) var(--space-2, 0.5rem);
+  font-family: var(--font-sans);
+  font-size: var(--font-xs, 0.75rem);
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--transition-fast);
+}
+
+.changelog-clear-btn:hover {
+  color: var(--text-primary);
+}
+
+/* ----------------------------------------------------------------------------
+   3. RELEASE TIMELINE (Logical Flow)
+   ---------------------------------------------------------------------------- */
+.changelog-timeline {
+  list-style: none;
+  padding: 0;
+  margin-block-start: var(--space-8, 2rem);
+  margin-block-end: 0;
+}
+
+.changelog-timeline>li {
+  position: relative;
+  border-inline-start: 2px solid var(--border-default);
+  padding-inline-start: var(--space-6, 1.5rem);
+  padding-block-end: var(--space-10, 2.5rem);
+}
+
+.changelog-timeline>li:last-child {
+  padding-block-end: var(--space-4, 1rem);
+  border-inline-start-color: transparent;
+  /* Clean terminal edge */
+}
+
+/* Node Dot on Timeline Spine */
+.changelog-timeline>li::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: -6px;
+  inset-block-start: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-brand);
+  box-shadow:
+    0 0 0 3px var(--surface-canvas),
+    0 0 10px var(--color-brand-glow);
+}
+
+/* Release Header Row */
+.changelog-release-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  margin-block-end: var(--space-2, 0.5rem);
+}
+
+.changelog-release-head h2 {
+  font-family: var(--font-mono);
+  font-size: var(--font-lg, 1.125rem);
+  font-weight: var(--weight-bold, 700);
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
   margin: 0;
 }
 
-.changelog-meta-date {
-  font-size: var(--font-xs);
-  color: var(--color-text-muted);
+.changelog-release-head time {
   font-family: var(--font-mono);
+  font-size: var(--font-xs, 0.75rem);
+  color: var(--text-muted);
 }
 
-.changelog-list {
+/* ----------------------------------------------------------------------------
+   4. TAGS & KIND BADGES (Harmonized with UI-Badge Engine)
+   ---------------------------------------------------------------------------- */
+.changelog-tag {
+  border-radius: var(--radius-full);
+  padding: 0.125rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: var(--font-2xs, 0.6875rem);
+  font-weight: var(--weight-semibold, 600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: var(--leading-none);
+  border: 1px solid transparent;
+}
+
+.changelog-tag.latest,
+.changelog-tag[data-tag="latest"] {
+  background-color: var(--badge-success-bg);
+  color: var(--badge-success-fg);
+  border-color: color-mix(in srgb, var(--color-success) 35%, transparent);
+}
+
+.changelog-tag.security,
+.changelog-tag[data-tag="security"] {
+  background-color: var(--badge-danger-bg);
+  color: var(--badge-danger-fg);
+  border-color: color-mix(in srgb, var(--color-danger) 35%, transparent);
+}
+
+.changelog-tag.major,
+.changelog-tag[data-tag="major"] {
+  background-color: var(--badge-brand-bg);
+  color: var(--badge-brand-fg);
+  border-color: color-mix(in srgb, var(--color-brand) 35%, transparent);
+}
+
+/* Release Summary */
+.changelog-summary {
+  font-size: var(--font-base, 0.875rem);
+  line-height: var(--leading-relaxed, 1.625);
+  color: var(--text-secondary);
+  margin-block-end: var(--space-4, 1rem);
+  max-width: 72ch;
+}
+
+/* ----------------------------------------------------------------------------
+   5. CHANGE LIST & CHANGE ITEMS
+   ---------------------------------------------------------------------------- */
+.changelog-change-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-2, 0.5rem);
 }
 
-.changelog-item {
-  position: relative;
-  padding-left: var(--space-5);
-  font-size: var(--font-sm);
-  line-height: 1.6;
-  color: var(--color-text);
+.changelog-change-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3, 0.75rem);
+  font-size: var(--font-base, 0.875rem);
+  line-height: var(--leading-relaxed, 1.625);
 }
 
-.changelog-item::before {
-  content: '•';
-  position: absolute;
-  left: var(--space-2);
-  color: var(--color-brand);
-  font-weight: bold;
+/* Category Kind Indicator */
+.changelog-kind {
+  flex-shrink: 0;
+  margin-block-start: 3px;
+  border-radius: var(--radius-sm, 6px);
+  padding: 0.125rem 0.4rem;
+  font-family: var(--font-mono);
+  font-size: var(--font-2xs, 0.6875rem);
+  font-weight: var(--weight-semibold, 600);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: var(--leading-none);
+  border: 1px solid transparent;
+}
+
+.changelog-kind.added,
+.changelog-kind[data-kind="added"] {
+  background-color: var(--badge-success-bg);
+  color: var(--badge-success-fg);
+  border-color: color-mix(in srgb, var(--color-success) 35%, transparent);
+}
+
+.changelog-kind.improved,
+.changelog-kind[data-kind="improved"] {
+  background-color: var(--badge-brand-bg);
+  color: var(--badge-brand-fg);
+  border-color: color-mix(in srgb, var(--color-brand) 35%, transparent);
+}
+
+.changelog-kind.fixed,
+.changelog-kind[data-kind="fixed"] {
+  background-color: var(--badge-warning-bg);
+  color: var(--badge-warning-fg);
+  border-color: color-mix(in srgb, var(--color-warning) 35%, transparent);
+}
+
+.changelog-kind.removed,
+.changelog-kind[data-kind="removed"] {
+  background-color: var(--badge-danger-bg);
+  color: var(--badge-danger-fg);
+  border-color: color-mix(in srgb, var(--color-danger) 35%, transparent);
+}
+
+.changelog-change-text {
+  color: var(--text-primary);
+}
+
+.changelog-change-text code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  color: var(--cyan-300, #67e8f9);
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  padding: 0.1rem 0.35rem;
+  border-radius: var(--radius-xs, 3px);
+}
+
+/* ----------------------------------------------------------------------------
+   6. EMPTY STATE
+   ---------------------------------------------------------------------------- */
+.changelog-empty {
+  margin-block-start: var(--space-8, 2rem);
+  padding: var(--space-6, 1.5rem);
+  background-color: var(--surface-card);
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-md, 8px);
+  font-size: var(--font-sm, 0.8125rem);
+  color: var(--text-muted);
+  text-align: center;
 }

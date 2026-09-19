@@ -1,11 +1,11 @@
 {
   "name": "pickory-docs",
   "version": "1.0.0",
-  "description": "Pickory Product Filter - Developer Documentation System",
+  "description": "Pickory Official Company Website & Product Ecosystem",
   "scripts": {
     "build": "node build.js",
     "watch": "node build.js --watch",
-    "serve": "python -m http.server 3000"
+    "serve": "npx serve -l 3000"
   },
   "keywords": [
     "documentation",

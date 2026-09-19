@@ -1,119 +1,149 @@
 /* ============================================================================
-   TOP GLOBAL NAVIGATION HEADER
-   File: src/styles/header.css
+   PAGE LAYOUT: GLOBAL NAVIGATION HEADER & MOBILE DRAWER
+   Architecture: HTML5 Popover API, CSS Discrete Transitions, DTCG Mapped
+   Integration: Strictly consumes tokens from 01-tokens.css
    ============================================================================ */
 
+/* ----------------------------------------------------------------------------
+   1. GLOBAL CANVAS APPLICATION
+   ---------------------------------------------------------------------------- */
+body:has(.doc-top-header) {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--surface-canvas, #09090b);
+  background-image: var(--bg-hero-radial);
+  background-repeat: no-repeat;
+  background-position: top center;
+}
+
+/* ----------------------------------------------------------------------------
+   2. STICKY TOP HEADER BAR
+   ---------------------------------------------------------------------------- */
 .doc-top-header {
   position: sticky;
-  top: 0;
-  left: 0;
-  right: 0;
+  inset-block-start: 0;
+  inset-inline: 0;
   width: 100%;
-  height: 56px;
-  background-color: var(--gray-900);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--color-border);
+  height: var(--header-h, 64px);
+  background-color: color-mix(in srgb, var(--surface-canvas, #09090b) 82%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-block-end: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.4));
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--space-6);
+  padding-inline: var(--space-4, 1rem);
   z-index: 100;
-  user-select: none;
 }
 
+@media (min-width: 768px) {
+  .doc-top-header {
+    padding-inline: var(--space-6, 1.5rem);
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   3. BRAND IDENTITY
+   ---------------------------------------------------------------------------- */
 .doc-header-left {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-4, 1rem);
 }
 
 .doc-header-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-2-5, 0.625rem);
   text-decoration: none;
-  color: var(--color-text);
-  font-weight: 700;
-  transition: opacity var(--transition);
+  color: var(--text-primary, #fafafa);
+  font-weight: var(--weight-bold, 700);
+  border-radius: var(--radius-sm, 6px);
+  padding: var(--space-1, 0.25rem) var(--space-1-5, 0.375rem);
+  transition: opacity var(--transition-fast);
 }
 
 .doc-header-brand:hover {
   opacity: 0.9;
 }
 
-.doc-header-logo {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-sm);
-  background: linear-gradient(135deg, var(--color-brand) 0%, #6366f1 100%);
-  color: #ffffff;
+.doc-header-wordmark {
+  font-size: 1.25rem;
   font-weight: 800;
-  font-size: 14px;
-  font-family: var(--font-mono);
-  box-shadow: 0 0 12px var(--color-brand-alpha);
+  letter-spacing: -0.035em;
+  color: var(--text-primary, #fafafa);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-style: italic;
+  position: relative;
 }
 
-.doc-header-title {
-  font-size: var(--font-base);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--color-text);
+/* Warm accent on the opening letter */
+.doc-header-wordmark::first-letter {
+  font-size: 1.45em;
+  font-weight: 900;
+  background: linear-gradient(135deg, #f09f33, #cc3f47);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .doc-header-title-sub {
-  color: var(--color-text-muted);
-  font-weight: 400;
+  color: var(--text-muted);
+  font-weight: var(--weight-regular, 400);
+  margin-inline-start: var(--space-1, 0.25rem);
 }
 
-/* Navigation Links (Tabs) */
+/* ----------------------------------------------------------------------------
+   4. DESKTOP NAVIGATION TABS
+   ---------------------------------------------------------------------------- */
 .doc-header-nav {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-1, 0.25rem);
   height: 100%;
 }
 
 .doc-header-link {
   display: inline-flex;
   align-items: center;
-  padding: 7px 14px;
-  font-size: var(--font-sm);
-  font-weight: 500;
-  color: var(--color-text-muted);
+  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  font-size: var(--font-sm, 0.8125rem);
+  font-weight: var(--weight-medium, 500);
+  color: var(--text-secondary);
   text-decoration: none;
-  border-radius: var(--radius-md);
-  transition: color var(--transition), background-color var(--transition);
+  border-radius: var(--radius-full);
   position: relative;
   white-space: nowrap;
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast);
 }
 
 .doc-header-link:hover {
-  color: var(--color-text);
-  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  background-color: var(--surface-hover);
 }
 
 .doc-header-link.is-active {
-  color: var(--color-text);
-  background-color: rgba(255, 255, 255, 0.08);
-  font-weight: 600;
+  color: var(--text-primary);
+  font-weight: var(--weight-semibold, 600);
 }
 
+/* Integrated Underline for Active Header Links */
 .doc-header-link.is-active::after {
-  content: '';
+  content: "";
   position: absolute;
-  bottom: -10px;
-  left: 14px;
-  right: 14px;
+  inset-block-end: -10px;
+  inset-inline: var(--space-3, 0.75rem);
   height: 2px;
   background-color: var(--color-brand);
-  border-radius: 2px;
+  border-radius: var(--radius-full);
 }
 
-/* Header Right Actions */
+/* ----------------------------------------------------------------------------
+   5. HEADER RIGHT ACTIONS & TRIGGERS
+   ---------------------------------------------------------------------------- */
 .doc-header-right {
   display: flex;
   align-items: center;
@@ -122,87 +152,227 @@
 .doc-header-actions {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-}
-
-.doc-header-search-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  background-color: var(--color-surface-subtle);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  color: var(--color-text-muted);
-  padding: 6px 12px;
-  font-size: var(--font-xs);
-  cursor: pointer;
-  transition: border-color var(--transition), color var(--transition);
-}
-
-.doc-header-search-btn:hover {
-  border-color: var(--color-border-hover);
-  color: var(--color-text);
-}
-
-.doc-header-kbd {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  background-color: rgba(255, 255, 255, 0.08);
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-muted);
+  gap: var(--space-2, 0.5rem);
 }
 
 .doc-header-icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-muted);
-  padding: 6px;
-  border-radius: var(--radius-sm);
-  transition: color var(--transition);
+  width: 36px;
+  height: 36px;
+  color: var(--text-secondary);
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid transparent;
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
   text-decoration: none;
 }
 
 .doc-header-icon-btn:hover {
-  color: var(--color-text);
+  color: var(--text-primary);
+  background-color: var(--surface-hover);
+  border-color: var(--border-subtle);
 }
 
-.doc-header-cta-btn {
+/* Mobile Hamburger Trigger */
+.doc-header-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md, 8px);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.doc-header-hamburger:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--border-strong);
+}
+
+/* ----------------------------------------------------------------------------
+   6. MOBILE POPOVER DRAWER (HTML Popover API Engine)
+   ---------------------------------------------------------------------------- */
+.doc-mobile-popover {
+  position: fixed;
+  inset-block-end: 0;
+  inset-inline: auto 0;
+  width: min(300px, 88vw);
+  height: 100dvh;
+  margin: 0;
+  padding: var(--space-4, 1rem);
+  border: none;
+  border-inline-start: 1px solid var(--border-default);
+  border-block-start: 1px solid var(--border-subtle);
+  background-color: var(--surface-overlay, #1f1f23);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-xl);
+  /* NOTE: do NOT set display here — the UA stylesheet controls display:none
+     when the popover is closed via [popover]:not(:popover-open) { display:none }.
+     Author-level display would override that and keep it permanently visible. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-sizing: border-box;
+}
+
+/* Apply flex layout + slide in when the popover is open */
+.doc-mobile-popover:popover-open {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 1rem);
+  transform: translateX(0);
+}
+
+@starting-style {
+  .doc-mobile-popover:popover-open {
+    transform: translateX(100%);
+  }
+}
+
+/* Native Backdrop Filter with Discrete Fade */
+.doc-mobile-popover::backdrop {
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  transition:
+    opacity var(--transition-normal),
+    display var(--transition-normal) allow-discrete,
+    overlay var(--transition-normal) allow-discrete;
+}
+
+.doc-mobile-popover:popover-open::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  .doc-mobile-popover:popover-open::backdrop {
+    opacity: 0;
+  }
+}
+
+.doc-mobile-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block-end: var(--space-3, 0.75rem);
+  border-block-end: 1px solid var(--border-subtle);
+}
+
+.doc-mobile-nav-label {
+  font-size: var(--font-xs, 0.75rem);
+  font-weight: var(--weight-semibold, 600);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.doc-mobile-popover-close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: #ffffff;
-  color: #0c0e14;
-  font-size: var(--font-xs);
-  font-weight: 600;
-  padding: 6px 14px;
-  border-radius: var(--radius-full);
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm, 6px);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.doc-mobile-popover-close:hover {
+  color: var(--text-primary);
+  background-color: var(--surface-hover);
+}
+
+.doc-mobile-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 0.25rem);
+}
+
+.doc-mobile-nav .doc-header-link {
+  display: flex;
+  align-items: center;
+  padding: 0.65rem 0.85rem;
+  font-size: var(--font-base, 0.875rem);
+  font-weight: var(--weight-medium, 500);
+  color: var(--text-secondary);
+  border-radius: var(--radius-md, 8px);
+}
+
+.doc-mobile-nav .doc-header-link:hover,
+.doc-mobile-nav .doc-header-link.is-active {
+  color: var(--text-primary);
+  background-color: var(--surface-hover);
+}
+
+.doc-mobile-nav .doc-header-link.is-active::after {
+  display: none;
+}
+
+.doc-mobile-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 0.75rem);
+  margin-block-start: auto;
+  padding-block-start: var(--space-4, 1rem);
+  border-block-start: 1px solid var(--border-subtle);
+}
+
+.doc-mobile-github {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 0.5rem);
+  padding: 0.6rem 0.85rem;
+  color: var(--text-secondary);
   text-decoration: none;
-  transition: opacity var(--transition), transform var(--transition);
-  white-space: nowrap;
+  font-size: var(--font-sm, 0.8125rem);
+  font-weight: var(--weight-medium, 500);
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--border-subtle);
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
-.doc-header-cta-btn:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+.doc-mobile-github:hover {
+  color: var(--text-primary);
+  background-color: var(--surface-hover);
+  border-color: var(--border-strong);
 }
 
+/* ----------------------------------------------------------------------------
+   7. RESPONSIVE BREAKPOINTS
+   ---------------------------------------------------------------------------- */
+/* Hide on desktop — use CSS only, don't fight the popover API above 768px */
 @media screen and (max-width: 768px) {
-  .doc-top-header {
-    padding: 0 var(--space-4);
-    height: auto;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-    padding-top: var(--space-3);
-    padding-bottom: var(--space-3);
+  .doc-header-nav {
+    display: none;
   }
 
-  .doc-header-nav {
-    order: 3;
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: 4px;
+  .doc-header-actions .doc-header-icon-btn,
+  .doc-header-actions .btn {
+    display: none;
+  }
+
+  .doc-header-hamburger {
+    display: inline-flex;
   }
 }

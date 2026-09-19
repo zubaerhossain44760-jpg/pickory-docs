@@ -1,125 +1,254 @@
 /* ============================================================================
-   PAGE STYLES: HOME PORTAL
+   PAGE STYLES: HOME PORTAL (Company Landing Page)
    File: src/styles/pages/home.css
-   Scope: Main Landing, Product Matrix, Ecosystem Directory
    ============================================================================ */
 
-/* Home Hero Block */
-.home-hero-container {
+/* Main Container */
+.home-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-6) var(--space-16);
+}
+
+/* ============================================================================
+   HERO SECTION
+   ============================================================================ */
+.home-hero-header {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  padding: var(--space-8) 0 var(--space-6);
-}
-
-.home-hero-badge-group {
-  display: flex;
   align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
+  padding: calc(var(--space-16) * 1.5) 0 var(--space-16);
+  min-height: 70vh;
 }
 
-.home-portal-lead {
-  font-size: var(--font-md);
+/* JetBrains style glowing background effect */
+.home-hero-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(0, 104, 253, 0.15) 0%, rgba(0, 255, 204, 0.05) 40%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+  filter: blur(40px);
+}
+
+.home-hero-content {
+  max-width: 800px;
+  z-index: 1;
+}
+
+.home-hero-title {
+  font-size: clamp(3rem, 5vw, 4.5rem);
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-6);
+  background: linear-gradient(180deg, #ffffff 0%, #a0a5b5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.home-hero-subtitle {
+  font-size: var(--font-lg);
   line-height: 1.6;
   color: var(--color-text-muted);
-  max-width: 720px;
+  margin: 0 auto var(--space-8);
+  max-width: 680px;
 }
 
-/* Quick Start / Roadmap Card */
-.home-roadmap-card {
-  background: linear-gradient(135deg, rgba(37, 37, 40, 0.9) 0%, rgba(25, 25, 28, 0.95) 100%);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-6);
-  margin-bottom: var(--space-8);
-  transition: border-color var(--transition), box-shadow var(--transition);
+.home-hero-actions {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: center;
 }
 
-.home-roadmap-card:hover {
-  border-color: var(--color-border-hover);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+/* ============================================================================
+   SHARED SECTION HEADERS
+   ============================================================================ */
+.home-section-header {
+  text-align: center;
+  margin-bottom: var(--space-12);
 }
 
-/* Product Showcase Grid */
+.home-section-title {
+  font-size: var(--font-2xl);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-4);
+}
+
+.home-section-desc {
+  font-size: var(--font-lg);
+  color: var(--color-text-muted);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ============================================================================
+   PRODUCTS SECTION
+   ============================================================================ */
 .home-product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: var(--space-6);
-  margin: var(--space-6) 0 var(--space-10);
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: var(--space-8);
+  margin-bottom: var(--space-16);
 }
 
 .home-product-card {
-  background-color: var(--bg-card-dark);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-6);
+  background: rgba(25, 25, 28, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+  justify-content: space-between;
+  gap: var(--space-6);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
 }
 
+/* Subtle gradient borders on hover */
+.home-product-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--color-border);
+  transition: background 0.3s ease;
+}
+
+.home-product-card--plugin::before { background: var(--color-brand); }
+.home-product-card--theme::before { background: var(--color-success); }
+
 .home-product-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--color-brand);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px -2px var(--effect-brand-glow-small);
+  background: rgba(30, 30, 35, 0.8);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
 .home-product-card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.home-product-card-icon {
+  font-size: 32px;
+  line-height: 1;
 }
 
 .home-product-card-title {
-  font-size: var(--font-lg);
+  font-size: var(--font-xl);
   font-weight: 700;
   color: var(--color-text);
-  margin: 0;
+  margin-bottom: var(--space-3);
 }
 
 .home-product-card-desc {
-  font-size: var(--font-sm);
+  font-size: var(--font-base);
   color: var(--color-text-muted);
-  line-height: 1.55;
+  line-height: 1.6;
+  margin-bottom: var(--space-6);
+}
+
+.home-product-card-features {
+  list-style: none;
+  padding: 0;
   margin: 0;
+  font-size: var(--font-sm);
+  color: var(--color-text);
+}
+
+.home-product-card-features li {
+  margin-bottom: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .home-product-card-footer {
-  margin-top: auto;
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--color-border-subtle);
+  margin-top: var(--space-6);
+}
+
+.home-product-card-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ============================================================================
+   FEATURES / WHY CHOOSE US
+   ============================================================================ */
+.home-feature-card {
+  text-align: center;
+  padding: var(--space-8) var(--space-6);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.home-feature-card:hover {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.home-feature-icon {
+  font-size: 40px;
+  margin-bottom: var(--space-4);
+}
+
+/* ============================================================================
+   FOOTER CTA BANNER
+   ============================================================================ */
+.home-footer-banner {
+  margin-top: var(--space-16);
+}
+
+.home-footer-banner-card {
+  background: linear-gradient(135deg, rgba(37, 37, 40, 0.9) 0%, rgba(25, 25, 28, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: var(--space-10) var(--space-8);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle glow behind the banner */
+.home-footer-banner-card::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%; width: 200%; height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.home-footer-banner-inner {
+  position: relative;
+  z-index: 1;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
+  gap: var(--space-6);
 }
 
-/* Ecosystem Integrations Matrix */
-.home-ecosystem-section {
-  margin-top: var(--space-10);
-}
-
-.home-ecosystem-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--space-4);
-}
-
-.home-ecosystem-pill {
-  background: var(--color-surface-subtle);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-sm);
-  padding: var(--space-3) var(--space-4);
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  font-size: var(--font-xs);
+.home-footer-banner-title {
+  font-size: var(--font-2xl);
+  font-weight: 700;
   color: var(--color-text);
-  transition: border-color var(--transition);
+  margin-bottom: var(--space-2);
 }
 
-.home-ecosystem-pill:hover {
-  border-color: var(--color-border-hover);
+.home-footer-banner-desc {
+  font-size: var(--font-lg);
+  color: var(--color-text-muted);
 }

@@ -2,14 +2,9 @@
  * ============================================================================
  * Pickory Product Filter - Interactive Developer Documentation Engine
  * File: app.js
- * Phase: 3 (Content Hydration, Interactive State Machine, Code Window, Scroll Spy)
- *
- * ARCHITECTURAL CONSTRAINTS:
- * - Strictly Pure Vanilla JavaScript (ES6+)
- * - Zero React hooks (No useState, No useEffect, No JSX)
- * - Zero external libraries (No jQuery, No lodash, No Alpine, No npm packages)
- * - Clean event delegation pattern
- * - Native Web APIs: IntersectionObserver, EventTarget, classList, dataset, navigator.clipboard
+ * Architecture: Event-Delegated, Zero-Dependency, Pure Vanilla Web APIs (ES6+)
+ * Performance: rAF-Gated Layout Engine, Inertial Scroll Guards, High-DPI Observer
+ * Accessibility: WCAG 2.2 AA / WAI-ARIA Compliant State Machine & Tab Engines
  * ============================================================================
  */
 
@@ -18,12 +13,9 @@
 
   /* ==========================================================================
      1. COMPONENT 1: REACTIVE STATE MACHINE VISUALIZER
-     Data store and event-delegated node activation with adjacent micro-card
+     Interactive SVG State Machine with Accessible Micro-Card Inspection
      ========================================================================== */
 
-  /**
-   * Technical specifications and architectural invariants for each pipeline node
-   */
   const STATE_MACHINE_NODES = {
     'user-interaction': {
       title: 'User Interaction',
@@ -62,9 +54,6 @@
     }
   };
 
-  /**
-   * Initializes the State Machine Flowchart and Micro-card
-   */
   function setupStateMachine() {
     const container = document.getElementById('state-machine-container');
     const microCard = document.getElementById('state-inspector-card');
@@ -75,24 +64,30 @@
     const microPath = microCard.querySelector('.ui-card-filepath');
     const microRole = microCard.querySelector('.ui-card-role');
     const microInvariant = microCard.querySelector('.ui-card-invariant');
-    const allNodes = container.querySelectorAll('.flow-node');
+    const allNodes = Array.from(container.querySelectorAll('.flow-node'));
 
-    /**
-     * Activates a specific node and updates the inspector micro-card
-     * @param {string} nodeId - The key matching STATE_MACHINE_NODES
-     */
+    // Inject accessible button semantics into SVG group nodes
+    allNodes.forEach((node) => {
+      node.setAttribute('role', 'button');
+      node.setAttribute('tabindex', '0');
+      node.setAttribute('aria-pressed', 'false');
+    });
+
     function activateNode(nodeId) {
       const nodeData = STATE_MACHINE_NODES[nodeId];
       if (!nodeData) return;
 
-      // 1. Toggle active state on SVG nodes
       allNodes.forEach((node) => {
         const isActive = node.getAttribute('data-node-id') === nodeId;
         node.classList.toggle('is-active', isActive);
-        node.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        node.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        if (isActive) {
+          node.setAttribute('aria-current', 'true');
+        } else {
+          node.removeAttribute('aria-current');
+        }
       });
 
-      // 2. Update micro-card DOM elements
       if (microTitle) microTitle.textContent = nodeData.title;
       if (microBadge) microBadge.textContent = nodeData.badge;
       if (microPath) microPath.textContent = nodeData.filePath;
@@ -100,7 +95,6 @@
       if (microInvariant) microInvariant.textContent = nodeData.invariant;
     }
 
-    // Event delegation on the SVG flowchart container
     container.addEventListener('click', (event) => {
       const nodeEl = event.target.closest('.flow-node');
       if (!nodeEl) return;
@@ -108,7 +102,6 @@
       if (nodeId) activateNode(nodeId);
     });
 
-    // Keyboard navigation (Enter / Space to activate focused node)
     container.addEventListener('keydown', (event) => {
       if (event.key === 'Enter' || event.key === ' ') {
         const nodeEl = event.target.closest('.flow-node');
@@ -120,18 +113,14 @@
       }
     });
 
-    // Default activate the first node (User Interaction)
     activateNode('user-interaction');
   }
 
   /* ==========================================================================
-     2. COMPONENT 2: MULTI-TAB JETBRAINS / STRIPE CODE WINDOW
-     DRY tab-switching logic via dataset & classList.toggle()
+     2. COMPONENT 2: MULTI-TAB CODE WINDOW (WAI-ARIA COMPLIANT)
+     Keyboard Arrow Navigation, Resilient Clipboard Engine & Race Guard
      ========================================================================== */
 
-  /**
-   * Initializes Multi-Tab Code Windows
-   */
   function setupCodeWindows() {
     const codeWindows = document.querySelectorAll('.ui-code-window');
 
@@ -139,74 +128,137 @@
       const tabGroup = windowEl.querySelector('.code-tab-group');
       const filenameLabel = windowEl.querySelector('.code-window-filename');
       const copyBtn = windowEl.querySelector('.copy-btn');
-      const tabPanes = windowEl.querySelectorAll('.code-tab-pane');
+      const tabPanes = Array.from(windowEl.querySelectorAll('.code-tab-pane'));
 
       if (!tabGroup) return;
 
-      // Event delegation for tab switching
-      tabGroup.addEventListener('click', (event) => {
-        const tabBtn = event.target.closest('.code-tab-btn');
-        if (!tabBtn) return;
+      const tabButtons = Array.from(tabGroup.querySelectorAll('.code-tab-btn'));
 
-        const targetPaneId = tabBtn.getAttribute('data-target');
-        const targetFilename = tabBtn.getAttribute('data-file');
-        if (!targetPaneId) return;
+      // Ensure proper WAI-ARIA roles
+      tabGroup.setAttribute('role', 'tablist');
+      tabButtons.forEach((btn, idx) => {
+        btn.setAttribute('role', 'tab');
+        const isInitActive = btn.classList.contains('is-active') || idx === 0;
+        btn.setAttribute('aria-selected', isInitActive ? 'true' : 'false');
+        btn.setAttribute('tabindex', isInitActive ? '0' : '-1');
 
-        // Toggle tab button active state
-        const allTabBtns = tabGroup.querySelectorAll('.code-tab-btn');
-        allTabBtns.forEach((btn) => {
-          btn.classList.toggle('is-active', btn === tabBtn);
-          btn.setAttribute('aria-selected', btn === tabBtn ? 'true' : 'false');
-        });
-
-        // Toggle code pane visibility
-        tabPanes.forEach((pane) => {
-          const isTarget = pane.id === targetPaneId;
-          pane.classList.toggle('is-active', isTarget);
-        });
-
-        // Dynamically update active filename indicator in the header
-        if (filenameLabel && targetFilename) {
-          filenameLabel.textContent = targetFilename;
+        const targetId = btn.getAttribute('data-target');
+        if (targetId) {
+          btn.setAttribute('aria-controls', targetId);
+          const pane = document.getElementById(targetId);
+          if (pane) {
+            pane.setAttribute('role', 'tabpanel');
+            pane.setAttribute('aria-labelledby', btn.id || `tab-btn-${targetId}`);
+            pane.hidden = !isInitActive;
+          }
         }
       });
 
-      // Clipboard copy function with temporary visual feedback
+      function switchTab(targetBtn) {
+        if (!targetBtn) return;
+        const targetPaneId = targetBtn.getAttribute('data-target');
+        const targetFilename = targetBtn.getAttribute('data-file');
+
+        tabButtons.forEach((btn) => {
+          const isTarget = btn === targetBtn;
+          btn.classList.toggle('is-active', isTarget);
+          btn.setAttribute('aria-selected', isTarget ? 'true' : 'false');
+          btn.setAttribute('tabindex', isTarget ? '0' : '-1');
+        });
+
+        tabPanes.forEach((pane) => {
+          const isTarget = pane.id === targetPaneId;
+          pane.classList.toggle('is-active', isTarget);
+          pane.hidden = !isTarget;
+        });
+
+        if (filenameLabel && targetFilename) {
+          filenameLabel.textContent = targetFilename;
+        }
+
+        targetBtn.focus();
+      }
+
+      tabGroup.addEventListener('click', (event) => {
+        const tabBtn = event.target.closest('.code-tab-btn');
+        if (tabBtn) switchTab(tabBtn);
+      });
+
+      // Keyboard arrow navigation according to WAI-ARIA Tabs pattern
+      tabGroup.addEventListener('keydown', (event) => {
+        const currentBtn = event.target.closest('.code-tab-btn');
+        if (!currentBtn) return;
+
+        const currentIndex = tabButtons.indexOf(currentBtn);
+        let nextIndex = null;
+
+        switch (event.key) {
+          case 'ArrowRight':
+            nextIndex = (currentIndex + 1) % tabButtons.length;
+            break;
+          case 'ArrowLeft':
+            nextIndex = (currentIndex - 1 + tabButtons.length) % tabButtons.length;
+            break;
+          case 'Home':
+            nextIndex = 0;
+            break;
+          case 'End':
+            nextIndex = tabButtons.length - 1;
+            break;
+          default:
+            return;
+        }
+
+        event.preventDefault();
+        switchTab(tabButtons[nextIndex]);
+      });
+
+      // Memory-safe, race-free clipboard trigger
       if (copyBtn) {
         copyBtn.addEventListener('click', async () => {
-          const activePane = windowEl.querySelector('.code-tab-pane.is-active');
+          const activePane = tabPanes.find((p) => !p.hidden) || tabPanes[0];
           const codeEl = activePane ? activePane.querySelector('code') : null;
           if (!codeEl) return;
 
-          const codeText = codeEl.textContent || '';
+          const codeText = codeEl.innerText || codeEl.textContent || '';
+          const copyText = copyBtn.querySelector('.copy-text');
+          const originalText = copyBtn._originalText || (copyText ? copyText.textContent : 'Copy Code');
+          copyBtn._originalText = originalText;
 
           try {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
+            if (navigator.clipboard && window.isSecureContext) {
               await navigator.clipboard.writeText(codeText);
             } else {
-              // Fallback for non-secure contexts
-              const textarea = document.createElement('textarea');
-              textarea.value = codeText;
-              textarea.style.position = 'fixed';
-              textarea.style.opacity = '0';
-              document.body.appendChild(textarea);
-              textarea.select();
+              // Non-secure context fallback
+              const textArea = document.createElement('textarea');
+              textArea.value = codeText;
+              textArea.style.position = 'fixed';
+              textArea.style.left = '-999999px';
+              textArea.style.top = '-999999px';
+              document.body.appendChild(textArea);
+              textArea.focus();
+              textArea.select();
               document.execCommand('copy');
-              document.body.removeChild(textarea);
+              textArea.remove();
             }
 
-            // Visual feedback: toggle checkmark state
+            // Cancel any pending timer to avoid visual state collision
+            if (copyBtn._timeoutId) clearTimeout(copyBtn._timeoutId);
+
             copyBtn.classList.add('is-copied');
-            const copyText = copyBtn.querySelector('.copy-text');
-            const originalText = copyText ? copyText.textContent : 'Copy Code';
             if (copyText) copyText.textContent = 'Copied!';
 
-            setTimeout(() => {
+            copyBtn._timeoutId = setTimeout(() => {
               copyBtn.classList.remove('is-copied');
               if (copyText) copyText.textContent = originalText;
+              copyBtn._timeoutId = null;
             }, 2000);
           } catch (err) {
-            console.error('Pickory Docs: Clipboard copy failed:', err);
+            console.error('Pickory Docs: Clipboard failed', err);
+            if (copyText) copyText.textContent = 'Error';
+            copyBtn._timeoutId = setTimeout(() => {
+              if (copyText) copyText.textContent = originalText;
+            }, 2000);
           }
         });
       }
@@ -215,14 +267,9 @@
 
   /* ==========================================================================
      3. COMPONENT 3: DYNAMIC CONTEXTUAL TOC & MAIN NAV SYNCHRONIZATION
-     Dynamic contextual subtopic rendering and bidirectional scroll spy
-     between Left Main Navigation and Right Practical Inquiries Sidebar
+     Bidirectional Scroll-Spy with Programmatic Scroll Mutex Lock
      ========================================================================== */
 
-  /**
-   * Data dictionary defining the contextual topics and practical questions
-   * associated with each primary section in the Main Navigation.
-   */
   const SECTION_CONTEXT_TOPICS = {
     'core-architecture': {
       title: 'Core Architecture & System Foundation',
@@ -314,31 +361,35 @@
     }
   };
 
-  /**
-   * Initializes the dynamic synchronization engine
-   */
   function setupDynamicContextSync() {
     const leftNavTree = document.querySelector('.doc-nav-tree');
-    const rightSidebar = document.querySelector('.doc-sidebar-right');
     const dynamicSection = document.getElementById('dynamic-toc-section');
     const dynamicList = document.getElementById('dynamic-toc-list');
+    const centerCanvas = document.querySelector('.doc-center-canvas') || window;
 
-    if (!leftNavTree || !rightSidebar || !dynamicList) return;
+    if (!leftNavTree || !dynamicList) return;
 
     const leftNavItems = Array.from(leftNavTree.querySelectorAll('.doc-nav-item'));
     const sectionIds = Object.keys(SECTION_CONTEXT_TOPICS);
-    const sectionElements = sectionIds
-      .map((id) => document.getElementById(id))
-      .filter(Boolean);
+    const sectionElements = sectionIds.map((id) => document.getElementById(id)).filter(Boolean);
 
     let activeSectionId = null;
     let activeSubtopicId = null;
+    let isProgrammaticScroll = false;
+    let scrollEndTimer = null;
     let subtopicObserver = null;
 
-    /**
-     * Updates the active class on the Left Sidebar main navigation
-     * @param {string} sectionId
-     */
+    function releaseProgrammaticLock() {
+      if (scrollEndTimer) clearTimeout(scrollEndTimer);
+      scrollEndTimer = setTimeout(() => {
+        isProgrammaticScroll = false;
+      }, 700);
+    }
+
+    if ('onscrollend' in window) {
+      window.addEventListener('scrollend', () => { isProgrammaticScroll = false; });
+    }
+
     function updateLeftSidebarActive(sectionId) {
       leftNavItems.forEach((item) => {
         const link = item.querySelector('.doc-nav-link');
@@ -346,52 +397,23 @@
           const href = link.getAttribute('href');
           const isMatch = href === `#${sectionId}`;
           item.classList.toggle('is-active', isMatch);
+          item.setAttribute('aria-current', isMatch ? 'true' : 'false');
         }
       });
     }
 
-    /**
-     * Renders contextual topics in the Right Sidebar and observes subtopics
-     * @param {string} sectionId
-     */
-    function renderRightSidebarContext(sectionId) {
-      const data = SECTION_CONTEXT_TOPICS[sectionId];
-      if (!data) return;
-
-      if (dynamicSection) dynamicSection.textContent = data.title;
-
-      // Render new items with subtle fade
-      dynamicList.style.opacity = '0';
-      setTimeout(() => {
-        dynamicList.innerHTML = data.topics.map((t, idx) => `
-          <li class="doc-toc-item ${idx === 0 ? 'is-active' : ''}" data-target-id="${t.id}">
-            <a href="#${t.id}" class="doc-toc-link">${t.label}</a>
-          </li>
-        `).join('');
-        dynamicList.style.opacity = '1';
-
-        // Connect subtopic observer for the newly rendered topics
-        setupSubtopicObserver(data.topics);
-      }, 80);
-    }
-
-    /**
-     * Highlights the active subtopic in the Right Sidebar
-     * @param {string} subtopicId
-     */
     function setActiveSubtopic(subtopicId) {
+      if (activeSubtopicId === subtopicId) return;
       activeSubtopicId = subtopicId;
       const items = dynamicList.querySelectorAll('.doc-toc-item');
       items.forEach((item) => {
         const targetId = item.getAttribute('data-target-id');
-        item.classList.toggle('is-active', targetId === subtopicId);
+        const isTarget = targetId === subtopicId;
+        item.classList.toggle('is-active', isTarget);
+        item.setAttribute('aria-current', isTarget ? 'location' : 'false');
       });
     }
 
-    /**
-     * Sets up IntersectionObserver for subtopics of the current section
-     * @param {Array} topics
-     */
     function setupSubtopicObserver(topics) {
       if (subtopicObserver) {
         subtopicObserver.disconnect();
@@ -406,27 +428,51 @@
       if (targetToIdMap.size === 0) return;
 
       subtopicObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const targetId = targetToIdMap.get(entry.target);
-            if (targetId && targetId !== activeSubtopicId) {
-              setActiveSubtopic(targetId);
-            }
-          }
-        });
+        if (isProgrammaticScroll) return;
+
+        // Choose the highest visible entry closest to our reading margin
+        const visibleEntries = entries.filter((e) => e.isIntersecting);
+        if (visibleEntries.length > 0) {
+          visibleEntries.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+          const targetId = targetToIdMap.get(visibleEntries[0].target);
+          if (targetId) setActiveSubtopic(targetId);
+        }
       }, {
         root: null,
-        rootMargin: '-10% 0px -55% 0px',
+        rootMargin: '-10% 0px -60% 0px',
         threshold: 0
       });
 
       targetToIdMap.forEach((_, el) => subtopicObserver.observe(el));
     }
 
-    /**
-     * Syncs a new section to both sidebars
-     * @param {string} sectionId
-     */
+    function renderRightSidebarContext(sectionId) {
+      const data = SECTION_CONTEXT_TOPICS[sectionId];
+      if (!data) return;
+
+      if (dynamicSection) dynamicSection.textContent = data.title;
+
+      // Safe fragment construction to prevent layout shifts
+      const fragment = document.createDocumentFragment();
+      data.topics.forEach((t, idx) => {
+        const li = document.createElement('li');
+        li.className = `doc-toc-item ${idx === 0 ? 'is-active' : ''}`;
+        li.setAttribute('data-target-id', t.id);
+        li.setAttribute('aria-current', idx === 0 ? 'location' : 'false');
+
+        const a = document.createElement('a');
+        a.href = `#${t.id}`;
+        a.className = 'doc-toc-link';
+        a.textContent = t.label;
+
+        li.appendChild(a);
+        fragment.appendChild(li);
+      });
+
+      dynamicList.replaceChildren(fragment);
+      setupSubtopicObserver(data.topics);
+    }
+
     function syncActiveSection(sectionId) {
       if (activeSectionId === sectionId) return;
       activeSectionId = sectionId;
@@ -434,8 +480,9 @@
       renderRightSidebarContext(sectionId);
     }
 
-    // 1. Observe all primary sections in the main canvas
     const sectionObserver = new IntersectionObserver((entries) => {
+      if (isProgrammaticScroll) return;
+
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const sectionId = entry.target.id;
@@ -446,89 +493,49 @@
       });
     }, {
       root: null,
-      rootMargin: '-10% 0px -60% 0px',
+      rootMargin: '-12% 0px -65% 0px',
       threshold: 0
     });
 
     sectionElements.forEach((el) => sectionObserver.observe(el));
 
-    // 2. Handle Left Sidebar clicks: smooth scroll & immediate sync
-    leftNavTree.addEventListener('click', (event) => {
-      const link = event.target.closest('.doc-nav-link');
+    // Unified click delegation for smooth scrolling
+    document.addEventListener('click', (event) => {
+      const link = event.target.closest('.doc-nav-link, .doc-toc-link');
       if (!link) return;
 
       const href = link.getAttribute('href');
-      if (href && href.startsWith('#')) {
-        const targetId = href.substring(1);
-        const targetEl = document.getElementById(targetId);
-        if (targetEl) {
-          event.preventDefault();
-          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+      if (!href || !href.startsWith('#')) return;
+
+      const targetId = href.substring(1);
+      const targetEl = document.getElementById(targetId);
+      if (!targetEl) return;
+
+      event.preventDefault();
+      isProgrammaticScroll = true;
+      releaseProgrammaticLock();
+
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      if (link.classList.contains('doc-nav-link')) {
         syncActiveSection(targetId);
+      } else {
+        setActiveSubtopic(targetId);
+      }
+
+      if (window.history.pushState) {
+        window.history.pushState(null, '', href);
       }
     });
 
-  /* ==========================================================================
-     4. COMPONENT 4: READING PROGRESS INDICATOR
-     Dynamic progress bar showing scroll position in main content
-     ========================================================================== */
-
-  /**
-   * Initializes the reading progress indicator
-   */
-  function setupReadingProgress() {
-    const centerCanvas = document.querySelector('.doc-center-canvas');
-    if (!centerCanvas) return;
-
-    const updateProgress = () => {
-      const scrollTop = centerCanvas.scrollTop;
-      const scrollHeight = centerCanvas.scrollHeight - centerCanvas.clientHeight;
-      const progress = scrollHeight > 0 ? scrollTop / scrollHeight : 0;
-      centerCanvas.style.setProperty('--reading-progress', progress);
-      centerCanvas.classList.add('reading-progress');
-    };
-
-    centerCanvas.addEventListener('scroll', updateProgress);
-    updateProgress(); // Initial call
-  }
-
-
-
-  /* ==========================================================================
-     INITIALIZATION: Bootstrap All Components
-     ========================================================================== */
-  setupStateMachine();
-  setupCodeWindows();
-  setupContextualTOC();
-  setupReadingProgress();
-    // 3. Handle Right Sidebar clicks: smooth scroll to subtopic
-    rightSidebar.addEventListener('click', (event) => {
-      const link = event.target.closest('.doc-toc-link');
-      if (!link) return;
-
-      const href = link.getAttribute('href');
-      if (href && href.startsWith('#')) {
-        const targetId = href.substring(1);
-        const targetEl = document.getElementById(targetId);
-        if (targetEl) {
-          event.preventDefault();
-          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          setActiveSubtopic(targetId);
-        }
-      }
-    });
-
-    // 4. Initial sync based on current URL hash or default to architecture-overview
+    // Hash hydration on load
     const initialHash = window.location.hash.replace('#', '');
-    let initialSection = 'core-architecture';
+    let initialSection = sectionIds[0];
 
     if (initialHash) {
-      // Check if hash is directly a section
       if (SECTION_CONTEXT_TOPICS[initialHash]) {
         initialSection = initialHash;
       } else {
-        // Find which section contains this subtopic
         for (const [secId, secData] of Object.entries(SECTION_CONTEXT_TOPICS)) {
           if (secData.topics.some((t) => t.id === initialHash)) {
             initialSection = secId;
@@ -542,20 +549,76 @@
   }
 
   /* ==========================================================================
-     4. RUNTIME BOOTSTRAP
-     DOM ready initialization
+     4. COMPONENT 4: READING PROGRESS INDICATOR
+     High-Performance rAF-Gated Layout Engine (Zero Forced Reflows)
      ========================================================================== */
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      setupStateMachine();
-      setupCodeWindows();
-      setupDynamicContextSync();
-      setupReadingProgress();
+
+  function setupReadingProgress() {
+    const centerCanvas = document.querySelector('.doc-center-canvas');
+    const targetScroller = centerCanvas && centerCanvas.scrollHeight > window.innerHeight
+      ? centerCanvas
+      : window;
+
+    let isTicking = false;
+
+    function calculateProgress() {
+      let progress = 0;
+
+      if (targetScroller === window) {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        progress = maxScroll > 0 ? scrollTop / maxScroll : 0;
+      } else {
+        const scrollTop = targetScroller.scrollTop;
+        const maxScroll = targetScroller.scrollHeight - targetScroller.clientHeight;
+        progress = maxScroll > 0 ? scrollTop / maxScroll : 0;
+      }
+
+      const clamped = Math.min(Math.max(progress, 0), 1);
+      const formatted = Number(clamped.toFixed(4));
+
+      // Batch all style updates
+      if (centerCanvas) {
+        centerCanvas.style.setProperty('--reading-progress', formatted);
+      } else {
+        document.documentElement.style.setProperty('--reading-progress', formatted);
+      }
+
+      isTicking = false;
+    }
+
+    function onScroll() {
+      if (!isTicking) {
+        window.requestAnimationFrame(calculateProgress);
+        isTicking = true;
+      }
+    }
+
+    targetScroller.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    calculateProgress();
+  }
+
+  /* ==========================================================================
+     5. RUNTIME INITIALIZATION GATEWAY
+     ========================================================================== */
+
+  function start() {
+    window.requestAnimationFrame(() => {
+      try {
+        setupStateMachine();
+        setupCodeWindows();
+        setupDynamicContextSync();
+        setupReadingProgress();
+      } catch (err) {
+        console.error('Pickory Docs: Engine initialization error', err);
+      }
     });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start, { once: true });
   } else {
-    setupStateMachine();
-    setupCodeWindows();
-    setupDynamicContextSync();
-    setupReadingProgress();
+    start();
   }
 })();

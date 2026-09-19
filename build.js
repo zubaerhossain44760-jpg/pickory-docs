@@ -4,33 +4,24 @@ const path = require('path');
 const CSS_PARTS = [
   'src/styles/01-tokens.css',
   'src/styles/header.css',
-  'src/styles/documentation/base.css',
-  'src/styles/sidebar.css',
+  'src/styles/base.css',
+  'src/styles/components/sidebar.css',
+  'src/styles/components/button.css',
   'src/styles/documentation/04-content.css',
-  'src/styles/documentation/05-components.css',
+  'src/styles/components.css',
+  'src/styles/pages/home.css',
   'src/styles/pages/support.css',
-  'src/styles/pages/product-filter.css',
-  'src/styles/pages/theme.css'
+  'src/styles/pages/product.css',
+  'src/styles/pages/changelog.css'
 ];
 
 const PAGES = {
   'index.html': [
     'src/layout/head.html',
     'src/layout/header.html',
-    'src/layout/documentation/doc-start.html',
-    'src/pages/product-filter/documentation/sidebar.html',
-    'src/layout/documentation/main-start.html',
-    'src/pages/product-filter/documentation/00-overview.html',
-    'src/pages/product-filter/documentation/01-core-architecture.html',
-    'src/pages/product-filter/documentation/02-client-reactive-engine.html',
-    'src/pages/product-filter/documentation/03-code-implementation.html',
-    'src/pages/product-filter/documentation/04-ssr-query-engine.html',
-    'src/pages/product-filter/documentation/05-database-indexing-storage.html',
-    'src/pages/product-filter/documentation/06-rest-api-lifecycle.html',
-    'src/pages/product-filter/documentation/07-admin-security-extensibility.html',
-    'src/layout/documentation/main-end.html',
-    'src/layout/documentation/sidebar-right.html',
-    'src/layout/documentation/doc-end.html',
+    'src/pages/home/01-hero.html',
+    'src/pages/home/02-products.html',
+    'src/pages/home/03-ecosystem.html',
     'src/layout/footer.html'
   ],
   'product-filter.html': [
@@ -45,10 +36,22 @@ const PAGES = {
     'src/pages/theme/theme.html',
     'src/layout/footer.html'
   ],
+  'product-filter-changelog.html': [
+    'src/layout/head.html',
+    'src/layout/header.html',
+    'src/pages/product-filter/changelog/product-filter-changelog.html',
+    'src/layout/footer.html'
+  ],
+  'theme-changelog.html': [
+    'src/layout/head.html',
+    'src/layout/header.html',
+    'src/pages/theme/changelog/theme-changelog.html',
+    'src/layout/footer.html'
+  ],
   'product-filter-docs.html': [
     'src/layout/head.html',
     'src/layout/documentation/doc-start.html',
-    'src/pages/product-filter/documentation/sidebar.html',
+    'src/pages/product-filter/documentation/sidebar-left.html',
     'src/layout/documentation/main-start.html',
     'src/pages/product-filter/documentation/00-overview.html',
     'src/pages/product-filter/documentation/01-core-architecture.html',
@@ -59,9 +62,23 @@ const PAGES = {
     'src/pages/product-filter/documentation/06-rest-api-lifecycle.html',
     'src/pages/product-filter/documentation/07-admin-security-extensibility.html',
     'src/layout/documentation/main-end.html',
-    'src/layout/documentation/sidebar-right.html',
+    'src/pages/product-filter/documentation/sidebar-right.html',
     'src/layout/documentation/doc-end.html',
-    'src/layout/footer.html'
+    'src/layout/documentation/footer.html'
+  ],
+  'theme-docs.html': [
+    'src/layout/head.html',
+    'src/layout/documentation/doc-start.html',
+    'src/pages/theme/documentation/sidebar-left.html',
+    'src/layout/documentation/main-start.html',
+    'src/pages/theme/documentation/01-overview.html',
+    'src/pages/theme/documentation/02-architecture-hierarchy.html',
+    'src/pages/theme/documentation/03-styling-tokens.html',
+    'src/pages/theme/documentation/04-hooks-extensibility.html',
+    'src/layout/documentation/main-end.html',
+    'src/pages/theme/documentation/sidebar-right.html',
+    'src/layout/documentation/doc-end.html',
+    'src/layout/documentation/footer.html'
   ],
   'support.html': [
     'src/layout/head.html',
