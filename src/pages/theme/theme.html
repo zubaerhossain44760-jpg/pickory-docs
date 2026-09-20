@@ -38,11 +38,29 @@
         </div>
       </div>
 
-      <!-- App Main Canvas: Theme Preview Screenshot -->
+      <!-- App Main Canvas: Theme Preview Screenshot Stack -->
       <div class="pf-app-preview-wrap">
         <img src="media/theme-shop-archive.png"
           alt="Pickory Theme storefront layout displaying sub-second product archives and modern header navigation"
           class="pf-app-preview-img" width="1782" height="1075" loading="eager" fetchpriority="high" decoding="async">
+        <img src="media/theme-single-product.png"
+          alt="Pickory Theme single product layout with responsive image gallery and purchase controls"
+          class="pf-app-preview-img" width="1822" height="802" loading="lazy" decoding="async">
+        <img src="media/theme-product-reviews.png" alt="Pickory Theme customer reviews and rating submission section"
+          class="pf-app-preview-img" width="1811" height="812" loading="lazy" decoding="async">
+        <img src="media/theme-cart.png"
+          alt="Pickory Theme modern shopping cart interface with live totals and checkout actions"
+          class="pf-app-preview-img" width="1782" height="807" loading="lazy" decoding="async">
+        <img src="media/theme-order-details.png" alt="Pickory Theme order confirmation overview with itemized breakdown"
+          class="pf-app-preview-img" width="1487" height="892" loading="lazy" decoding="async">
+        <img src="media/theme-account-orders.png"
+          alt="Pickory Theme customer account orders dashboard with status tracking" class="pf-app-preview-img"
+          width="1782" height="848" loading="lazy" decoding="async">
+        <img src="media/theme-account-details.png"
+          alt="Pickory Theme user account settings and password management interface" class="pf-app-preview-img"
+          width="1783" height="866" loading="lazy" decoding="async">
+        <img src="media/theme-account-login.png" alt="Pickory Theme customer authentication and account login portal"
+          class="pf-app-preview-img" width="1763" height="806" loading="lazy" decoding="async">
       </div>
     </div>
   </section>
@@ -134,6 +152,298 @@
           </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- 4. Pickory Architectural Overview -->
+  <section class="pf-documentation" aria-labelledby="pf-doc-heading">
+    <div class="pf-container">
+      <header class="pf-doc-header">
+        <h2 id="pf-doc-heading" class="pf-doc-title">Pickory: A Comprehensive Architectural and Functional Analysis</h2>
+      </header>
+
+      <article class="pf-doc-section">
+        <h3>Executive Summary</h3>
+        <p>The landscape of online retail demands digital storefronts that balance robust visual customization with strict performance metrics. Historically, WordPress and WooCommerce themes have struggled with this equilibrium, often achieving visual flexibility by sacrificing loading speeds—a compromise that directly degrades user experience and search engine visibility. Pickory emerges as a specialized solution to this paradigm. It is a highly optimized, developer-friendly WooCommerce theme designed to serve content with minimal overhead. By treating performance as a foundational architectural requirement rather than a post-development afterthought, Pickory caters simultaneously to the non-technical store owner requiring visual control, the developer demanding modern tooling, and automated systems (including AI indexers and search crawlers) that prioritize semantic, lightweight code structures.</p>
+        <p>This report synthesizes the fundamental elements of the Pickory architecture, verifying its claims of hyper-fast rendering, decoupled customization, and deeply integrated e-commerce capabilities. At its core, the theme's viability is anchored by the following foundational pillars:</p>
+        <ul>
+          <li><strong>Performance-First Architecture:</strong> Pickory eliminates traditional WordPress theme bloat through server-side selective asset loading, ensuring users only download the precise CSS and JavaScript required for their current page context.</li>
+          <li><strong>Decoupled Customization:</strong> The theme utilizes a slot-based header and footer system alongside an 11-tier Customizer, generating clean, server-rendered CSS rather than injecting inline styles.</li>
+          <li><strong>Native E-Commerce Subsystems:</strong> Features like the AJAX-powered mini-cart and custom product card loops are built natively from scratch, avoiding reliance on heavy third-party page builders or shortcode stacking.</li>
+          <li><strong>Developer and Privacy Centric:</strong> Pickory integrates modern build tools (Vite, Hot Module Replacement) and ensures strict GDPR compliance by bundling all typography locally.</li>
+        </ul>
+        <p>By analyzing the intersection of its selective asset delivery, PHP performance requirements, and modular ecosystem, this document provides a definitive overview of Pickory’s technical and commercial positioning in the modern e-commerce ecosystem.</p>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>The E-Commerce Performance Paradigm and Asset Architecture</h3>
+        <p>The fundamental flaw in many legacy WordPress themes is the monolithic delivery of digital assets. Standard practice dictates bundling all stylesheets, scripts, and third-party libraries into a few large files that are loaded site-wide. Loading all CSS for every visitor on every page significantly slows down the website because CSS blocks rendering; the browser prioritizes CSS processing, stopping the parsing of HTML and delaying the time to interactivity [cite: 1]. Consequently, a visitor reading a simple blog post is forced to download the JavaScript required for a complex checkout process, leaving users waiting for unnecessary resources to parse. Pickory dismantles this approach through an intelligent asset allocation system.</p>
+        
+        <h4>Selective Loading at the Server Level</h4>
+        <p>Rather than utilizing delayed execution or client-side lazy loading—where the browser is still burdened with parsing instructions it will eventually execute—Pickory employs selective loading at the server level. The server determines the specific context of the requested page (e.g., a single product page, an archive cart, or a checkout flow) before generating the HTML document.</p>
+        <p>This means that when a user navigates to the shop catalog, only the styles and scripts pertinent to the shop interface are delivered over the network. When they transition to the cart, the server injects only the cart-specific assets. By keeping CSS modular and separating it into multiple contextual files, the main render-blocking file is much smaller, reducing the initial CSS render-blocking and loading times [cite: 1, 2]. By resolving these dependencies server-side, Pickory minimizes the payload size, drastically reducing the time it takes for the browser to render the page.</p>
+        <p>Furthermore, shared utilities that are required across multiple contexts are consolidated into a single, highly optimized reusable bundle. This prevents the redundant downloading of identical code strings, striking a delicate balance between extreme compartmentalization and efficient browser caching.</p>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>Modern Build Tools and Versioning</h3>
+        <p>For the development and deployment pipelines, Pickory’s asset system is powered by Vite, a modern frontend build tool known for its exceptionally fast performance.</p>
+        <ul>
+          <li><strong>Hot Module Replacement (HMR):</strong> For developers actively modifying the theme, Vite provides HMR. This technology allows developers to see their code changes instantly reflected in the browser without requiring a full page refresh, preserving the state of the application during development.</li>
+          <li><strong>Content-Based Hashing:</strong> In production, all assets are automatically versioned using content-based hashing. The build system appends a unique alphanumeric string (a hash) to the filename based on the file's exact contents. If a file is updated, its hash changes. This allows browsers to cache files aggressively for long periods. When an update occurs, the new filename instantly bypasses the old cache, ensuring users never experience a broken interface due to stale CSS or JavaScript.</li>
+        </ul>
+        <p>Crucially, the complexity of this Vite-powered build system is entirely abstracted away from the end-user. Store owners receive production-ready, pre-compiled, and optimized files, allowing them to install and operate the theme without executing command-line scripts or managing node modules.</p>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>The Conversion-Optimized Shopping Experience</h3>
+        <p>The primary metric of success for any e-commerce platform is its conversion rate—the percentage of visitors who complete a purchase. Pickory approaches conversion rate optimization (CRO) by redesigning the default WooCommerce product displays, focusing on visual clarity, performance, and trust signals.</p>
+        
+        <h4>Reconstructed Product Cards</h4>
+        <p>The standard WooCommerce product loop often requires extensive customization or reliance on heavy page-builder plugins to achieve a modern aesthetic. Pickory replaces this default loop entirely with a custom product card system built from scratch. These product cards are structured into distinct visual hierarchies, providing the exact information a consumer needs to make a purchasing decision:</p>
+        <ul>
+          <li><strong>Badges:</strong> Dynamic indicators such as sale badges (with multiple selectable display styles) and "New" badges. The "New" badge is particularly intelligent, utilizing a configurable day threshold to automatically flag recent additions to the catalog.</li>
+          <li><strong>Optimized Thumbnails:</strong> Pickory optimizes for the Largest Contentful Paint (LCP)—a critical Core Web Vital metric. The theme automatically signals the browser to prioritize the first product image on any catalog page, while deferring (lazily loading) the remaining off-screen images.</li>
+          <li><strong>Intelligent Categorization:</strong> Each card prominently displays the primary category. To maintain consistency, Pickory includes fallback logic that integrates smoothly with popular SEO plugins, ensuring the most relevant category is always displayed.</li>
+          <li><strong>Accessible Star Ratings:</strong> Social proof is vital for sales. The cards display star ratings when reviews exist. For unrated products, the theme generates an "accessible empty-star state," which maintains visual grid consistency and is correctly labeled for screen reading software.</li>
+          <li><strong>Core Details:</strong> The title, an optional short description, pricing, and the add-to-cart mechanism are cleanly integrated.</li>
+        </ul>
+        <p>By allowing every single element of the product card to be independently toggled or configured via the WordPress Customizer, Pickory eliminates the need for shortcode stacking or third-party visual builders. This keeps the Document Object Model (DOM) shallow, further enhancing rendering speeds.</p>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>Enhancing the Single Product Interface</h3>
+        <p>The single product page is the ultimate point of decision for a consumer. Pickory extends the default WooCommerce capabilities by integrating built-in sales facilitators and trust-building mechanisms.</p>
+        <p>Like the archive pages, the main product image is automatically prioritized for LCP. The theme also introduces a global price suffix configuration (e.g., appending "per unit" or "excl. VAT" to prices), which is essential for B2B (business-to-business) or international stores requiring specific pricing clarity.</p>
+        <p>To directly address buyer hesitation, Pickory includes dedicated, customizable sections that would otherwise require additional plugins:</p>
+        <ul>
+          <li><strong>Trust Points Section:</strong> A dedicated area featuring a primary heading and up to three benefit statements (e.g., "Free Shipping," "30-Day Returns"). Store owners can select distinct icon styles to match their brand aesthetic.</li>
+          <li><strong>Payment Badges Section:</strong> A highly visible "Guaranteed Safe Checkout" strip that can display up to four payment provider logos, immediately reassuring the customer of transaction security.</li>
+          <li><strong>Third-Party Injection:</strong> A single Customizer field allows administrators to safely inject third-party badge shortcodes into both archive cards and single product pages, maintaining design integrity while integrating external review platforms.</li>
+        </ul>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>Advanced Product Filtering Ecosystem</h3>
+        <p>To further extend the shopping experience, Pickory’s architecture is designed to integrate seamlessly with the Pickory Product Filter—a specialized companion plugin engineered for large-scale catalogs. Built to handle stores with over 10,000 products, this filter subsystem bypasses expensive postmeta scans by utilizing a denormalized, flat product index table that stores the most commonly filtered fields in a single, optimized database location [cite: 3, 4].</p>
+        <p>This filtering ecosystem introduces robust capabilities without sacrificing speed, offering:</p>
+        <ul>
+          <li><strong>AJAX-Powered Interactions:</strong> Filters apply instantaneously without triggering full page reloads, utilizing debounced inputs for price sliders and search queries to prevent server overwhelming [cite: 3, 4].</li>
+          <li><strong>Diverse Input Types:</strong> Customers can narrow choices via dual-thumb price range sliders, star rating filters, custom taxonomies, and WooCommerce attributes displayed as checkboxes, radio buttons, color/image swatches, or button grids [cite: 3, 4].</li>
+          <li><strong>Caching &amp; Modern Standards:</strong> The filter supports object caching (Redis/Memcached), provides query response caching for logged-out users, and ensures URLs remain addressable (bookmarkable) so users can rely on native browser back/forward buttons [cite: 3, 4].</li>
+        </ul>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>Responsive and State-Preserving Shop Grids</h3>
+        <p>The layout of the product catalog dictates how efficiently a user can browse inventory. Pickory provides full responsive control over the shop grid, allowing administrators to dictate the exact number of columns for desktop, tablet, and mobile breakpoints directly from the Customizer. The system automatically calculates the optimum number of products per page based on these column and row settings, extending this geometric consistency to "Related Products" and "Upsell" sections.</p>
+        <p>Furthermore, Pickory incorporates a highly refined grid/list view toggle within the shop toolbar. While many themes offer this feature, they frequently suffer from layout shifts or "flickers" when a user navigates to a new page. Pickory solves this by saving the visitor's layout preference directly into their browser storage. Upon subsequent visits or page loads, the preferred layout is restored instantaneously before the initial render, ensuring a seamless, flicker-free browsing experience.</p>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>The AJAX Mini-Cart Subsystem: Reducing Friction</h3>
+        <p>Cart abandonment is a prevalent challenge in e-commerce, often exacerbated by slow, cumbersome cart interfaces. Pickory addresses this by implementing the mini-cart not as a simple dropdown, but as a comprehensive, independent subsystem.</p>
+        <p>Because interactive mini-carts can heavily tax server resources if their scripts are loaded globally, Pickory enforces strict conditional loading. If the store owner disables the mini-cart, its associated styles and scripts are entirely omitted from the page payload, resulting in zero overhead.</p>
+        <p>When enabled, the mini-cart functions as a highly interactive drawer powered by AJAX (Asynchronous JavaScript and XML). This allows the browser to communicate with the server and update the user interface without requiring a full page reload.</p>
+        <p>The mini-cart subsystem provides several advanced functionalities:</p>
+        <ul>
+          <li><strong>Seamless Updates:</strong> Adding a product instantaneously updates the cart icon badge, the calculated total, and the drawer's internal contents seamlessly.</li>
+          <li><strong>In-Drawer Management:</strong> Customers can fluidly adjust product quantities or remove items entirely from within the drawer, keeping them anchored to their current browsing context rather than forcing them to navigate to a dedicated cart page.</li>
+          <li><strong>Total Savings Indicator:</strong> A psychological driver for completing purchases is visualizing discounts. The mini-cart dynamically calculates and displays the exact financial amount a customer is saving through combined sale prices and applied coupons. If no savings apply, the indicator intelligently hides itself to avoid confusing the user.</li>
+          <li><strong>Algorithmic Recommendation Rail:</strong> To maximize the Average Order Value (AOV), the drawer features a built-in product recommendation rail. Administrators can source these suggestions from trending items, newest arrivals, discounted stock, or manually featured products. To protect performance, these dynamic results are temporarily cached and refresh automatically, preventing excessive database queries during high-traffic periods.</li>
+        </ul>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>Structural Customization: Headers, Footers, and Navigation</h3>
+        <p>The architecture of a website's header and footer is critical for both user navigation and search engine understanding. Pickory discards the rigid, hard-coded header files common in older themes, replacing them with a highly flexible, preset-driven ecosystem.</p>
+        
+        <h4>The Slot-Based Component System</h4>
+        <p>Pickory ships with three distinct header presets and three footer presets. Each operates as a standalone layout with its own highly optimized, context-specific assets. Transitioning from one preset to another completely flushes the previous configuration, ensuring that no unused CSS or structural markup from the discarded layout lingers in the code.</p>
+        <p>The foundational technology enabling this flexibility is a slot-based system, conceptually similar to component composition in modern JavaScript frameworks (like React or Vue). The structural areas of the header (top bar, main bar, sticky bar) and footer (primary area, bottom bar) are divided into configurable "slots."</p>
+        <p>Store owners dictate exactly which functional components occupy which slots. Available header components encompass logos, search bars, navigation menus, cart and account icons, wishlists, promotional links, mobile toggles, and areas for custom shortcode injection. Footer components encompass brand and contact information, navigation menus, social and app download links, legal copyright text, and payment icons.</p>
+        <p>Crucially for stability and security, Pickory applies server-side validation to these component structures. Before the HTML is generated, the server verifies that the requested components are recognized and valid. If an administrator accidentally inputs a misconfigured component via a custom function, the server simply ignores it, thereby preventing catastrophic layout corruption or broken HTML structures on the front end.</p>
+        
+        <h4>Comprehensive Menu Locations</h4>
+        <p>To support expansive e-commerce catalogs and complex site architectures, Pickory registers ten strictly dedicated menu locations. This granular control eliminates the ambiguity often associated with WordPress menu management, where a single menu is stretched to fit multiple, conflicting design contexts.</p>
+        <p>The ten discrete menu locations are structurally mapped as follows:</p>
+        <ul>
+          <li><strong>Top Bar Menus:</strong> Two distinct locations (left and right alignment) for secondary information such as currency switchers, language toggles, or contact links.</li>
+          <li><strong>Primary Header Menus:</strong> Two locations (main navigation and secondary navigation) for the primary catalog categories and critical pages.</li>
+          <li><strong>Sticky Header Menu:</strong> A specialized location for simplified navigation when the user scrolls down the page.</li>
+          <li><strong>Mobile Drawer Menu:</strong> A dedicated location specifically optimized for off-canvas touch interactions on mobile devices.</li>
+          <li><strong>Footer Menus:</strong> Three distinct columns (primary links, customer care, and legal/policy links) to organize bottom-of-page navigation comprehensively.</li>
+          <li><strong>Global Social Links:</strong> A single, synchronized menu location for social media profiles, rendering the appropriate vector icons automatically.</li>
+        </ul>
+        <p>By assigning each location to a specific, unalterable visual position within the theme's templates, administrators can manage complex site hierarchies with absolute certainty regarding where their links will appear.</p>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>Typography and Global Compliance</h3>
+        <p>Typography in web design is not merely an aesthetic choice; it is a critical intersection of performance engineering and international legal compliance. Pickory addresses this intersection definitively by eschewing external font delivery networks entirely.</p>
+        
+        <h4>Curated Font Selection</h4>
+        <p>The theme ships with nine premium font families, providing a curated spectrum of typographic styles designed to support varying brand identities, from minimalist tech catalogs to luxury editorial boutiques.</p>
+        <p>The inclusion of these specific families allows for deep customization:</p>
+        <ul>
+          <li><strong>Sans-Serif Options:</strong> Inter, Outfit, Montserrat, Roboto, Open Sans, Manrope. These are highly legible on digital displays and ideal for dense product data and user interfaces.</li>
+          <li><strong>Serif Options:</strong> Playfair Display, Lora, Merriweather. These provide a traditional, authoritative aesthetic, suited for high-end retail or long-form blog content.</li>
+        </ul>
+        <p>Administrators wield precise control over this typography through four independent slots in the Customizer: body text, primary headings, the header area, and the footer area. This zoning allows for sophisticated font pairing without requiring custom CSS.</p>
+        
+        <h4>Self-Hosting, WOFF2, and GDPR Compliance</h4>
+        <p>Historically, most WordPress themes loaded typography via external services like Google Fonts. This method generates additional DNS (Domain Name System) lookups and external HTTP requests, delaying the time it takes for text to become visible. Furthermore, loading fonts from external servers inherently exposes the visitor's IP address to a third party. Under the European Union’s GDPR (General Data Protection Regulation), exposing an IP address to third-party servers without explicit, prior consent has resulted in substantial legal fines for website owners.</p>
+        <p>Pickory completely mitigates both the performance and legal risks by ensuring all fonts are self-hosted and bundled directly within the theme’s directory. The fonts are delivered in the WOFF2 (Web Open Font Format 2) specification. WOFF2 is the most modern web font format, offering compression rates up to 30% better than its predecessors, resulting in significantly faster download speeds.</p>
+        <p>Additionally, these are "variable files"—a single font file that contains a continuous range of design variations (such as weight and slant) rather than requiring separate files for bold, italic, and regular text. Finally, Pickory preloads critical fonts, forcing the browser to download the typography before any text attempts to render on the screen. This entirely eradicates the "flash of unstyled text" (FOUT), ensuring a polished, professional aesthetic from the first millisecond of interaction, while guaranteeing absolute offline functionality and strict privacy compliance.</p>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>The Customization Engine: Global vs. Page-Level Control</h3>
+        <p>To accommodate both sitewide branding and highly specific marketing campaigns, Pickory employs a dual-layered customization strategy. It offers robust global settings governed by a meticulously organized Customizer, balanced by granular, per-page override capabilities.</p>
+        
+        <h4>The 11-Tier Global Customizer</h4>
+        <p>The native WordPress Customizer in Pickory has been heavily expanded and structured into eleven dedicated, logical sections. This organization prevents the overwhelming "settings fatigue" often experienced with multipurpose themes.</p>
+        <p>The Customizer sections and their functional controls are delineated as follows:</p>
+        <ul>
+          <li><strong>Colors:</strong> Management of the sitewide brand color palette, generating global CSS variables for absolute consistency.</li>
+          <li><strong>Typography:</strong> Assignment of the bundled font families across the four distinct typographic zones, including responsive sizing controls.</li>
+          <li><strong>Layout:</strong> Establishment of the global architectural mode, dictating whether the site container spans full-width or remains boxed within a maximum width.</li>
+          <li><strong>Header:</strong> Selection of the active header preset and granular toggling of individual section visibility.</li>
+          <li><strong>Footer:</strong> Selection of the active footer preset and toggling of footer sections.</li>
+          <li><strong>Buttons:</strong> Configuration of global button aesthetics and visual interaction effects (e.g., implementing ripple animations on click).</li>
+          <li><strong>Shop:</strong> Deep control over the catalog interface: grid columns, rows, excerpt visibility, breadcrumb trails, page titles, and badge thresholds.</li>
+          <li><strong>Single Product:</strong> Refinement of the individual product view: price suffixes, trust points content creation, icon selection, and payment badge injection.</li>
+          <li><strong>Cart:</strong> Management of cart-specific display options and structural preferences.</li>
+          <li><strong>Account:</strong> Customization of the WooCommerce "My Account" interface and user dashboard.</li>
+          <li><strong>Blog:</strong> Structural definitions for article archives, including sidebar positioning and content layout styles.</li>
+        </ul>
+        <p>A critical engineering detail of Pickory’s Customizer is its output method. When a user modifies a setting (e.g., changing a primary color), the theme does not scatter inline style attributes throughout the HTML document. Inline styles inflate DOM size and create specificity nightmares for developers. Instead, Pickory processes the Customizer data and outputs clean, consolidated, server-rendered CSS, maintaining pristine code hygiene.</p>
+        
+        <h4>Strict Page-Level Override Hierarchy</h4>
+        <p>While global settings ensure consistency, e-commerce platforms often require specialized layouts for unique landing pages or promotional campaigns. Pickory provides page-level control directly within the WordPress editor interface.</p>
+        <p>Administrators can apply specific overrides to individual pages, including:</p>
+        <ul>
+          <li><strong>Layout Override:</strong> A page can be independently switched between the default, full-width, boxed, or a distraction-free "narrow" mode.</li>
+          <li><strong>Title Visibility:</strong> The standard page title heading can be hidden to allow full creative control over the top-of-page content.</li>
+          <li><strong>Vertical Padding:</strong> Top and bottom spacing can be entirely removed, a critical requirement for creating edge-to-edge, immersive block-based designs.</li>
+        </ul>
+        <p>To prevent conflicting instructions, Pickory operates on a strict, mathematically predictable override hierarchy. If a page-level setting is defined in the post meta, it takes absolute precedence. If no page-level setting exists, the global Customizer value is applied. If the Customizer value has not been configured, the system falls back to a sensibly coded default. This three-layered architecture—Page Meta &gt; Customizer &gt; Core Default—ensures zero ambiguity in how the site will render, providing a predictable environment for both AI indexers and human developers.</p>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>Native Integration: WordPress Block Editor Compatibility</h3>
+        <p>The trajectory of WordPress development has definitively shifted away from classic WYSIWYG editors and bulky, proprietary third-party page builders (such as Elementor or WPBakery) toward native block-based editing (Project Gutenberg). Recognizing this, Pickory is engineered for seamless, out-of-the-box compatibility with the WordPress Block Editor.</p>
+        <p>While the theme utilizes its own highly optimized systems for the structural headers and footers, the content area of any page or post fully leverages the native block ecosystem. This hybrid approach yields several distinct advantages:</p>
+        <ul>
+          <li><strong>Dimensional Support:</strong> Pickory natively registers support for wide and full-width block alignments, allowing users to create expansive, modern layouts without fighting the theme’s core container widths.</li>
+          <li><strong>Visual Parity:</strong> The theme meticulously matches editor styles to the frontend presentation. The typography, spacing, and colors viewed inside the WordPress backend perfectly mirror what the end-user will see, creating a true "What You See Is What You Get" authoring experience.</li>
+          <li><strong>Global Design Tokens:</strong> The visual choices made in the Pickory Customizer (colors, font sizes, spacing) are abstracted into global design tokens (CSS variables). These tokens are then injected directly into the Block Editor, ensuring that any native block utilizes the exact brand guidelines established by the store owner.</li>
+          <li><strong>Custom Block Styles &amp; Patterns:</strong> Pickory extends native blocks by registering custom block styles, providing additional visual permutations specifically tailored for e-commerce contexts. Furthermore, the theme includes a library of standard block patterns—pre-designed clusters of blocks that can be inserted into a page with a single click to rapidly assemble complex layouts.</li>
+        </ul>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>Extensibility and Developer Experience (DevX)</h3>
+        <p>While Pickory is highly accessible to non-technical store owners, its underlying architecture is built to serve as a robust foundation for professional developers and agencies who need to heavily customize or extend the platform. The Developer Experience (DevX) is centered around modularity, security, and modern workflow tooling.</p>
+        
+        <h4>Modular Architecture and the Component System</h4>
+        <p>Pickory rejects the monolithic file structures of older themes, a paradigm where tightly coupled dependencies mean a failure in one element can cause a chain reaction corrupting the entire application [cite: 5]. Instead, the codebase is strictly modular, behaving more like a decoupled architecture where elements are interconnected but stand on independent foundations [cite: 5, 6, 7]. Each major subsystem—the AJAX cart, the product card rendering loops, the preset engines, the asset compilers, and the settings API—resides in its own isolated file or directory structure. This adherence to the principle of "single responsibility" makes the codebase highly navigable for developers; modifying the cart logic does not run the risk of inadvertently breaking the header layout.</p>
+        <p>Furthermore, the components that make up the headers, footers, and layout types are entirely filterable using standard WordPress hooks. A developer building a highly bespoke client site can register a completely new custom component (e.g., a real-time stock ticker or a specialized B2B login portal) and inject it into Pickory’s slot-based system without ever modifying the parent theme’s core files.</p>
+        <p>Child theme support is comprehensive and first-class. A developer can create a child theme to introduce entirely new header or footer presets by simply adding a JSON layout definition file. The parent theme dynamically reads this file and integrates the new preset into the Customizer GUI effortlessly.</p>
+        
+        <h4>Security, Debugging, and Tooling</h4>
+        <p>In an e-commerce environment, security and stability are non-negotiable. Pickory adheres to strict WordPress coding standards and security protocols:</p>
+        <ul>
+          <li><strong>Data Integrity:</strong> All user input is rigorously sanitized before being saved to the database, neutralizing malicious code injection. All output is escaped late (just before rendering), preventing Cross-Site Scripting (XSS) vulnerabilities.</li>
+          <li><strong>AJAX Security:</strong> Every AJAX endpoint within the theme (such as those powering the mini-cart) is secured via nonce protection (Number Used Once), authenticating the origin of the request and preventing Cross-Site Request Forgery (CSRF).</li>
+          <li><strong>Pre-configured Tooling:</strong> For agencies, the theme ships with pre-configured static analysis and linting tooling. This allows development teams to automatically check their custom code against syntax and logic errors before deployment.</li>
+          <li><strong>Explicit Debugging:</strong> When placed into development mode, Pickory alters its error-handling behavior. Instead of failing silently and presenting a blank white screen, the debug mode surfaces explicit, highly detailed error messages. If a required asset manifest is missing due to a build failure, the loader exits gracefully and instructs the developer on exactly what failed and why.</li>
+        </ul>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>Accessibility and Internationalization</h3>
+        <p>A modern digital storefront must be accessible to all users, regardless of disability or geographic location. Pickory integrates comprehensive accessibility features and internationalization support at the structural level.</p>
+        <p>To ensure compliance with global accessibility standards, Pickory features proper semantic heading hierarchies across all templates, ensuring screen readers can logically map the document outline. All interactive elements (such as the custom quantity adjusters or the mini-cart toggles) are outfitted with required screen reader labels (ARIA attributes). Furthermore, all interactive controls are fully navigable via keyboard, ensuring users who cannot operate a mouse can seamlessly browse, add to cart, and check out.</p>
+        <p>For the global market, the theme is fully translation-ready. It features complete internationalization (i18n) coverage across all strings of text, allowing for rapid deployment of multilingual stores using standard translation files (.po/.mo) or compatible plugins.</p>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>Technical Requirements and Core Components</h3>
+        <p>To guarantee the high-performance baselines engineered into Pickory, the hosting environment must meet specific modern criteria.</p>
+        
+        <h4>System Requirements</h4>
+        <p>The theme operates under the following technical prerequisites, ensuring maximum security and execution speed:</p>
+        <ul>
+          <li><strong>WordPress Version 6.6+:</strong> Ensures compatibility with modern block editor APIs and core performance enhancements.</li>
+          <li><strong>WooCommerce Required:</strong> Pickory is a dedicated e-commerce platform; its core logic relies heavily on WooCommerce data structures.</li>
+          <li><strong>PHP Version 8.0+:</strong> Modern PHP versions provide massive improvements in execution speed and memory management over legacy versions like PHP 7.4. Server-level benchmarking demonstrates that upgrading from PHP 7.4 to 8.0 reduces mean processing times drastically from 91.7 ms to 67.1 ms [cite: 8]. Pushing further, PHP 8.3 handles 169 requests per second—a substantial increase from the 149 requests per second managed by PHP 7.4 (an over 13% improvement)—and standard WooCommerce deployments see a ~21% performance increase on PHP 8.4 [cite: 9, 10].</li>
+        </ul>
+        
+        <h4>Comprehensive Feature Summary</h4>
+        <p>When deployed, Pickory provides a complete suite of professional e-commerce tools built directly into the core theme, heavily reducing reliance on third-party plugins:</p>
+        <ul>
+          <li>Three standalone header presets featuring drag-and-drop structural component slots.</li>
+          <li>Three robust footer presets with highly configurable information sections.</li>
+          <li>Nine bundled, self-hosted WOFF2 font families ensuring total GDPR compliance.</li>
+          <li>A comprehensive suite of optimized store templates covering the shop catalog, single product views, cart interface, checkout flow, user account dashboards, and the dynamic mini-cart.</li>
+          <li>An 11-section global Customizer providing real-time visual previews of all configuration changes.</li>
+          <li>An integrated AJAX-powered mini-cart subsystem featuring real-time savings calculations, in-drawer quantity management, and an algorithmic product recommendation rail.</li>
+          <li>A visual admin layout builder for structuring the slot-based components.</li>
+          <li>Flawless compatibility with the WordPress native Block Editor, integrating global design tokens.</li>
+          <li>Translation-ready language files for immediate internationalization.</li>
+          <li>Comprehensive technical and user documentation supporting both setup and advanced development.</li>
+        </ul>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>Pricing, Availability, and Market Context</h3>
+        <p>While precise real-time pricing figures, licensing models (e.g., single-site versus unlimited agency tiers), and direct purchasing availability for the core Pickory theme are currently unavailable in the provided data, analyzing its ecosystem provides a clear market context. The companion Pickory Product Filter plugin is freely accessible via the official WordPress plugin repository, indicating a likely freemium or deeply integrated ecosystem model [cite: 3, 4, 11].</p>
+        <p>Understanding where Pickory fits in the market requires defining its target audience:</p>
+        <ul>
+          <li><strong>Ideal Users:</strong> Performance-focused development agencies, technically mindful store owners seeking aggressive Core Web Vitals scores, and catalogs requiring robust, latency-free filtering (up to 10,000+ products).</li>
+          <li><strong>Anti-Use Cases:</strong> Pickory is expressly not suited for non-e-commerce websites (as it fundamentally relies on WooCommerce data structures) or users who absolutely demand heavy, visual, drag-and-drop page builders (like Elementor) to construct global header and footer architectures, as doing so bypasses Pickory's optimized preset slots.</li>
+          <li><strong>Market Reception:</strong> As of its current lifecycle stage, the ecosystem is highly specialized and emerging. The companion plugin currently registers "Fewer than 10 active installations" on the WordPress repository, highlighting that it is a newly introduced, niche performance tool aimed at early adopters and modern developers [cite: 3, 4, 11].</li>
+        </ul>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>Migration and Deployment Logistics</h3>
+        <p>For existing e-commerce stores migrating to Pickory from a legacy theme, a structured deployment process is necessary due to the architectural differences:</p>
+        <ul>
+          <li><strong>Staging Environment Preparation:</strong> Store owners must clone their live database to a staging environment before deploying Pickory, as swapping themes directly on a live WooCommerce site carries extreme risk.</li>
+          <li><strong>Plugin Auditing and Deprecation:</strong> Administrators must actively disable redundant third-party plugins that previously handled features now natively managed by Pickory (e.g., mini-cart plugins, font loaders, dedicated mobile menu plugins). Failing to do so will result in script conflicts and negate the performance benefits of the theme.</li>
+          <li><strong>Header/Footer Slot Reconfiguration:</strong> Because Pickory utilizes a dynamic preset and slot system, existing WordPress menu assignments and widget placements will not automatically transfer. Administrators must manually rebuild their navigation structures into Pickory’s 10 dedicated menu locations.</li>
+          <li><strong>PHP Optimization:</strong> Server administrators must ensure the hosting environment is updated to at least PHP 8.0, with OPcache correctly configured to maximize the speed of the server-side rendering logic.</li>
+        </ul>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>Future Outlook: The Trajectory of Performance-First Architecture</h3>
+        <p>The broader WordPress ecosystem is currently navigating a protracted transition toward Full Site Editing (FSE) and block-based architectures. Pickory’s methodology aligns with this trajectory by decoupling structural elements (headers/footers) into independent, highly optimized subsystems while fully supporting the native content block editor.</p>
+        <p>As automated search engine indexers (such as Googlebot) increasingly prioritize semantic HTML, minimal DOM depth, and instant Core Web Vitals metrics over purely visual complexity, monolithic legacy themes will face obsolescence. Pickory's approach—enforcing selective asset loading at the server level, decoupling customization from the HTML output, and prioritizing native functionality over plugin reliance—represents the necessary evolution of commercial WordPress themes. By stripping away runtime bloat, it ensures that the technical infrastructure actively facilitates, rather than hinders, the primary goal of online retail: user conversion.</p>
+      </article>
+
+      <article class="pf-doc-section pf-faq">
+        <h3>Contextualizing the Platform (Frequently Asked Questions)</h3>
+        <dl>
+          <dt>Operational Dependency on WooCommerce</dt>
+          <dd>Pickory is strictly purpose-built for online retail. The core architecture is deeply intertwined with WooCommerce, which is an absolute requirement for the theme to function. It cannot be used as a standard blogging or portfolio theme without the WooCommerce plugin active.</dd>
+          
+          <dt>Compatibility with Third-Party Page Builders</dt>
+          <dd>While designed to eliminate the need for heavy page builders (like Elementor or Divi), Pickory does not actively block them. However, its isolated architecture means global header and footer presets are managed by the theme itself, while internal page content remains agnostic and can be constructed via any third-party editor if desired.</dd>
+          
+          <dt>Extensibility of Structural Components</dt>
+          <dd>The header and footer slot system is highly extensible via standard WordPress filter hooks, allowing developers to register and insert entirely new, custom-coded components into the visual layout engine.</dd>
+          
+          <dt>Resilience of the Build System</dt>
+          <dd>The theme ships exclusively with pre-built, production-ready files. If an internal asset manifest goes missing or a compiled file is accidentally deleted, the selective loader is programmed to exit gracefully and report the issue in debug mode, rather than crashing the site architecture silently.</dd>
+          
+          <dt>Support for Customization via Child Themes</dt>
+          <dd>Pickory fully supports child themes, allowing developers to inject new header and footer presets (via JSON configurations), securely override core template files, and extend structural components without altering the parent theme's source code.</dd>
+        </dl>
+      </article>
+
     </div>
   </section>
 </main>

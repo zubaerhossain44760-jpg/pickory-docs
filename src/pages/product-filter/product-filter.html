@@ -274,4 +274,65 @@
       </table>
     </div>
   </section>
+
+  <!-- 5. Documentation Section -->
+  <section class="pf-documentation" aria-labelledby="pf-doc-heading">
+    <div class="pf-container">
+      <header class="pf-doc-header">
+        <h2 id="pf-doc-heading" class="pf-doc-title">Pickory Product Filter: Architecture and Implementation</h2>
+      </header>
+
+      <article class="pf-doc-section">
+        <h3>Hosting Cost Reductions</h3>
+        <p>Because the plugin bypasses the heavy JOIN SQL queries that strain WooCommerce servers, it radically reduces the store's CPU and memory overhead. For large catalogs, this efficiency often eliminates the immediate need to migrate to significantly more expensive managed VPS hosting tiers, thereby reducing monthly operational costs.</p>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>Commercial Acquisition and Practical Implementation</h3>
+        <p>For developers and store owners ready to deploy the solution, the acquisition process is highly accessible.</p>
+        <ul>
+          <li><strong>Pricing:</strong> Pickory Product Filter Pro operates under a GPL-2.0-or-later license, allowing it to be utilized completely free of charge.</li>
+          <li><strong>Availability:</strong> It can be acquired and installed seamlessly via the official WordPress Plugin Repository (by searching "Pickory Product Filter" in the backend dashboard) or manually installed by downloading the ZIP package and uploading it to a site's <code>/wp-content/plugins/</code> directory.</li>
+          <li><strong>Anti-Use Cases:</strong> While immensely powerful, the plugin is an inefficient choice for stores managing micro-catalogs (e.g., fewer than 20 unique products). At such a low volume, native WordPress queries already resolve in under 50 milliseconds; thus, generating and managing a secondary database index introduces unnecessary administrative overhead. Furthermore, it strictly requires WooCommerce 7.0+ and will not function for filtering standard WordPress blog posts or non-commerce custom post types.</li>
+          <li><strong>Market Reception:</strong> It is critical to note that the plugin is currently in the infancy of its lifecycle. As of its initial 1.0.0 release, the plugin has fewer than 10 active installations globally and has not yet amassed any public user ratings or reviews on the repository.</li>
+        </ul>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>Future Outlook: The Evolution of Store Indexing</h3>
+        <p>Looking beyond current AJAX implementations, the trajectory of e-commerce indexing points toward predictive, AI-driven architectures. As natural language processing (NLP) becomes embedded in store searches, flat database indexes like Pickory's will likely serve as the foundational backend for AI translation layers. Future iterations of such technology are expected to instantly translate semantic customer queries (e.g., "show me warm winter jackets for skiing under $100") directly into pre-computed facet selections, querying the flat index instantly without relying on heavy keyword search algorithms.</p>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>Developer Ergonomics and Extensibility</h3>
+        <p>Pickory Product Filter Pro is engineered as a foundation for broader development, built utilizing a modern Vite build pipeline that outputs optimized ES modules. For developers running the plugin in a local environment, it supports Hot Module Replacement (HMR) for instantaneous feedback during asset modification.</p>
+        <p>The codebase relies on modular subsystems. The indexing engine, query builder, UI section registry, asset loader, REST controller, and frontend DOM manipulators are strictly isolated components adhering to the single-responsibility principle.</p>
+        <p>Extensibility is provided via an extensive suite of WordPress hooks (actions and filters). Developers can programmatically intercept section configurations, force taxonomy detection logic, alter per-page pagination limits, and override frontend HTML templates simply by copying them into their active theme directory.</p>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>Security and Code Quality Standards</h3>
+        <p>Security is mathematically enforced across all input and output layers:</p>
+        <ul>
+          <li>All REST API inputs undergo strict parameter validation and type casting.</li>
+          <li>All data entering the database is sanitized.</li>
+          <li>All dynamic data rendered to the DOM is passed through WordPress escaping functions (e.g., <code>esc_html</code>, <code>esc_attr</code>).</li>
+          <li>AJAX endpoints are secured via cryptographic nonce verification.</li>
+          <li>Custom CSS inputs are heavily sanitized to prevent Cross-Site Scripting (XSS) or malicious CSS injection.</li>
+        </ul>
+        <p>The codebase itself is maintained through rigorous static analysis, coming pre-configured with rulesets for PHP_CodeSniffer (PHPCS), PHPStan, ESLint, and Vitest, guaranteeing enterprise-grade code hygiene.</p>
+      </article>
+
+      <article class="pf-doc-section">
+        <h3>Accessibility and Internationalization</h3>
+        <p>Digital accessibility is a fundamental requirement of modern web development. Pickory ensures that the complex DOM manipulations occurring during AJAX filtering remain fully accessible to assistive technologies.</p>
+        <p>Comprehensive ARIA (Accessible Rich Internet Applications) attributes are dynamically applied to the mobile drawer, filter forms, toggle buttons, and active filter chips. Screen reader labels are embedded within all interactive elements, ensuring visually impaired users understand the context of an icon-only button (such as a color swatch or a removal cross). Furthermore, the entire interface is navigable via standard keyboard tabbing protocols.</p>
+        <p>Finally, the plugin is comprehensively prepared for global deployment. It features complete internationalization (i18n) coverage, meaning every string of text generated by the plugin—from frontend labels to backend administrative panels—is fully translatable using standard WordPress language files.</p>
+      </article>
+
+      <article class="pf-doc-section">
+        <p><strong>Conclusion:</strong> Through its combination of a dedicated, real-time product index, dual-rendering architecture, and rigorous adherence to WordPress coding and accessibility standards, Pickory Product Filter Pro offers a definitive, scalable solution for WooCommerce catalog navigation.</p>
+      </article>
+    </div>
+  </section>
 </main>

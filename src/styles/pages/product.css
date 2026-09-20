@@ -112,12 +112,8 @@
 .pf-mockup-window,
 .pf-app-window,
 .pf-window {
-  background-color: var(--bg-canvas-dark, #0b1329);
-  border: 1px solid var(--border-subtle-alpha, rgba(255, 255, 255, 0.12));
-  border-bottom: none;
   border-radius: var(--radius-lg, 12px) var(--radius-lg, 12px) 0 0;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
 }
 
 /* Window Header Bar */
@@ -197,9 +193,11 @@
 .pf-app-preview-wrap {
   position: relative;
   width: 100%;
-  background-color: var(--bg-canvas-dark, #0b1329);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
   overflow: hidden;
   display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 1rem);
   align-items: center;
   justify-content: center;
 }

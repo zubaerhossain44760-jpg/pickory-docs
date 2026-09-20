@@ -370,7 +370,10 @@
     if (!leftNavTree || !dynamicList) return;
 
     const leftNavItems = Array.from(leftNavTree.querySelectorAll('.doc-nav-item'));
-    const sectionIds = Object.keys(SECTION_CONTEXT_TOPICS);
+    const sectionIds = leftNavItems.map(item => {
+      const link = item.querySelector('.doc-nav-link');
+      return link && link.getAttribute('href').startsWith('#') ? link.getAttribute('href').substring(1) : null;
+    }).filter(Boolean);
     const sectionElements = sectionIds.map((id) => document.getElementById(id)).filter(Boolean);
 
     let activeSectionId = null;
@@ -486,7 +489,7 @@
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const sectionId = entry.target.id;
-          if (sectionId && SECTION_CONTEXT_TOPICS[sectionId]) {
+          if (sectionId) {
             syncActiveSection(sectionId);
           }
         }

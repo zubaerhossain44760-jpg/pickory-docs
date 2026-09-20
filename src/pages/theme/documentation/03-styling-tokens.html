@@ -57,14 +57,79 @@
           </div>
 
           <div class="doc-content-block">
-            <h3 class="doc-subsection-title" id="theme-subtopic-2-2">2.2 CSS Containment &amp; CLS Protection</h3>
+            <h3 class="doc-subsection-title" id="theme-subtopic-2-2">2.2 Breakpoints &amp; Typography</h3>
+            <p class="doc-paragraph">
+              Fluid typography scales and layout breakpoints eliminate abrupt layout reflows across devices:
+            </p>
+
+            <div class="doc-table-container">
+              <table class="doc-data-table">
+                <thead>
+                  <tr>
+                    <th>Breakpoint / Type Token</th>
+                    <th>CSS Value</th>
+                    <th>Application Scope</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>--theme-breakpoint-sm</code></td>
+                    <td><code>640px</code></td>
+                    <td>Mobile handset landscape / small tablets.</td>
+                  </tr>
+                  <tr>
+                    <td><code>--theme-breakpoint-md</code></td>
+                    <td><code>768px</code></td>
+                    <td>Tablet portrait; switches shop grid to two-column flow.</td>
+                  </tr>
+                  <tr>
+                    <td><code>--theme-breakpoint-lg</code></td>
+                    <td><code>1024px</code></td>
+                    <td>Desktop breakpoint; displays sticky facet sidebar.</td>
+                  </tr>
+                  <tr>
+                    <td><code>--theme-breakpoint-xl</code></td>
+                    <td><code>1280px</code></td>
+                    <td>Wide monitors; four-column archive catalog grid.</td>
+                  </tr>
+                  <tr>
+                    <td><code>--theme-font-family</code></td>
+                    <td><code>InterVariable, sans-serif</code></td>
+                    <td>High-legibility variable font system with zero FOUT.</td>
+                  </tr>
+                  <tr>
+                    <td><code>--theme-text-product-title</code></td>
+                    <td><code>clamp(0.9375rem, 1.2vw, 1.0625rem)</code></td>
+                    <td>Fluid clamp formula preventing title truncation.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="doc-content-block">
+            <h3 class="doc-subsection-title" id="theme-subtopic-2-3">2.3 CSS Containment &amp; CLS Protection</h3>
             <p class="doc-paragraph">
               To guarantee high Google PageSpeed scores, product cards implement CSS containment (<code>contain: layout style;</code>) and explicit image aspect-ratio placeholders. This prevents cumulative layout shifts when product images lazy-load:
             </p>
 
             <div class="code-window">
               <div class="code-window-header">
-                <span class="code-window-title">assets/css/woocommerce.css — Containment & Aspect-Ratio</span>
+                <div class="code-window-controls">
+                  <span class="code-window-dot code-window-dot--red"></span>
+                  <span class="code-window-dot code-window-dot--yellow"></span>
+                  <span class="code-window-dot code-window-dot--green"></span>
+                </div>
+                <div class="code-window-meta">
+                  <span class="code-window-filename">assets/css/woocommerce.css</span>
+                  <button type="button" class="copy-btn" aria-label="Copy CSS snippet">
+                    <svg class="copy-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25v-7.5Z"/>
+                      <path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25v-7.5Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25h-7.5Z"/>
+                    </svg>
+                    <span class="copy-text">Copy</span>
+                  </button>
+                </div>
               </div>
               <pre class="code-block"><code class="language-css">.pickory-product-card {
   contain: layout style;
